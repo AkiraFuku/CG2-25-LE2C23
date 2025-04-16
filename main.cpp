@@ -2,9 +2,17 @@
 #include<cstdint>
 #include<string>
 #include<format>
-void Log(const std::string& message) {
-   
+#include<filesystem>
+#include<fstream>
+#include<chrono>
+//void Log(const std::string& message) {
+//   
+//    OutputDebugStringA(message.c_str());
+//}
+void Log(std::ofstream& os, const std::string& message) {
+    os << message << std::endl;
     OutputDebugStringA(message.c_str());
+
 }
 std::wstring ConvertString(const std::string& str) {
     if (str.empty()) {
@@ -48,13 +56,25 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 std::wstring wstr = L"Hello,DirectX!";
 //winmain
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
-    //ウィンドウのサイズ
-    const int32_t kClientWidth = 1280;
-    const int32_t kClientHeight = 720;
+   
+    //ログ出力用のディレクトリを作成
+    std::filesystem::create_directory("logs");
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::chrono::time_point<std::chrono::system_clock,std::chrono::seconds>
+        nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    std::chrono::zoned_time localTime{
+        std::chrono::current_zone(),
+        nowSeconds
+    };
+    std::string dataString = std::format(
+        "{:%Y%m%d_%H%M%S}",
+        localTime
+    );
+    std::string logFilePath = std::string("logs/") + dataString + ".log";
+    //ファイルへの書き込み
+    std::ofstream logStream(logFilePath);
 
-    RECT wrc = { 0, 0, kClientWidth, kClientHeight };
 
-    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
 
     WNDCLASS wc={};
     //ウィンドウプロシージャ
@@ -69,8 +89,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     RegisterClass(&wc);
 	// Output
    // Log("Hello,DirectX!\n");
-    Log(ConvertString(std::format( L"WSTRING{}\n",wstr)));
+    Log(logStream,ConvertString( std::format( L"WSTRING{}\n",wstr)));
+
 	//OutputDebugStringA("Hello,DirectX!\n");
+    // //ウィンドウのサイズ
+    const int32_t kClientWidth = 1280;
+    const int32_t kClientHeight = 720;
+
+    RECT wrc = { 0, 0, kClientWidth, kClientHeight };
+
+    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
       HWND hwnd = CreateWindow(
             wc.lpszClassName,//クラス名
             L"CG2",
