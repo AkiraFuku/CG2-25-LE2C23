@@ -160,8 +160,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
          nullptr
      );
       //
-      uint32_t* p = nullptr;
-      *p = 100;
+      
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
