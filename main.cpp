@@ -15,6 +15,7 @@
 #pragma comment(lib,"Dbghelp.lib")
 
 
+
 void Log(std::ofstream& os, const std::string& message) {
     os << message << std::endl;
     OutputDebugStringA(message.c_str());
@@ -170,6 +171,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //
             assert(SUCCEEDED(hr));
 
+#ifdef _DEBUG
+
+            //デバッグレイヤーの有効化
+            ID3D12Debug1* debugController = nullptr;
+            if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))){
+                debugController->EnableDebugLayer();
+                //デバッグレイヤーの詳細な情報を取得
+                debugController->SetEnableGPUBasedValidation(TRUE);
+
+            }
+          
+#endif // _DEBUG
+
+
             //アダプターの作成
             IDXGIAdapter4* useAdapter = nullptr;
             //良い順番のアダプターを探す
@@ -289,6 +304,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &rtvDesc,
                 rtvHandles[1]
             );
+
       //
       
 
@@ -299,6 +315,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else{
+            ////
+
             //backBufferIndexを取得
             UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
             //
@@ -327,6 +345,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //コマンドリストをリセット
             hr = commandList->Reset(commandAllocator, nullptr);
             assert(SUCCEEDED(hr));
+            /////
 
         }
        
