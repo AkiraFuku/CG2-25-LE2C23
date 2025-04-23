@@ -299,8 +299,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else{
-
-
+            //backBufferIndexを取得
+            UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+            //
+            commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], FALSE, nullptr);
+            //
+            //クリアカラー
+            float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };
+            //
+            commandList->ClearRenderTargetView(
+                rtvHandles[backBufferIndex],
+                clearColor,
+                0,
+                nullptr
+            );
+            //コマンドリストをクローズ
+            hr = commandList->Close();
+            assert(SUCCEEDED(hr));
+            //GPUにコマンドリストを実行
+            ID3D12CommandList* commandLists[] = { commandList };
+            commandQueue->ExecuteCommandLists(1, commandLists);
+            //スワップチェーンをフリップ
+            swapChain->Present(1, 0);
+            //コマンドアロケーターをリセット
+            hr = commandAllocator->Reset();
+            assert(SUCCEEDED(hr));
+            //コマンドリストをリセット
+            hr = commandList->Reset(commandAllocator, nullptr);
+            assert(SUCCEEDED(hr));
 
         }
        
