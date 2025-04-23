@@ -229,7 +229,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 IID_PPV_ARGS(&commandList)
             );
             assert(SUCCEEDED(hr));
-                
+            //スワップチェーンの作成
+            IDXGISwapChain4* swapChain = nullptr;
+            DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+            swapChainDesc.Width = kClientWidth;//画像の幅
+            swapChainDesc.Height = kClientHeight;//画像の高さ
+            swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
+            swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
+            swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//レンダリングターゲットとして使用
+            swapChainDesc.BufferCount = 2;//バッファの数
+            swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//写したら破棄
+            // コマンドキュー,ウィンドウハンドル、設定して生成
+            hr = dxgiFactory->CreateSwapChainForHwnd(
+                commandQueue,
+                hwnd,
+                &swapChainDesc,
+                nullptr,
+                nullptr,
+                reinterpret_cast<IDXGISwapChain1**>(&swapChain)
+            );
+            assert(SUCCEEDED(hr));
+
       //
       
 
