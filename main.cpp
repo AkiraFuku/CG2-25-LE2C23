@@ -250,6 +250,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
 
+            //ディスクプリプターヒープの作成
+            ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+            D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+            rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;//レンダリングターゲットビュー
+            rtvDescriptorHeapDesc.NumDescriptors = 2;//バッファの数
+            hr = device->CreateDescriptorHeap(
+                &rtvDescriptorHeapDesc,
+                IID_PPV_ARGS(&rtvDescriptorHeap)
+            );
+            assert(SUCCEEDED(hr));
       //
       
 
