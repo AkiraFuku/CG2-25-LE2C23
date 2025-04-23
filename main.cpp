@@ -214,7 +214,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &commandQueueDesc,
                 IID_PPV_ARGS(&commandQueue));
             assert(SUCCEEDED(hr));
-
+            //コマンドアロケーターの作成
+            ID3D12CommandAllocator* commandAllocator = nullptr;
+            hr = device->CreateCommandAllocator(
+                D3D12_COMMAND_LIST_TYPE_DIRECT,
+                IID_PPV_ARGS(&commandAllocator));
+            assert(SUCCEEDED(hr));
+            //コマンドリストの作成
+            ID3D12GraphicsCommandList* commandList = nullptr;
+            hr =device->CreateCommandList(
+                0,
+                D3D12_COMMAND_LIST_TYPE_DIRECT,
+                commandAllocator, nullptr,
+                IID_PPV_ARGS(&commandList)
+            );
+            assert(SUCCEEDED(hr));
+                
       //
       
 
