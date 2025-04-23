@@ -159,17 +159,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
          wc.hInstance,
          nullptr
      );
-      //
-      
 
-    MSG msg{};
-    while (msg.message != WM_QUIT) {
-        //メッセージがある限りGetMessageを呼び出す
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        } else{
-            //ウィンドウを表示
+
+                  //ウィンドウを表示
             ShowWindow(hwnd, SW_SHOW);
             // DXGIファクトリーの作成
             IDXGIFactory7* dxgiFactory = nullptr;
@@ -215,6 +207,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             }
             assert(device!=nullptr);
             Log(logStream, "Complete create D3D12Device!!!\n" );
+            //コマンドキューの作成
+            ID3D12CommandQueue* commandQueue = nullptr;
+            D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+            hr = device->CreateCommandQueue(
+                &commandQueueDesc,
+                IID_PPV_ARGS(&commandQueue));
+            assert(SUCCEEDED(hr));
+
+      //
+      
+
+    MSG msg{};
+    while (msg.message != WM_QUIT) {
+        //メッセージがある限りGetMessageを呼び出す
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        } else{
+
+
+
         }
        
     }
