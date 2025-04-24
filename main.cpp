@@ -222,6 +222,38 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             }
             assert(device!=nullptr);
             Log(logStream, "Complete create D3D12Device!!!\n" );
+#ifdef _DEBUG
+            ID3D12InfoQueue* infoQueue = nullptr;
+            if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+            {
+                ///深刻なエラーを出力・停止
+                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+                ///エラーを出力・停止
+                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+                ///警告を出力/停止
+                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
+                ///解放
+                infoQueue->Release();
+                //メッセージID
+                D3D12_MESSAGE_ID denyIds[]={
+                    D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
+
+                };
+                //
+                D3D12_MESSAGE_SEVERITY severities[]={D3D12_MESSAGE_SEVERITY_INFO};
+                D3D12_INFO_QUEUE_FILTER filter{};
+                filter.DenyList.NumIDs = _countof(denyIds);
+                filter.DenyList.pIDList = denyIds;
+                filter.DenyList.NumSeverities = _countof(severities);
+                filter.DenyList.pSeverityList = severities;
+                //
+                infoQueue->PushStorageFilter(&filter);
+
+            }
+           
+
+#endif // _DEBUG
+
             //コマンドキューの作成
             ID3D12CommandQueue* commandQueue = nullptr;
             D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
