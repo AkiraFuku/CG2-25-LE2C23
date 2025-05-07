@@ -337,8 +337,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 rtvHandles[1]
             );
 
-      //
-      
+      //fenceのさくせい
+            ID3D12Fence* fence = nullptr;
+            uint64_t fenceValue = 0;
+            hr = device->CreateFence(
+                fenceValue,
+                D3D12_FENCE_FLAG_NONE,
+                IID_PPV_ARGS(&fence)
+            );
+            assert(SUCCEEDED(hr));
+            HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            assert(fenceEvent != nullptr);
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -377,6 +386,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 0,
                 nullptr
             );
+            ///
+            
+            barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+            barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+            //transitionバリアーを張る
+            commandList->ResourceBarrier(1, &barrier);
+            ///
             //コマンドリストをクローズ
             hr = commandList->Close();
             assert(SUCCEEDED(hr));
@@ -385,6 +401,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandQueue->ExecuteCommandLists(1, commandLists);
             //スワップチェーンをフリップ
             swapChain->Present(1, 0);
+            ///gpuの完了を待つ
+            fenceValue++;
+            commandQueue->Signal(fence, fenceValue);
+            ///
+            if (fence->GetCompletedValue()<fenceValue)
+            {
+
+                fence->SetEventOnCompletion(fenceValue, fenceEvent);
+                WaitForSingleObject(fenceEvent, INFINITE);
+            }
             //コマンドアロケーターをリセット
             hr = commandAllocator->Reset();
             assert(SUCCEEDED(hr));
