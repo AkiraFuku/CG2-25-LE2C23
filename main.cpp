@@ -351,7 +351,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             //backBufferIndexを取得
             UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-            //
+            ///バリアーの設定
+            D3D12_RESOURCE_BARRIER barrier{};
+            //Transitionバリアー
+            barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            //noneにする
+            barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            //バリアを得るリソース。バックアップｂufferのインデックスを取得
+            barrier.Transition.pResource = swapChainResources[backBufferIndex];
+            //遷移前（現在）のリソース状態
+            barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+            //遷移後のリソース状態
+            barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+            //transitionバリアーを張る
+            commandList->ResourceBarrier(1, &barrier);
+            ///
             commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], FALSE, nullptr);
             //
             //クリアカラー
