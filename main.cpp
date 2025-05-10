@@ -15,6 +15,8 @@
 #pragma comment(lib,"Dbghelp.lib")
 #include<dxgidebug.h>
 #pragma comment(lib,"dxguid.lib")
+#include<dxcapi.h>
+#pragma comment(lib,"dxcompiler.lib")
 
 
 
@@ -97,6 +99,80 @@ static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception){
     );
     return EXCEPTION_EXECUTE_HANDLER;
 }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="filePath"></param>
+/// <param name="profile"></param>
+/// <param name="dxcUtils"></param>
+/// <param name="dxcCompiler"></param>
+/// <param name="includeHandler"></param>
+/// <returns></returns>
+IDxcBlob* CompileShader(
+// compilerするshaderファイルのパス
+const std::wstring& filePath,
+//　compilerに使用するprofile
+const wchar_t* profile,
+//
+IDxcUtils* dxcUtils,
+IDxcCompiler3* dxcCompiler,
+IDxcIncludeHandler* includeHandler
+
+){
+    //hlslファイルの読み込み
+    Log(ConvertString(std::format(L"Bigin CompileShader, path:{},profiale:{}\n",filePath,profile)));
+    IDxcBlobEncoding* shaderSource = nullptr;
+    HRESULT hr = dxcUtils->LoadFile(
+        filePath.c_str(),
+        nullptr,
+        &shaderSource
+    );
+    assert(SUCCEEDED(hr));
+    DxcBuffer shaderSoursBuffer{};
+    shaderSoursBuffer.Ptr = shaderSource->GetBufferPointer();
+    shaderSoursBuffer.Size = shaderSource->GetBufferSize();
+    shaderSoursBuffer.Encoding = DXC_CP_ACP;
+    //compileする
+    LPCWSTR arguments[] = {
+        filePath.c_str(),
+        L"-E",L"main",
+        L"-T",profile,
+        L"-Zi",L"-Qembed_debug",
+        L"-Od",
+        L"-Zpr",
+       
+    };
+
+    IDxcResult* shaderResult = nullptr;
+    hr = dxcCompiler->Compile(
+        &shaderSoursBuffer,
+        arguments,
+        _countof(arguments),
+        includeHandler,
+        IID_PPV_ARGS(&shaderResult)
+    );
+    assert(SUCCEEDED(hr));
+
+    //警告・エラー確認
+    IDxcBlobUtf8* shaderError = nullptr;
+    shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+    if (shaderError != nullptr&&shaderError->GetStringLength()!=0) {
+        //エラーがあった場合
+        Log(shaderError->GetStringPointer());
+        assert(false);
+    }
+    //compile結果をうけとってわたす
+    IDxcBlob* shaderBlob = nullptr;
+    hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+    assert(SUCCEEDED(hr));
+    Log(ConvertString(std::format(L"Compile Succeeded, path:{},profiale:{}\n", filePath, profile)));
+    //解放
+    shaderSource->Release();
+    shaderResult->Release();
+    return shaderBlob;
+
+
+};
 
 
 
@@ -348,8 +424,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 IID_PPV_ARGS(&fence)
             );
             assert(SUCCEEDED(hr));
+            //スワップチェーンのフリップを待つためのイベント
+            //イベントオブジェクトの作成
             HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
             assert(fenceEvent != nullptr);
+            ///
+            //DXCCompileの初期化
+            IDxcUtils* dxcUtils = nullptr;
+            IDxcCompiler3* dxcCompiler = nullptr;
+            hr = DxcCreateInstance(
+                CLSID_DxcUtils,
+                IID_PPV_ARGS(&dxcUtils)
+            );
+            assert(SUCCEEDED(hr));
+            hr = DxcCreateInstance(
+                CLSID_DxcCompiler,
+                IID_PPV_ARGS(&dxcCompiler)
+            );
+            assert(SUCCEEDED(hr));
+
+            //includeに対応する為の設定
+            IDxcIncludeHandler* includeHandler = nullptr;
+            hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+            assert(SUCCEEDED(hr));
+
 
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -428,15 +526,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     CloseHandle(fenceEvent);
     fence->Release();
     rtvDescriptorHeap->Release();
+//スワップチェーンの解放
     swapChainResources[0]->Release();
     swapChainResources[1]->Release();
     swapChain->Release();
+    //コマンドリストの解放
     commandList->Release();
     commandAllocator->Release();
+    //コマンドキューの解放
     commandQueue->Release();
+    //デバイスの解放
     device->Release();
+    //アダプターの解放
     useAdapter->Release();
+    //DXGIファクトリーの解放
     dxgiFactory->Release();
+    
+    dxcCompiler->Release();
+    dxcUtils->Release();
+    //includeHandlerの解放
+    includeHandler->Release();
+    //コマンドキューの解放
+
+
+    
+
     //デバッグレイヤーの解放
 #ifdef _DEBUG
     debugController->Release();
