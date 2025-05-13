@@ -116,11 +116,13 @@ const wchar_t* profile,
 //
 IDxcUtils* dxcUtils,
 IDxcCompiler3* dxcCompiler,
-IDxcIncludeHandler* includeHandler
+IDxcIncludeHandler* includeHandler,
+std::ofstream& os
+
 
 ){
     //hlslファイルの読み込み
-    Log(ConvertString(std::format(L"Bigin CompileShader, path:{},profiale:{}\n",filePath,profile)));
+    Log(os,ConvertString(std::format(L"Bigin CompileShader, path:{},profiale:{}\n",filePath,profile)));
     IDxcBlobEncoding* shaderSource = nullptr;
     HRESULT hr = dxcUtils->LoadFile(
         filePath.c_str(),
@@ -158,14 +160,14 @@ IDxcIncludeHandler* includeHandler
     shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
     if (shaderError != nullptr&&shaderError->GetStringLength()!=0) {
         //エラーがあった場合
-        Log(shaderError->GetStringPointer());
+        Log(os,shaderError->GetStringPointer());
         assert(false);
     }
     //compile結果をうけとってわたす
     IDxcBlob* shaderBlob = nullptr;
     hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
     assert(SUCCEEDED(hr));
-    Log(ConvertString(std::format(L"Compile Succeeded, path:{},profiale:{}\n", filePath, profile)));
+    Log(os,ConvertString(std::format(L"Compile Succeeded, path:{},profiale:{}\n", filePath, profile)));
     //解放
     shaderSource->Release();
     shaderResult->Release();
@@ -429,6 +431,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
             assert(fenceEvent != nullptr);
             ///
+
             //DXCCompileの初期化
             IDxcUtils* dxcUtils = nullptr;
             IDxcCompiler3* dxcCompiler = nullptr;
@@ -519,6 +522,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             /////
 
+
         }
        
     }
@@ -549,6 +553,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //コマンドキューの解放
 
 
+
     
 
     //デバッグレイヤーの解放
@@ -562,6 +567,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
         debug->ReportLiveObjects(DXGI_DEBUG_ALL,DXGI_DEBUG_RLO_ALL);
         debug->ReportLiveObjects(DXGI_DEBUG_APP,DXGI_DEBUG_RLO_ALL);
         debug->ReportLiveObjects(DXGI_DEBUG_D3D12,DXGI_DEBUG_RLO_ALL);
+
         debug->Release();
     }
  
