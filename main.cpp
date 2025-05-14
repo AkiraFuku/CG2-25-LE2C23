@@ -175,6 +175,38 @@ std::ofstream& os
 
 
 };
+ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes){
+    //リソース用ヒープ
+            D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+            uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//アップロードヒープ
+            //リソース
+            D3D12_RESOURCE_DESC resourceDesc{};
+            //バッファリソース
+            resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            resourceDesc.Width = sizeInBytes;//リソースのサイズ
+            // バッファのサイズ
+            resourceDesc.Height = 1;
+            resourceDesc.DepthOrArraySize = 1;
+            resourceDesc.MipLevels = 1;
+            resourceDesc.SampleDesc.Count = 1;
+            //
+            resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            //リソースを作る
+            ID3D12Resource* resource = nullptr;
+           HRESULT hr = device->CreateCommittedResource(
+                &uploadHeapProperties,
+                D3D12_HEAP_FLAG_NONE,
+                &resourceDesc,
+                D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&resource)
+            );
+            assert(SUCCEEDED(hr));
+            return resource;
+
+
+};
+
 
 
 
@@ -560,32 +592,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            //頂点リソース用ヒープ
-            D3D12_HEAP_PROPERTIES uploadHeapProperties{};
-            uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//アップロードヒープ
-            //頂点リソース
-            D3D12_RESOURCE_DESC vertexResourceDesc{};
-            //バッファリソース
-            vertexResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-            vertexResourceDesc.Width = sizeof(Vector4) * 3;//リソースのサイズ
-            // バッファのサイズ
-            vertexResourceDesc.Height = 1;
-            vertexResourceDesc.DepthOrArraySize = 1;
-            vertexResourceDesc.MipLevels = 1;
-            vertexResourceDesc.SampleDesc.Count = 1;
-            //
-            vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-            //頂点リソースを作る
-            ID3D12Resource* vertexResource = nullptr;
-            hr = device->CreateCommittedResource(
-                &uploadHeapProperties,
-                D3D12_HEAP_FLAG_NONE,
-                &vertexResourceDesc,
-                D3D12_RESOURCE_STATE_GENERIC_READ,
-                nullptr,
-                IID_PPV_ARGS(&vertexResource)
-            );
-            assert(SUCCEEDED(hr));
+            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
             ///
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -621,6 +628,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             scissorRect.bottom = kClientHeight;
             ///
 
+            ///マテリアルリソース
+            ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4) );
+            //マテリアルデータの設定
+            Vector4* materialData = nullptr;
+            //書き込む為のアドレス
+            materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+            //データの設定
+            *materialData =  Vector4(1.0f, 0.0f, 0.0f, 1.0f );
 
             //コマンドリストの初期化
             
