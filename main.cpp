@@ -456,7 +456,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             D3D12_ROOT_SIGNATURE_DESC descriptionRootSignatur{};
             descriptionRootSignatur.Flags =
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-            //シリアライズしてバイナリにする
+
+            ///ルートパラメータの設定
+            D3D12_ROOT_PARAMETER rootParameters[1]{};
+            rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+            rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
+            rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+            descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
+            descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
+
+
+
+            //シリアライズしてバイナリにする;
             ID3DBlob* signatureBlob = nullptr;
             ID3DBlob* errorBlob = nullptr;
             hr = D3D12SerializeRootSignature(
@@ -469,7 +480,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 Log(logStream,reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
                 assert(false);
             }
-            //バイナリを元に生成
+            //バイナリを元にルートシグネチャー生成
             ID3D12RootSignature* rootSignature = nullptr;
             hr = device->CreateRootSignature(
                 0,
@@ -478,6 +489,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 IID_PPV_ARGS(&rootSignature)
             );
             assert(SUCCEEDED(hr));
+            
+
+
+
 
             //InputLayoutの設定
             D3D12_INPUT_ELEMENT_DESC inputElementDescs[1] = {};
