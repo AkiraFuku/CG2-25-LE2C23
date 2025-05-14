@@ -17,6 +17,8 @@
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 #include"Vector4.h"
+#include"MassFunction.h"
+
 
 
 
@@ -490,10 +492,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
             ///ルートパラメータの設定
-            D3D12_ROOT_PARAMETER rootParameters[1]{};
+            D3D12_ROOT_PARAMETER rootParameters[2]{};
             rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+            rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+            rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
+            rootParameters[1].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
             descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
             descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
@@ -637,6 +642,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //データの設定
             *materialData =  Vector4(1.0f, 0.0f, 0.0f, 1.0f );
 
+            ///WVP行列リソースの設定
+            ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+            //WVP行列データの設定
+            Matrix4x4* wvpData = nullptr;
+            //書き込む為のアドレス
+            wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+            //行列の初期化
+            *wvpData = Makeidetity4x4();
             //コマンドリストの初期化
             
 
@@ -692,10 +705,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
-            commandList->SetGraphicsRootConstantBufferView(
-                0,
-                materialResource->GetGPUVirtualAddress()
-            );
+            commandList->SetGraphicsRootConstantBufferView(0,materialResource->GetGPUVirtualAddress());
+            //WVP行列リソースの設定
+            commandList->SetGraphicsRootConstantBufferView(1,wvpResource->GetGPUVirtualAddress());
+
             //
             commandList->DrawInstanced(3, 1, 0, 0);
 
@@ -785,6 +798,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     pixelShaderBlob->Release();
     //マテリアルリソースの解放
     materialResource->Release();
+    //WVP行列リソースの解放
+    wvpResource->Release();
 
 
 
