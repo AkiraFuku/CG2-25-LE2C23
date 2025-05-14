@@ -691,6 +691,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            //マテリアルリソースの設定
+            commandList->SetGraphicsRootConstantBufferView(
+                0,
+                materialResource->GetGPUVirtualAddress()
+            );
             //
             commandList->DrawInstanced(3, 1, 0, 0);
 
@@ -776,9 +781,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
         errorBlob->Release();
     }
     //シェーダーの解放
-    rootSignature->Release();
     vertexShaderBlob->Release();
     pixelShaderBlob->Release();
+    //マテリアルリソースの解放
+    materialResource->Release();
+
 
 
     
