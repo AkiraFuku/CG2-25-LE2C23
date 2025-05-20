@@ -28,7 +28,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 /// <param name="vector"></param>
 /// <param name="matrix"></param>
 /// <returns></returns>
-Vector3  Transform(const Vector3& vector, const Matrix4x4& matrix);
+Vector3  vector3Transform(const Vector3& vector, const Matrix4x4& matrix);
 
 Matrix4x4 MakeRotateXMatrix( float radian);
 Matrix4x4 MakeRotateYMatrix( float radian);

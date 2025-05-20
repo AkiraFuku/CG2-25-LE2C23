@@ -651,7 +651,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //行列の初期化
             *wvpData = Makeidetity4x4();
             //コマンドリストの初期化
-            
+            Transform transform{{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
+            Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+           
+            ID3D12Resource* transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
+            //マテリアルデータの設定
+            //行列の初期化
+            Matrix4x4* transformatiomationMatrixDate = nullptr;
+            //書き込む為のアドレス
+            transformatiomationMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformatiomationMatrixDate));
+            //行列の初期化
+           
+
+            //  WVP行列の作成
+            Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
+            Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
+            Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+            //透視投影行列の作成
+            Matrix4x4 projectionMatirx= MakePerspectiveFovMatrix(
+                0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 100.0f
+            );
+            //ワールド行列とビュー行列とプロジェクション行列を掛け算
+            Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
+            //行列をGPUに転送
+            *transformatiomationMatrixDate = worldViewProjectionMatrix;
+
 
 
 
@@ -663,8 +687,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else{
-            ////
+            ///////
+            ///Update
+            ///////
 
+            transform.rotate.y += 0.03f;
+            Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
+            *wvpData = worldMatrix;
+
+
+
+
+
+
+
+
+            ///////
+            ///Update
+            ///////
+            ///
+            //DRAW
             //backBufferIndexを取得
             UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
             ///バリアーの設定
@@ -752,6 +794,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
         }
        
     }
+    ///
+
+
+
     //リソースの解放
     CloseHandle(fenceEvent);
     fence->Release();
@@ -800,6 +846,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     materialResource->Release();
     //WVP行列リソースの解放
     wvpResource->Release();
+    //トランスフォーム行列リソースの解放
+    transformatiomationMatrixResource->Release();
 
 
 
