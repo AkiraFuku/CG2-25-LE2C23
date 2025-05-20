@@ -18,7 +18,10 @@
 #pragma comment(lib,"dxcompiler.lib")
 #include"Vector4.h"
 #include"MassFunction.h"
-
+#include"externals/imgui/imgui.h"
+#include"externals/imgui/imgui_impl_dx12.h"
+#include"externals/imgui/imgui_impl_win32.h"
+extern IMGUI
 
 
 
@@ -208,6 +211,18 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes){
 
 
 };
+ID3D12DescriptorHeap* CreateDescriptorHeap( ID3D12Device* device,D3D12_DESCRIPTOR_HEAP_TYPE heepType,UINT numDescriptors,bool shaderVisible)
+{
+    //ディスクリプタヒープの設定
+    D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
+    heapDesc.NumDescriptors = numDescriptors;
+    heapDesc.Type = heepType;
+    heapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    ID3D12DescriptorHeap* descriptorHeap = nullptr;
+    HRESULT hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
+    assert(SUCCEEDED(hr));
+    return descriptorHeap;
+}
 
 
 
@@ -412,15 +427,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
 
             //ディスクプリプターヒープの作成
-            ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
-            D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
-            rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;//レンダリングターゲットビュー
-            rtvDescriptorHeapDesc.NumDescriptors = 2;//バッファの数
-            hr = device->CreateDescriptorHeap(
-                &rtvDescriptorHeapDesc,
-                IID_PPV_ARGS(&rtvDescriptorHeap)
-            );
-            assert(SUCCEEDED(hr));
+            ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
             //スワップチェーンからリソースをひっぱる
             ID3D12Resource* swapChainResources[2] = {nullptr};
             hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
@@ -676,6 +683,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //行列をGPUに転送
             *transformatiomationMatrixDate = worldViewProjectionMatrix;
 
+            //srvの設定
+            ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+
 
 
 
@@ -803,6 +813,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     fence->Release();
  //RTVの解放
     rtvDescriptorHeap->Release();
+
+    //SRVの解放
+    srvDescriptorHeap->Release();
 //スワップチェーンの解放
 
     swapChainResources[0]->Release();
