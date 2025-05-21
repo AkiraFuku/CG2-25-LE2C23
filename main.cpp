@@ -21,6 +21,7 @@
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
+#include"externals/DirectXTex/DirectXTex.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -231,6 +232,90 @@ ID3D12DescriptorHeap* CreateDescriptorHeap( ID3D12Device* device,D3D12_DESCRIPTO
     return descriptorHeap;
 }
 
+DirectX::ScratchImage LoadTexture(const std::string& filePath)
+{
+    //テクスチャの読み込み
+    DirectX::ScratchImage image{};
+    std::wstring filePathW= ConvertString(filePath);
+    HRESULT hr = DirectX::LoadFromWICFile(
+        filePathW.c_str(),
+        DirectX::WIC_FLAGS_FORCE_SRGB,
+        nullptr,
+        image
+
+    );
+    assert(SUCCEEDED(hr));
+    //ミップマップの生成
+    DirectX::ScratchImage mipImages{};
+    hr = DirectX::GenerateMipMaps(
+        image.GetImages(),
+        image.GetImageCount(),
+        image.GetMetadata(),
+        DirectX::TEX_FILTER_DEFAULT,
+        0,
+        mipImages
+    );
+    assert(SUCCEEDED(hr));
+
+
+
+    return mipImages;
+
+
+}
+
+ID3D12Resource* CresteTextureResourse(ID3D12Device* device , const DirectX::TexMetadata& metadata)
+{
+    ///metadataを基にリソースを作成
+    D3D12_RESOURCE_DESC resourceDesc = {};
+    resourceDesc.Width = UINT(metadata.width);//幅
+    resourceDesc.Height = UINT(metadata.height);//高さ
+    resourceDesc.MipLevels = UINT16(metadata.mipLevels);//ミップマップの数    
+    resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);//配列の数
+    resourceDesc.Format = metadata.format;//フォーマット
+    resourceDesc.SampleDesc.Count = 1;//サンプル数
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);//リソースの次元
+    //利用するheapの設定
+    D3D12_HEAP_PROPERTIES heapProperties = {};
+    heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;//カスタムヒープ
+    heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//CPUのページプロパティ
+    heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//メモリプールの設定
+    //リソースの生成
+    ID3D12Resource* resource = nullptr;
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&resource)
+    );
+    assert(SUCCEEDED(hr));
+    return resource;
+
+
+}
+
+void UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchImage& mipImages)
+{
+    //Metadataの取得
+    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    //全mipmapに対して
+    for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel){
+        //MipMapLevelを指定して画像を取得
+        const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+        //textureに転送
+        HRESULT hr= textur->WriteToSubresource(
+            UINT(mipLevel),
+            nullptr,//全領域へコピー
+            img->pixels,////転送するデータ
+            UINT(img->rowPitch),////1行分のバイト数
+            UINT(img->slicePitch)////1枚分のバイト数
+        );
+        assert(SUCCEEDED(hr));
+    }
+}
+
 
 
 
@@ -238,6 +323,8 @@ ID3D12DescriptorHeap* CreateDescriptorHeap( ID3D12Device* device,D3D12_DESCRIPTO
 std::wstring wstr = L"Hello,DirectX!";
 //winmain
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
+    CoInitializeEx(0, COINIT_MULTITHREADED);
+
     SetUnhandledExceptionFilter(ExportDump);
     //ログ出力用のディレクトリを作成
     std::filesystem::create_directory("logs");
@@ -708,6 +795,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
 
+            //
+            DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+            const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+            ID3D12Resource* textureResource = CresteTextureResourse(device, metadata);
+            //テクスチャのアップロード
+            UploadTextureData(textureResource, mipImages);
+
+
             //メインループ
     MSG msg{};
     while (msg.message != WM_QUIT) {
@@ -840,7 +935,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
         }
        
     }
+
+    CoUninitialize();
     ///
+    //ImGuiの終了処理
     ////
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -855,6 +953,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //SRVの解放
     srvDescriptorHeap->Release();
+    //テクスチャの解放
+    textureResource->Release();
 //スワップチェーンの解放
 
     swapChainResources[0]->Release();
