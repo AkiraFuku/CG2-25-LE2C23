@@ -802,6 +802,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //テクスチャのアップロード
             UploadTextureData(textureResource, mipImages);
 
+            //metaDataを基にSRVの設定
+            //
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+            srvDesc.Format = metadata.format;
+            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            srvDesc.Texture2D.MostDetailedMip = UINT(metadata.mipLevels);//最初のミップマップ
+            //SRVを作成するdescriptorの取得
+            D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+            //SRVのハンドルをずらす
+            textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ;
+            textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            //SRVの設定
+            device->CreateShaderResourceView(
+                textureResource,
+                &srvDesc,
+                textureSrvHandleCPU
+            );
+
+
 
             //メインループ
     MSG msg{};
@@ -955,6 +976,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     srvDescriptorHeap->Release();
     //テクスチャの解放
     textureResource->Release();
+  
+    (*descriptorHeaps)->Release();
+
+   
 //スワップチェーンの解放
 
     swapChainResources[0]->Release();
