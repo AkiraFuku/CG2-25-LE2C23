@@ -251,7 +251,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath)
         image.GetImages(),
         image.GetImageCount(),
         image.GetMetadata(),
-        DirectX::TEX_FILTER_DEFAULT,
+        DirectX::TEX_FILTER_SRGB,
         0,
         mipImages
     );
@@ -751,9 +751,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
             //行列の初期化
             *wvpData = Makeidetity4x4();
-            ImGui::Begin("MaterialData");
-            ImGui::ColorEdit4("Color", &(*materialData).x);
-            ImGui::End();
+
 
             //コマンドリストの初期化
             Transform transform{{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
@@ -812,7 +810,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             srvDesc.Format = metadata.format;
             srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-            srvDesc.Texture2D.MostDetailedMip = UINT(metadata.mipLevels);//最初のミップマップ
+            srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);//最初のミップマップ
             //SRVを作成するdescriptorの取得
             D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
             D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -853,7 +851,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::ShowDemoWindow();
           
 
-
+                        ImGui::Begin("MaterialData");
+            ImGui::ColorEdit4("Color", &(*materialData).x);
+            ImGui::End();
 
 
 
