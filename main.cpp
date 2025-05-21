@@ -853,6 +853,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
                         ImGui::Begin("MaterialData");
             ImGui::ColorEdit4("Color", &(*materialData).x);
+           
             ImGui::End();
 
 
