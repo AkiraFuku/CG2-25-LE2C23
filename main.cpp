@@ -21,7 +21,8 @@
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
-extern IMGUI
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 
@@ -59,6 +60,12 @@ std::string ConvertString(const std::wstring& str) {
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+
+    if (ImGui_ImplWin32_WndProcHandler(hwnd,msg,wparam,lparam))
+    {
+        return true;
+    }
+
         switch (msg) {
             //
         case WM_DESTROY:
@@ -250,7 +257,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     std::ofstream logStream(logFilePath);
 
 
-
+    
     WNDCLASS wc={};
     //ウィンドウプロシージャ
     wc.lpfnWndProc = WindowProc;
@@ -686,10 +693,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //srvの設定
             ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
+            IMGUI_CHECKVERSION();
+            ImGui::CreateContext();
+            ImGui::StyleColorsDark();
+            ImGui_ImplWin32_Init(hwnd);
+            ImGui_ImplDX12_Init(
+                device,
+                swapChainDesc.BufferCount,
+                rtvDesc.Format,
+                srvDescriptorHeap,
+                srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+                srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+            );
 
+            ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
 
-
-
+            //メインループ
     MSG msg{};
     while (msg.message != WM_QUIT) {
         //メッセージがある限りGetMessageを呼び出す
@@ -697,6 +716,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else{
+            ImGui_ImplDX12_NewFrame();
+            ImGui_ImplWin32_NewFrame();
+            ImGui::NewFrame();
+
             ///////
             ///Update
             ///////
@@ -707,6 +730,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
 
+            ImGui::ShowDemoWindow();
 
 
 
@@ -715,8 +739,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///////
             ///Update
             ///////
+
+
             ///
             //DRAW
+            ///
+            ImGui::Render();
             //backBufferIndexを取得
             UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
             ///バリアーの設定
@@ -745,7 +773,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 0,
                 nullptr
             );
+
             ///
+            commandList->SetDescriptorHeaps(1, descriptorHeaps);
+            ///
+
+
             commandList->RSSetViewports(1, &viewport);//ビューポートの設定
             commandList->RSSetScissorRects(1, &scissorRect);//シザー矩形の設定
             // RootSignatureの設定
@@ -771,6 +804,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+            ///
+
+            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
             //transitionバリアーを張る
             commandList->ResourceBarrier(1, &barrier);
             ///
@@ -805,7 +841,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
        
     }
     ///
-
+    ////
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
 
 
     //リソースの解放
