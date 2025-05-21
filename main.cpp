@@ -751,6 +751,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
             //行列の初期化
             *wvpData = Makeidetity4x4();
+            ImGui::Begin("MaterialData");
+            ImGui::ColorEdit4("Color", &(*materialData).x);
+            ImGui::End();
+
             //コマンドリストの初期化
             Transform transform{{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
             Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
@@ -847,6 +851,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
             ImGui::ShowDemoWindow();
+          
+
 
 
 
