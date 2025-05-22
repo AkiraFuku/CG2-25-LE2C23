@@ -592,14 +592,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             descriptionRootSignatur.Flags =
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
+
+            ///
+            D3D12_DESCRIPTOR_RANGE descriptorRange[1]={};
+            descriptorRange[0].BaseShaderRegister=0;
+            descriptorRange[0].NumDescriptors=1;
+            descriptorRange[0].RangeType=D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+            descriptorRange[0].OffsetInDescriptorsFromTableStart=D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+            ///
+            D3D12_STATIC_SAMPLER_DESC staticSamplers[1]={};
+            staticSamplers[0].Filter=D3D12_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+            staticSamplers[0].AddressU=D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+            staticSamplers[0].AddressV=D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+            staticSamplers[0].AddressW=D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+            staticSamplers[0].ComparisonFunc=D3D12_COMPARISON_FUNC_NEVER;
+            staticSamplers[0].MaxLOD=D3D12_FLOAT32_MAX;
+            staticSamplers[0].ShaderRegister=0;
+            staticSamplers[0].ShaderVisibility=D3D12_SHADER_VISIBILITY_PIXEL;
+            descriptionRootSignatur.pStaticSamplers=staticSamplers;
+            descriptionRootSignatur.NumStaticSamplers=_countof(staticSamplers);
+
+
+
             ///ルートパラメータの設定
-            D3D12_ROOT_PARAMETER rootParameters[2]{};
+            D3D12_ROOT_PARAMETER rootParameters[3]{};
             rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
             rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
             rootParameters[1].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+            rootParameters[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+            rootParameters[2].ShaderVisibility=D3D12_SHADER_VISIBILITY_PIXEL;
+            rootParameters[2].DescriptorTable.pDescriptorRanges=descriptorRange;
+            rootParameters[2].DescriptorTable.NumDescriptorRanges=_countof(descriptorRange);
+
             descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
             descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
@@ -719,11 +746,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //書き込む為のアドレス
             vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
             //データの設定
-            vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+            vertexData[0].position = { -0.5f, -0.15f, 0.0f, 1.0f };
             vertexData[0].texcoord = { 0.0f, 1.0f };
             vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
             vertexData[1].texcoord = { 0.5f, 0.0f };
-            vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+            vertexData[2].position = { 0.5f, -0.15f, 0.0f, 1.0f };
             vertexData[2].texcoord = { 1.0f, 1.0f };
             //ビューポート
             D3D12_VIEWPORT viewport{};
@@ -852,9 +879,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///Update
             ///////
 
-            transform.rotate.y += 0.03f;
+            /*transform.rotate.y += 0.03f;
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-            *wvpData = worldMatrix;
+            *wvpData = worldMatrix;*/
 
 
 
@@ -862,7 +889,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
           
 
                         ImGui::Begin("MaterialData");
+            ImGui::Text("MaterialData");
             ImGui::ColorEdit4("Color", &(*materialData).x);
+
+         
+            
+           
+               // ImGui::(&(*wvpData));
+            
+
            
             ImGui::End();
 
@@ -924,6 +959,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
             commandList->SetGraphicsRootConstantBufferView(0,materialResource->GetGPUVirtualAddress());
+            //
+            commandList->SetGraphicsRootDescriptorTable(2,textureSrvHandleGPU);
             //WVP行列リソースの設定
             commandList->SetGraphicsRootConstantBufferView(1,wvpResource->GetGPUVirtualAddress());
 
