@@ -18,3 +18,8 @@ struct Transform{
     Vector3 rotate;
     Vector3 traslate;
 };
+struct VertexData{
+    Vector4 position;
+    Vector4 texcoord;
+
+};
