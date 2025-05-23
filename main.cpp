@@ -863,6 +863,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                         ImGui::Begin("MaterialData");
             ImGui::ColorEdit4("Color", &(*materialData).x);
             ImGui::SliderFloat3("rotate",& transform.rotate.x,-360.0f,360.0f);
+            ImGui::SliderFloat3("traslate",& transform.traslate.x,-360.0f,360.0f);
+            ImGui::SliderFloat3("scale",& transform.scale.x,-360.0f,360.0f);
            
             ImGui::End();
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
