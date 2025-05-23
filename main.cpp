@@ -777,7 +777,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //書き込む為のアドレス
             materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
             //データの設定
-            *materialData =  Vector4(1.0f, 0.0f, 0.0f, 1.0f );
+            *materialData =  Vector4(1.0f, 1.0f, 1.0f, 1.0f );
 
             ///WVP行列リソースの設定
             ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -790,7 +790,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
             //コマンドリストの初期化
-            Transform transform{{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
+            Transform transform{{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
             Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
            
             ID3D12Resource* transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -891,6 +891,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                         ImGui::Begin("MaterialData");
             ImGui::Text("MaterialData");
             ImGui::ColorEdit4("Color", &(*materialData).x);
+            ImGui::Text("transform");
+            ImGui::SliderFloat3("rotate",&transform.rotate.x ,-360.0f,360.0f);
+            ImGui::SliderFloat3("scale",&transform.scale.x ,1.0f,100.0f);
+            ImGui::SliderFloat3("traslate",&transform.traslate.x ,-10.0f,1.0f);
 
          
             
