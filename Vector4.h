@@ -5,6 +5,10 @@ struct Vector4{
     float z;
     float w;
 };
+struct Vector2{
+    float x;
+    float y;
+};
 struct Matrix4x4{
    float m[4][4];
 };
@@ -20,6 +24,6 @@ struct Transform{
 };
 struct VertexData{
     Vector4 position;
-    Vector4 texcoord;
+    Vector2 texcoord;
 
 };
