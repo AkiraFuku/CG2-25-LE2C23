@@ -724,13 +724,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///Update
             ///////
 
-            transform.rotate.y += 0.03f;
+            /*transform.rotate.y += 0.03f;
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
+            *wvpData = worldMatrix;*/
+                 
+      
+            
+            ImGui::Begin("settings");
+            ImGui::ColorEdit4("Color", &(*materialData).x);
+           
+           
+            ImGui::SliderFloat3("rotate", &transform.rotate.x,0.0f, 360.0f);
+            ImGui::SliderFloat3("scale", &transform.scale.x,1.0f, 360.0f);
+            ImGui::SliderFloat3("traslate", &transform.traslate.x,-2.0f, 2.0f);
+           
+           
+
+
+           // ImGui::sli
+            ImGui::End();
+             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
             *wvpData = worldMatrix;
 
 
-
-            ImGui::ShowDemoWindow();
+           
 
 
 
