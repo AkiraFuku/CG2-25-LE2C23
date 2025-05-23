@@ -731,7 +731,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
+            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
             ///
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
