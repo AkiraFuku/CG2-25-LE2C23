@@ -592,6 +592,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             descriptorRange[0].NumDescriptors = 1;//ディスクリプタの数1つ
             descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
             descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
+            ///
+          
 
 
 
@@ -617,7 +619,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
             descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
-
+            D3D12_STATIC_SAMPLER_DESC staticSamplers[1]{};
+            staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//線形フィルタリング
+            staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
+            staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
+            staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
+            staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//比較関数は使用しない
+            staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//最大LODは最大値
+            staticSamplers[0].ShaderRegister = 0;//シェーダーのレジスタ番号0
+            staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使用する
+            descriptionRootSignatur.pStaticSamplers = staticSamplers;//スタティックサンプラーの設定
+            descriptionRootSignatur.NumStaticSamplers = _countof(staticSamplers);//スタティックサンプラーの数
 
             //シリアライズしてバイナリにする;
             ID3DBlob* signatureBlob = nullptr;
@@ -1053,6 +1065,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     wvpResource->Release();
     //トランスフォーム行列リソースの解放
     transformatiomationMatrixResource->Release();
+
+
 
 
 
