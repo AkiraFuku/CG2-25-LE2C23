@@ -775,7 +775,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //書き込む為のアドレス
             materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
             //データの設定
-            *materialData =  Vector4(1.0f, 0.0f, 0.0f, 1.0f );
+            *materialData =  Vector4(1.0f, 1.0f, 1.0f, 1.0f );
 
             ///WVP行列リソースの設定
             ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -949,6 +949,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetGraphicsRootConstantBufferView(0,materialResource->GetGPUVirtualAddress());
             //WVP行列リソースの設定
             commandList->SetGraphicsRootConstantBufferView(1,wvpResource->GetGPUVirtualAddress());
+            ///
+            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
             //
             commandList->DrawInstanced(3, 1, 0, 0);
