@@ -8,6 +8,10 @@ struct Vector4{
 struct Matrix4x4{
    float m[4][4];
 };
+struct Vector2{
+    float x;
+    float y;
+};
 struct Vector3{
     float x;
     float y;
@@ -18,3 +22,7 @@ struct Transform{
     Vector3 rotate;
     Vector3 traslate;
 };
+struct VartexData{
+    Vector4 position; // 4D position vector
+    Vector2 texcoord; // 2D texture coordinate vector
+}; 

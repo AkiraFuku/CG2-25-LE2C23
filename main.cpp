@@ -698,24 +698,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
+            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 3);
             ///
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
             //リソース先頭アドレス
             vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
-            vertexBufferView.StrideInBytes = sizeof(Vector4);
+            vertexBufferView.SizeInBytes = sizeof(VartexData) * 3;
+            vertexBufferView.StrideInBytes = sizeof(VartexData);
 
             //頂点データの設定
-            Vector4* vertexData = nullptr;
+            VartexData* vertexData = nullptr;
             //書き込む為のアドレス
             vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
             //データの設定
-            vertexData[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-            vertexData[1] = { 0.0f, 0.5f, 0.0f, 1.0f };
-            vertexData[2] = { 0.5f, -0.5f, 0.0f, 1.0f };
+            vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+            vertexData[0] .texcoord= { 0.0f, 1.0f };
+
+            vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
+            vertexData[1].texcoord = { 0.5f, 0.0f };
+            vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+            vertexData[2].texcoord = { 1.0f, 1.0f };
             //ビューポート
             D3D12_VIEWPORT viewport{};
             //
