@@ -971,7 +971,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
        
     }
 
-    CoUninitialize();
+    
     ///
     //ImGuiの終了処理
     ////
@@ -1048,7 +1048,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
     
-
+CoUninitialize();
     //デバッグレイヤーの解放
 #ifdef _DEBUG
     debugController->Release();
