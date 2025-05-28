@@ -917,6 +917,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &srvDesc,
                 textureSrvHandleCPU
             );
+            //
             ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResourse(
                 device,
                 kClientWidth,
@@ -937,7 +938,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 depthStencilResource,
                 &dsvDesc,
                 dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+                
             );
+            //DepyhStencillStatesの設定
+            D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+            // Depthの機能を有効化
+            depthStencilDesc.DepthEnable = true;
+            // 書き込み
+            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+            // 比較関数はLessEqual
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+            // DepthStencleの設定
+            graphicPipelineStateDesc.DepthStencilState = depthStencilDesc;
+            graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;//DSVのフォーマットを設定
+
 
 
 
