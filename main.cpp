@@ -336,6 +336,40 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
     
 }
 
+ID3D12Resource* CreateDepthStencilTextureResourse(ID3D12Device* device, int32_t width, int32_t height){
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Width = width;//幅
+    resourceDesc.Height = height;//高さ
+    resourceDesc.MipLevels = 1;//ミップマップの数
+    resourceDesc.DepthOrArraySize = 1;//配列の数
+    resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット
+    resourceDesc.SampleDesc.Count = 1;//サンプル数
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;//リソースの次元
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//深度ステンシルを許可
+    //利用するheapの設定
+    D3D12_HEAP_PROPERTIES heapProperties = {};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//VRAM上に作る
+    //深度値のクリア設定
+    D3D12_CLEAR_VALUE dephtClearValue{};
+    dephtClearValue.DepthStencil.Depth = 1.0f;//深度値のクリア値
+    dephtClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット RESOURSEと合わせる
+    //リソースの生成
+    ID3D12Resource* resource = nullptr;
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,//深度書き込み状態
+        &dephtClearValue,//深度値のクリア設定
+        IID_PPV_ARGS(&resource)
+    );
+    assert(SUCCEEDED(hr));
+    return resource;
+
+
+}
+
+
 
 
 
@@ -748,14 +782,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 3);
+            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 6);
             ///
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
             //リソース先頭アドレス
             vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferView.SizeInBytes = sizeof(VartexData) * 3;
+            vertexBufferView.SizeInBytes = sizeof(VartexData) * 6;
             vertexBufferView.StrideInBytes = sizeof(VartexData);
 
             //頂点データの設定
@@ -765,11 +799,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //データの設定
             vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
             vertexData[0] .texcoord= { 0.0f, 1.0f };
-
             vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
             vertexData[1].texcoord = { 0.5f, 0.0f };
             vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
             vertexData[2].texcoord = { 1.0f, 1.0f };
+            vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+            vertexData[3].texcoord = { 0.0f, 1.0f };
+            vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+            vertexData[4].texcoord = { 0.5f, 0.0f };
+            vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+            vertexData[5].texcoord = { 1.0f, 1.0f };
             //ビューポート
             D3D12_VIEWPORT viewport{};
             //
@@ -878,6 +917,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &srvDesc,
                 textureSrvHandleCPU
             );
+            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResourse(
+                device,
+                kClientWidth,
+                kClientHeight
+            );
+            //DSVの設定
+            ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(
+                device,
+                D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+                1,
+                false
+            );
+            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度24ビット、ステンシル8ビット
+            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            //DSVのハンドルを取得
+            device->CreateDepthStencilView(
+                depthStencilResource,
+                &dsvDesc,
+                dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+            );
+
+
+
+
 
 
 
@@ -974,7 +1038,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
             //
-            commandList->DrawInstanced(3, 1, 0, 0);
+            commandList->DrawInstanced(6, 1, 0, 0);
 
 
 
@@ -1040,7 +1104,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //テクスチャの解放
     textureResource->Release();
   
-   // (*descriptorHeaps)->Release();
+ 
 
    
 //スワップチェーンの解放
@@ -1088,6 +1152,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     wvpResource->Release();
     //トランスフォーム行列リソースの解放
     transformatiomationMatrixResource->Release();
+    //テクスチャリソースの解放
+    depthStencilResource->Release();
+
     intermediateResource->Release();    
     
 
