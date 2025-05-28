@@ -316,6 +316,40 @@ void UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchImage& mipIm
     }
 }
 
+ID3D12Resource* CreateDepthStencilTextureResourse(ID3D12Device* device, int32_t width, int32_t height){
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Width = width;//幅
+    resourceDesc.Height = height;//高さ
+    resourceDesc.MipLevels = 1;//ミップマップの数
+    resourceDesc.DepthOrArraySize = 1;//配列の数
+    resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット
+    resourceDesc.SampleDesc.Count = 1;//サンプル数
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;//リソースの次元
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//深度ステンシルを許可
+    //利用するheapの設定
+    D3D12_HEAP_PROPERTIES heapProperties = {};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//VRAM上に作る
+    //深度値のクリア設定
+    D3D12_CLEAR_VALUE dephtClearValue{};
+    dephtClearValue.DepthStencil.Depth = 1.0f;//深度値のクリア値
+    dephtClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット RESOURSEと合わせる
+    //リソースの生成
+    ID3D12Resource* resource = nullptr;
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,//深度書き込み状態
+        &dephtClearValue,//深度値のクリア設定
+        IID_PPV_ARGS(&resource)
+    );
+    assert(SUCCEEDED(hr));
+    return resource;
+
+
+}
+
+
 
 
 
@@ -861,6 +895,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 textureResource,
                 &srvDesc,
                 textureSrvHandleCPU
+            );
+            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResourse(
+                device,
+                kClientWidth,
+                kClientHeight
             );
 
 
