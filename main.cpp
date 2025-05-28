@@ -374,6 +374,9 @@ ID3D12Resource* CreateDepthStencilTextureResourse(ID3D12Device* device, int32_t 
 
 
 
+
+
+
 std::wstring wstr = L"Hello,DirectX!";
 //winmain
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
@@ -961,6 +964,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &srvDesc,
                 textureSrvHandleCPU
             );
+            ///
+            D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            commandList->OMSetRenderTargets(
+                1,
+                &rtvHandles[swapChain->GetCurrentBackBufferIndex()],
+                FALSE,
+                &dsvHandle
+            );
            
           
 
@@ -982,6 +993,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else{
+            commandList->ClearDepthStencilView(
+                dsvHandle,
+                D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+                1.0f, 0,
+                0, nullptr
+            );
             ImGui_ImplDX12_NewFrame();
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
