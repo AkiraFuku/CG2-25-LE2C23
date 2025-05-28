@@ -22,6 +22,8 @@
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 #include"externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
+#include <vector>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -734,6 +736,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 logStream
             );
             assert(pixelShaderBlob != nullptr);
+            ////
+            // 
+            // 
+            // 
             //PSOの生成
             D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineStateDesc{};
             graphicPipelineStateDesc.pRootSignature = rootSignature;
@@ -753,6 +759,43 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //カラー
             graphicPipelineStateDesc.SampleDesc.Count = 1;
             graphicPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+            ///
+            //
+            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResourse(
+                device,
+                kClientWidth,
+                kClientHeight
+            );
+            //DSVの設定
+            ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(
+                device,
+                D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+                1,
+                false
+            );
+            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度24ビット、ステンシル8ビット
+            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            //DSVのハンドルを取得
+            device->CreateDepthStencilView(
+                depthStencilResource,
+                &dsvDesc,
+                dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+            );
+            //DepthStencilStateの設定
+            D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+            //深度テストを有効化
+            depthStencilDesc.DepthEnable = true;
+            // 書き込み
+            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+            //比較関数はLessEqual
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+            // DepthStencilの設定
+            graphicPipelineStateDesc.DepthStencilState = depthStencilDesc;
+            // DepthStencilViewの設定
+            graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            ///
+            ///
             //PSOの生成
             ID3D12PipelineState* graphicsPipelineState = nullptr;
             hr = device->CreateGraphicsPipelineState(
@@ -760,6 +803,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 IID_PPV_ARGS(&graphicsPipelineState)
             );
             assert(SUCCEEDED(hr));
+            ///
+            /// pso終了
+            ///
             ///
 
             ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 6);
@@ -896,27 +942,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &srvDesc,
                 textureSrvHandleCPU
             );
-            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResourse(
-                device,
-                kClientWidth,
-                kClientHeight
-            );
-            //DSVの設定
-            ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(
-                device,
-                D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-                1,
-                false
-            );
-            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度24ビット、ステンシル8ビット
-            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-            //DSVのハンドルを取得
-            device->CreateDepthStencilView(
-                depthStencilResource,
-                &dsvDesc,
-                dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
-            );
+           
+          
+
+
+
+            
 
 
 
@@ -1133,6 +1164,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     transformatiomationMatrixResource->Release();
     //テクスチャリソースの解放
     depthStencilResource->Release();
+    //DSVの解放
+    dsvDescriptorHeap->Release();
 
 
 
