@@ -901,6 +901,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 kClientWidth,
                 kClientHeight
             );
+            //DSVの設定
+            ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(
+                device,
+                D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+                1,
+                false
+            );
+            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度24ビット、ステンシル8ビット
+            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            //DSVのハンドルを取得
+            device->CreateDepthStencilView(
+                depthStencilResource,
+                &dsvDesc,
+                dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+            );
+
+
+
+
 
 
 
@@ -1111,6 +1131,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     wvpResource->Release();
     //トランスフォーム行列リソースの解放
     transformatiomationMatrixResource->Release();
+    //テクスチャリソースの解放
+    depthStencilResource->Release();
+
 
 
 
