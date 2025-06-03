@@ -1039,9 +1039,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     srvDescriptorHeap->Release();
     //テクスチャの解放
     textureResource->Release();
-  
-   // (*descriptorHeaps)->Release();
-
    
 //スワップチェーンの解放
 
