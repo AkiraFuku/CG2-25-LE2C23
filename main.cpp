@@ -336,6 +336,37 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
     
 }
 
+ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width,int32_t height){
+    D3D12_RESOURCE_DESC resourceDesc{};
+    resourceDesc.Width = width;//幅
+    resourceDesc.Height = height;//高さ
+    resourceDesc.MipLevels = 1;//ミップマップの数
+    resourceDesc.DepthOrArraySize = 1;//配列の数
+    resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット
+    resourceDesc.SampleDesc.Count = 1;//サンプル数
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;//リソースの次元
+    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//深度ステンシルを許可
+    //利用するheapの設定
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//デフォルトヒープ
+    // 深度値のクリア設定    
+    D3D12_CLEAR_VALUE depthClearValue{};
+    depthClearValue.DepthStencil.Depth = 1.0f;//深度値のクリア値
+    depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット
+    //リソースの生成
+    ID3D12Resource* resource = nullptr;
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,//深度書き込み状態
+        &depthClearValue,//深度値のクリア設定
+        IID_PPV_ARGS(&resource)
+    );
+    assert(SUCCEEDED(hr));
+    return resource;
+}
+
 
 
 
@@ -698,7 +729,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             D3D12_COLOR_WRITE_ENABLE_ALL;
             //RasteriwrStateの設定
             D3D12_RASTERIZER_DESC rasterizerDesc{};
-            rasterizerDesc.CullMode=D3D12_CULL_MODE_BACK;
+            rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;//カリングなし
+                //BACK;
+
             rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
             //shaderのコンパイル
             IDxcBlob* vertexShaderBlob = CompileShader(
@@ -888,6 +921,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &srvDesc,
                 textureSrvHandleCPU
             );
+            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+    
 
 
 
@@ -1095,7 +1130,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     wvpResource->Release();
     //トランスフォーム行列リソースの解放
     transformatiomationMatrixResource->Release();
-    intermediateResource->Release();    
+    intermediateResource->Release(); 
+
+    depthStencilResource->Release();
     
 
 
