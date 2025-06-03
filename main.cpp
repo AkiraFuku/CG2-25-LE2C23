@@ -416,7 +416,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 #ifdef _DEBUG
 
-            //デバッグレイヤーの有効化
+            //デバッグレイヤーの有効
             ID3D12Debug1* debugController = nullptr;
             if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))){
                 debugController->EnableDebugLayer();
@@ -748,14 +748,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 3);
+            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 6);
             ///
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
             //リソース先頭アドレス
             vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferView.SizeInBytes = sizeof(VartexData) * 3;
+            vertexBufferView.SizeInBytes = sizeof(VartexData) * 6;
             vertexBufferView.StrideInBytes = sizeof(VartexData);
 
             //頂点データの設定
@@ -768,8 +768,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
             vertexData[1].texcoord = { 0.5f, 0.0f };
+
             vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
             vertexData[2].texcoord = { 1.0f, 1.0f };
+
+            vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+            vertexData[3].texcoord = { 0.0f, 1.0f };
+
+            vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+            vertexData[4].texcoord = { 0.5f, 0.0f };
+
+            vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+            vertexData[5].texcoord = { 1.0f, 1.0f };
             //ビューポート
             D3D12_VIEWPORT viewport{};
             //
@@ -974,7 +984,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
             //
-            commandList->DrawInstanced(3, 1, 0, 0);
+            commandList->DrawInstanced(6, 1, 0, 0);
 
 
 
