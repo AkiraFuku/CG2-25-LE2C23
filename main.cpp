@@ -753,31 +753,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 logStream
             );
             assert(pixelShaderBlob != nullptr);
-
-
-            //PSOの生成
-            D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineStateDesc{};
-            graphicPipelineStateDesc.pRootSignature = rootSignature;
-            graphicPipelineStateDesc.InputLayout = inputLayoutDesc;
-            graphicPipelineStateDesc.VS ={ vertexShaderBlob->GetBufferPointer(),
-            vertexShaderBlob->GetBufferSize() };//ヴァーテックスシェーダー
-            graphicPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
-            pixelShaderBlob->GetBufferSize() };//ピクセルシェーダー
-            graphicPipelineStateDesc.BlendState = blendDesc;//ブレンドステート
-            graphicPipelineStateDesc.RasterizerState = rasterizerDesc;//ラスタライザーステート
-            ///巻き込むRTV
-            graphicPipelineStateDesc.NumRenderTargets = 1;
-            graphicPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-            ///トポロジー
-            graphicPipelineStateDesc.PrimitiveTopologyType = 
-            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-            //カラー
-            graphicPipelineStateDesc.SampleDesc.Count = 1;
-            graphicPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-
-
             ////
-              ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
            
             ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
             //深度ステンシルビューの設定
@@ -798,6 +775,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //比較関数
             depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
+            //PSOの生成
+            D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineStateDesc{};
+            graphicPipelineStateDesc.pRootSignature = rootSignature;
+            graphicPipelineStateDesc.InputLayout = inputLayoutDesc;
+            graphicPipelineStateDesc.VS ={ vertexShaderBlob->GetBufferPointer(),
+            vertexShaderBlob->GetBufferSize() };//ヴァーテックスシェーダー
+            graphicPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
+            pixelShaderBlob->GetBufferSize() };//ピクセルシェーダー
+            graphicPipelineStateDesc.BlendState = blendDesc;//ブレンドステート
+            graphicPipelineStateDesc.RasterizerState = rasterizerDesc;//ラスタライザーステート
+            ///巻き込むRTV
+            graphicPipelineStateDesc.NumRenderTargets = 1;
+            graphicPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+            ///トポロジー
+            graphicPipelineStateDesc.PrimitiveTopologyType = 
+            D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+            //カラー
+            graphicPipelineStateDesc.SampleDesc.Count = 1;
+            graphicPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+           
+            //深度ステンシルビューの設定
             graphicPipelineStateDesc.DepthStencilState = depthStencilDesc;//PSOにDSSを設定
             graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルビューのフォーマット
             ////
@@ -978,7 +976,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             transform.rotate.y += 0.03f;
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-            *wvpData = worldMatrix;
+            *wvpData = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
 
 
 
