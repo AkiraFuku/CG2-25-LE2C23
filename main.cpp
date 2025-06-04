@@ -950,13 +950,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
 
 
+            ID3D12Resource* VertexResourseSprite = CreateBufferResource(device, sizeof(VartexData) * 6);
+            //頂点バッファビューの設定
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+            //リソース先頭アドレス
+            vertexBufferViewSprite.BufferLocation = VertexResourseSprite->GetGPUVirtualAddress();
+            //リソースのサイズ
+            vertexBufferViewSprite.SizeInBytes = sizeof(VartexData) * 6;
+            //一個あたりのサイズ
+            vertexBufferViewSprite.StrideInBytes = sizeof(VartexData);
+            //頂点データの設定
+            VartexData* vertexDataSprite = nullptr;
+            VertexResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+            //データの設定
+            vertexDataSprite[0].position={0.0f,360.0f,0.0f,1.0f};
+            vertexDataSprite[0].texcoord = { 0.0f,1.0f };   
+            vertexDataSprite[1].position={0.0f,0.0f,0.0f,1.0f};
+            vertexDataSprite[1].texcoord = { 0.0f,0.0f };   
+            vertexDataSprite[2].position={640.0f,360.0f,0.0f,1.0f};
+            vertexDataSprite[2].texcoord = { 1.0f,1.0f }; 
 
-          
-
-            
-    
-
-
+            vertexDataSprite[3].position={0.0f,0.0f,0.0f,1.0f};
+            vertexDataSprite[3].texcoord = { 0.0f,0.0f };   
+            vertexDataSprite[4].position={640.0f,0.0f,0.0f,1.0f};
+            vertexDataSprite[4].texcoord = { 1.0f,0.0f };   
+            vertexDataSprite[5].position={640.0f,360.0f,0.0f,1.0f};
+            vertexDataSprite[5].texcoord = { 1.0f,1.0f };   
 
             //メインループ
     MSG msg{};
