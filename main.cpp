@@ -753,6 +753,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 logStream
             );
             assert(pixelShaderBlob != nullptr);
+
+
             //PSOの生成
             D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineStateDesc{};
             graphicPipelineStateDesc.pRootSignature = rootSignature;
@@ -772,6 +774,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //カラー
             graphicPipelineStateDesc.SampleDesc.Count = 1;
             graphicPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+
+            ////
+              ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+           
+            ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+            //深度ステンシルビューの設定
+            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルのフォーマット
+            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            device->CreateDepthStencilView(
+                depthStencilResource,
+                &dsvDesc,
+                dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+            );
+
+            //DSSの設定
+            D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+            depthStencilDesc.DepthEnable = true;//深度テストを有効にする
+            //書き込み
+            depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+            //比較関数
+            depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+            graphicPipelineStateDesc.DepthStencilState = depthStencilDesc;//PSOにDSSを設定
+            graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルビューのフォーマット
+            ////
             //PSOの生成
             ID3D12PipelineState* graphicsPipelineState = nullptr;
             hr = device->CreateGraphicsPipelineState(
@@ -921,7 +950,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &srvDesc,
                 textureSrvHandleCPU
             );
-            ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+
+
+
+          
+
+            
     
 
 
@@ -984,7 +1018,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //transitionバリアーを張る
             commandList->ResourceBarrier(1, &barrier);
             ///
-            commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], FALSE, nullptr);
+            D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], FALSE, &dsvHandle);
             //
             //クリアカラー
             float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };
@@ -995,6 +1030,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 0,
                 nullptr
             );
+            //深度ステンシルビューのクリア
+            commandList->ClearDepthStencilView(
+                dsvHandle,
+                D3D12_CLEAR_FLAG_DEPTH ,
+                1.0f, 0, 0, nullptr
+            );
+            
 
             ///
             commandList->SetDescriptorHeaps(1, descriptorHeaps);
@@ -1133,6 +1175,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     intermediateResource->Release(); 
 
     depthStencilResource->Release();
+    dsvDescriptorHeap->Release();
     
 
 
