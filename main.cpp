@@ -949,6 +949,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 textureSrvHandleCPU
             );
 
+
             //スプライトリソース
             ID3D12Resource* vertexResourseSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
             //スプライトの頂点バッファビューの設定
@@ -979,6 +980,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            
             vertexDataSprite[5].position = { 640.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
+
+            ID3D12Resource* transformationMatrixResourseSprite = CreateBufferResource(device, sizeof(Matrix4x4));
+            //スプライトの行列データの設定
+            Matrix4x4* transformationMatrixDataSprite = nullptr;
+            //書き込む為のアドレス
+            transformationMatrixResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+
+            //行列の初期化
+            *transformationMatrixDataSprite = Makeidetity4x4();
+
+            Transform spriteTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+
+
+
 
 
 
@@ -1205,8 +1221,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     transformatiomationMatrixResource->Release();
     intermediateResource->Release(); 
 
+
+    //depthStencilResourceの解放
     depthStencilResource->Release();
     dsvDescriptorHeap->Release();
+
+    //
+    vertexResourseSprite->Release();
+
+
     
 
 
