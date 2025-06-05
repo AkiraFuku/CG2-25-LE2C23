@@ -990,7 +990,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //行列の初期化
             *transformationMatrixDataSprite = Makeidetity4x4();
 
-            Transform spriteTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+            Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+            //スプライトの行列の初期化
+
+            Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
+            Matrix4x4 viewMatrixSprite = Makeidetity4x4();
+            Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
+            //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
+            Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
+            *transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
 
 
@@ -1228,6 +1236,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //
     vertexResourseSprite->Release();
+    transformatiomationMatrixResource->Release();
 
 
     
