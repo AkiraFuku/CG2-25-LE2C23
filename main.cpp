@@ -1125,6 +1125,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+            commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
+            commandList->DrawInstanced(6, 1, 0, 0);
+
             ///
 
             ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
