@@ -962,8 +962,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             VertexData* vertexDataSprite = nullptr;
             //書き込む為のアドレス
             vertexResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-            vertexDataSprite[0].position = { 0.0f, -0.5f, 0.0f, 1.0f };
+            vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
+            
+            vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+            vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
+           
+            vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
+            vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
+            
+            vertexDataSprite[3].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+            vertexDataSprite[3].texcoord = { 0.0f, 1.0f };
+            
+            vertexDataSprite[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+            vertexDataSprite[4].texcoord = { 1.0f, 0.0f };
+           
+            vertexDataSprite[5].position = { 640.0f, 360.0f, 0.0f, 1.0f };
+            vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
+
 
 
                  
