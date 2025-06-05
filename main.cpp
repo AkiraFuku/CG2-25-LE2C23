@@ -808,18 +808,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VartexData) * 6);
+            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
             ///
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
             //リソース先頭アドレス
             vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferView.SizeInBytes = sizeof(VartexData) * 6;
-            vertexBufferView.StrideInBytes = sizeof(VartexData);
+            vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+            vertexBufferView.StrideInBytes = sizeof(VertexData);
 
             //頂点データの設定
-            VartexData* vertexData = nullptr;
+            VertexData* vertexData = nullptr;
             //書き込む為のアドレス
             vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
             //データの設定
@@ -949,7 +949,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 textureSrvHandleCPU
             );
 
+            //スプライトリソース
+            ID3D12Resource* vertexResourseSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
+            //スプライトの頂点バッファビューの設定
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+            //リソース先頭アドレス
+            vertexBufferViewSprite.BufferLocation = vertexResourseSprite->GetGPUVirtualAddress();
+            //リソースのサイズ
+            vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+            vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+            
+            VertexData* vertexDataSprite = nullptr;
+            //書き込む為のアドレス
+            vertexResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+            vertexDataSprite[0].position = { 0.0f, -0.5f, 0.0f, 1.0f };
+            vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
 
+
+                 
 
           
 
