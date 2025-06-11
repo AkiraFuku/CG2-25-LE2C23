@@ -809,38 +809,134 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
 
-            ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
-            ///
-            //頂点バッファビューの設定
-            D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+            //ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
+            /////
+            ////頂点バッファビューの設定
+            //D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+            ////リソース先頭アドレス
+            //vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+            ////リソースのサイズ
+            //vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+            //vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+            ////頂点データの設定
+            //VertexData* vertexData = nullptr;
+            ////書き込む為のアドレス
+            //vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+            ////データの設定
+            //vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+            //vertexData[0] .texcoord= { 0.0f, 1.0f };
+
+            //vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
+            //vertexData[1].texcoord = { 0.5f, 0.0f };
+
+            //vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+            //vertexData[2].texcoord = { 1.0f, 1.0f };
+
+            //vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+            //vertexData[3].texcoord = { 0.0f, 1.0f };
+
+            //vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+            //vertexData[4].texcoord = { 0.5f, 0.0f };
+
+            //vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+            //vertexData[5].texcoord = { 1.0f, 1.0f };
+
+               // 球の描画
+            const uint32_t kSubdivision=8;
+            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, sizeof(VertexData) * 6*kSubdivision*kSubdivision);
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
             //リソース先頭アドレス
-            vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+            vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
-            vertexBufferView.StrideInBytes = sizeof(VertexData);
+            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6*kSubdivision*kSubdivision;
+            vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 
-            //頂点データの設定
-            VertexData* vertexData = nullptr;
-            //書き込む為のアドレス
-            vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-            //データの設定
-            vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
-            vertexData[0] .texcoord= { 0.0f, 1.0f };
+            VertexData* vertexDataSphere=nullptr;
+            vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+            const float kLonEvery =std::numbers::pi_v<float>*2.0f/static_cast<float>(kSubdivision);//経度
+            const float kLatEvery =std::numbers::pi_v<float>/static_cast<float>(kSubdivision);//緯度
+            for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
+            {
+                float lat =-std::numbers::pi_v<float>/2.0f+kLatEvery*latIndex;
+                for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
+                {
+                   
+                    float lon=lonIndex*kLonEvery;
 
-            vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
-            vertexData[1].texcoord = { 0.5f, 0.0f };
+                    VertexData verA={
+                        {
+                            std::cosf(lat)* std::cosf(lon),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon),
+                            1.0f
+                        },
+                        {
+                            float(lonIndex)/float(kSubdivision),
+                            1.0f-float(latIndex)/float(kSubdivision)
 
-            vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
-            vertexData[2].texcoord = { 1.0f, 1.0f };
+                        
+                        }
+                    };
+                    VertexData verB={
+                        {
+                            std::cosf(lat+kLatEvery)* std::cosf(lon),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon),
+                            1.0f
+                        },
+                        {
+                              float(lonIndex)/float(kSubdivision),
+                            1.0f-float(latIndex+1.0f)/float(kSubdivision)
+                        
+                        }
+                    };
+                    VertexData verC={
+                        {
+                            std::cosf(lat)* std::cosf(lon+kLonEvery),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon+kLonEvery),
+                            1.0f
+                        },
+                        {
 
-            vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
-            vertexData[3].texcoord = { 0.0f, 1.0f };
+                          float(lonIndex+1.0f)/float(kSubdivision),
+                            1.0f-float(latIndex)/float(kSubdivision)
+                        }
+                    };
+                    VertexData verD={
+                        {
+                            std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon+kLonEvery),
+                            1.0f
+                        },
+                        {
+                              float(lonIndex+1.0f)/float(kSubdivision),
+                            1.0f-float(latIndex+1.0f)/float(kSubdivision)
+                        
+                        }
+                    };
+                    uint32_t startIndex=(latIndex*kSubdivision+lonIndex)*6;
+                    vertexDataSphere[startIndex+0]=verA;
+                    vertexDataSphere[startIndex+1]=verB;
+                    vertexDataSphere[startIndex+2]=verC;
 
-            vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-            vertexData[4].texcoord = { 0.5f, 0.0f };
+                    vertexDataSphere[startIndex+3]=verC;
+                    vertexDataSphere[startIndex+4]=verB;
+                    vertexDataSphere[startIndex+5]=verD;
 
-            vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
-            vertexData[5].texcoord = { 1.0f, 1.0f };
+
+
+                }
+
+
+            }
+
+
+
+
+
             //ビューポート
             D3D12_VIEWPORT viewport{};
             //
@@ -880,7 +976,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             //コマンドリストの初期化
             Transform transform{{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
-            Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
+            Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
            
             ID3D12Resource* transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
             //マテリアルデータの設定
@@ -1002,120 +1098,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             *transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
 
-            // 球の描画
-            const uint32_t kSubdivision=24;
-            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, sizeof(VertexData) * 6*kSubdivision*kSubdivision);
-            D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
-            //リソース先頭アドレス
-            vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
-            //リソースのサイズ
-            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6*kSubdivision*kSubdivision;
-            vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
-
-            VertexData* vertexDataSphere;
-            const float kLonEvery =std::numbers::pi_v<float>*2.0f/static_cast<float>(kSubdivision);//経度
-            const float kLatEvery =std::numbers::pi_v<float>/static_cast<float>(kSubdivision);//緯度
-            for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
-            {
-                float lat =-std::numbers::pi_v<float>*kLatEvery*latIndex;
-                for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
-                {
-                   
-                    float lon=lonIndex*kLonEvery;
-
-                    VertexData verA={
-                        {
-                            std::cosf(lat)* std::cosf(lon),
-                            std::sinf(lat),
-                            std::cosf(lat)* std::sinf(lon),
-                            1.0f
-                        },
-                        {
-                            float(lonIndex)/float(kSubdivision),
-                            1.0f-float(latIndex)/float(kSubdivision)
-
-                        
-                        }
-                    };
-                    VertexData verB={
-                        {
-                            std::cosf(lat+kLatEvery)* std::cosf(lon),
-                            std::sinf(lat+kLatEvery),
-                            std::cosf(lat+kLatEvery)* std::sinf(lon),
-                            1.0f
-                        },
-                        {
-                              float(lonIndex)/float(kSubdivision),
-                            1.0f-float(latIndex+1.0f)/float(kSubdivision)
-                        
-                        }
-                    };
-                    VertexData verC={
-                        {
-                            std::cosf(lat)* std::cosf(lon+kLonEvery),
-                            std::sinf(lat),
-                            std::cosf(lat)* std::sinf(lon+kLonEvery),
-                            1.0f
-                        },
-                        {
-
-                          float(lonIndex+1.0f)/float(kSubdivision),
-                            1.0f-float(latIndex)/float(kSubdivision)
-                        }
-                    };
-                    VertexData verD={
-                        {
-                            std::cosf(lat+kLatEvery)*cosf(lon+lonIndex),
-                            std::sinf(lat),
-                            std::cosf(lat+latIndex)* std::sinf(lon+lonIndex),
-                            1.0f
-                        },
-                        {
-                              float(lonIndex+1.0f)/float(kSubdivision),
-                            1.0f-float(latIndex+1.0f)/float(kSubdivision)
-                        
-                        }
-                    };
-                    uint32_t startIndex=(latIndex*kSubdivision+lonIndex)*6;
-                    vertexDataSphere[startIndex+0]=verA;
-                    vertexDataSphere[startIndex+1]=verB;
-                    vertexDataSphere[startIndex+2]=verC;
-
-                    vertexDataSphere[startIndex+3]=verC;
-                    vertexDataSphere[startIndex+4]=verB;
-                    vertexDataSphere[startIndex+5]=verD;
+         
 
 
+          
+        
 
-                }
+          
 
-
-            }
-
-             ID3D12Resource* transformationMatrixResourseSphere = CreateBufferResource(device, sizeof(Matrix4x4));
-            //スプライトの行列データの設定
-            Matrix4x4* transformationMatrixDataSphere = nullptr;
-            //書き込む為のアドレス
-            transformationMatrixResourseSphere->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSphere));
-
-            //行列の初期化
-            *transformationMatrixDataSphere = Makeidetity4x4();
-
-            Transform transformSphere{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-            //スプライトの行列の初期化
-
-            Matrix4x4 worldMatrixSphere = MakeAfineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.traslate);
-            Matrix4x4 viewMatrixSphere = Makeidetity4x4();
-            Matrix4x4 projectionMatrixSphere = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
-            //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
-            Matrix4x4 worldViewProjectionMatrixSphere = Multiply(worldMatrixSphere, Multiply(viewMatrixSphere, projectionMatrixSphere));
-            *transformationMatrixDataSphere = worldViewProjectionMatrixSphere;
-
-
-
-
-
-                 
+           
+       
 
           
 
@@ -1140,22 +1132,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///Update
             ///////
 
-            transform.rotate.y += 0.03f;
-            Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-            *wvpData = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
+            //transform.rotate.y += 0.03f;
+          
 
 
 
-            ImGui::ShowDemoWindow();
+           // ImGui::ShowDemoWindow();
           
 
                         ImGui::Begin("MaterialData");
             ImGui::ColorEdit4("Color", &(*materialData).x);
 
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
+            ImGui::DragFloat3("rotate",&(transform.rotate.x));
+           
             ImGui::End();
-
-
+             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
+             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+              Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
+            *wvpData = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
 
 
             ///////
@@ -1216,7 +1211,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //PSOの設定
             commandList->SetPipelineState(graphicsPipelineState);
             //VBVの設定
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1225,25 +1220,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetGraphicsRootConstantBufferView(1,wvpResource->GetGPUVirtualAddress());
             ///
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-
             //
-            commandList->DrawInstanced(6, 1, 0, 0);
-
-
-
-
+            commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
             ///
-           
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+           
+           
 
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-            commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-            commandList->DrawInstanced(6, 1, 0, 0);
 
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+
+           /* commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-            commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
+            commandList->DrawInstanced(6, 1, 0, 0);*/
+            
+
+            
 
             ///
 
@@ -1329,7 +1321,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //シリアライズしたバイナリの解放
     signatureBlob->Release();
     // //頂点リソースの解放
-    vertexResource->Release();
+   // vertexResource->Release();
     //
     graphicsPipelineState->Release();
     //
@@ -1359,6 +1351,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     transformationMatrixResourseSprite->Release();
 
     vertexResourceSphere->Release();
+    //transformationMatrixResourseSphere->Release();
 
 
     
