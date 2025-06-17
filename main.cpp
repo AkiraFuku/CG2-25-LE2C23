@@ -369,6 +369,22 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 }
 
 
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap,uint32_t descriptorSize,uint32_t index)
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr+=(descriptorSize*index);
+    return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap,uint32_t descriptorSize,uint32_t index)
+{
+    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU=descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr+=(descriptorSize*index);
+    return handleGPU;
+}
+
+
+
 
 
 
@@ -497,6 +513,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             }
             assert(device!=nullptr);
             Log(logStream, "Complete create D3D12Device!!!\n" );
+            const uint32_t descriptorSizeSRV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            const uint32_t descriptorSizeRTV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+            const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
 #ifdef _DEBUG
             ID3D12InfoQueue* infoQueue = nullptr;
             if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
@@ -1034,11 +1054,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
             srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);//最初のミップマップ
             //SRVを作成するdescriptorの取得
-            D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-            D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+           // D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+           // D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
             //SRVのハンドルをずらす
-            textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ;
-            textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+          //  textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ;
+           // textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+          D3D12_CPU_DESCRIPTOR_HANDLE  textureSrvHandleCPU= GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,1);
+           D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU= GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,1);
             //SRVの設定
             device->CreateShaderResourceView(
                 textureResource,
@@ -1096,6 +1119,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
             Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
             *transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
+
+            
 
 
          
