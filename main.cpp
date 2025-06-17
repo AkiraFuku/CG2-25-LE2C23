@@ -867,8 +867,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //vertexData[5].texcoord = { 1.0f, 1.0f };
 
                // 球の描画
-            const uint32_t kSubdivision=8;
-            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, sizeof(VertexData) * 6*kSubdivision*kSubdivision);
+            const uint32_t kSubdivision=32;
+            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, (sizeof(VertexData) * 6)*kSubdivision*(kSubdivision+1));
             D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
             //リソース先頭アドレス
             vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
@@ -883,10 +883,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
             {
                 float lat =-std::numbers::pi_v<float>/2.0f+kLatEvery*latIndex;
-                for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex)
+                for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex)
                 {
                    
-                    float lon=lonIndex*kLonEvery;
+                    float lon=lonIndex*kLonEvery + std::numbers::pi_v<float> / 2.0f;
 
                     VertexData verA={
                         {
@@ -911,7 +911,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                         },
                         {
                               float(lonIndex)/float(kSubdivision),
-                            1.0f-float(latIndex+1.0f)/float(kSubdivision)
+                            1.0f-float(latIndex+1)/float(kSubdivision)
                         
                         }
                     };
@@ -924,7 +924,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                         },
                         {
 
-                          float(lonIndex+1.0f)/float(kSubdivision),
+                          float(lonIndex+1)/float(kSubdivision),
                             1.0f-float(latIndex)/float(kSubdivision)
                         }
                     };
@@ -936,8 +936,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                             1.0f
                         },
                         {
-                              float(lonIndex+1.0f)/float(kSubdivision),
-                            1.0f-float(latIndex+1.0f)/float(kSubdivision)
+                              float(lonIndex+1)/float(kSubdivision),
+                            1.0f-float(latIndex+1)/float(kSubdivision)
                         
                         }
                     };
@@ -1279,7 +1279,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //WVP行列リソースの設定
             commandList->SetGraphicsRootConstantBufferView(1,wvpResource->GetGPUVirtualAddress());
             ///
-            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
             //
             commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
             ///
@@ -1290,9 +1290,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
 
-           /* commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-            commandList->DrawInstanced(6, 1, 0, 0);*/
+            commandList->DrawInstanced(6, 1, 0, 0);
             
 
             
@@ -1353,6 +1353,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     srvDescriptorHeap->Release();
     //テクスチャの解放
     textureResource->Release();
+    textureResource2->Release();
+
    
 //スワップチェーンの解放
 
@@ -1400,6 +1402,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //トランスフォーム行列リソースの解放
     transformatiomationMatrixResource->Release();
     intermediateResource->Release(); 
+    intermediateResource2->Release(); 
 
 
     //depthStencilResourceの解放
@@ -1412,6 +1415,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     vertexResourceSphere->Release();
     //transformationMatrixResourseSphere->Release();
+
+
 
 
     
