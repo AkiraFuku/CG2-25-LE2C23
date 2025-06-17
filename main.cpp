@@ -605,18 +605,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換・書き込み
             rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャ
             //ディスクリプタの先頭を取得
-            D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+           // D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+ 
             //ディスクリプタ２つ用意
             D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
             //rtv一つ目 先頭を入れる
-            rtvHandles[0] = rtvStartHandle;
+            //rtvHandles[0] = rtvStartHandle;
+            rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,0);
             device->CreateRenderTargetView(
                 swapChainResources[0],
                 &rtvDesc,
                 rtvHandles[0]
             );
             //rtv二つ目 ハンドルを得る
-            rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+           // rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+            rtvHandles[1]= GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,1);
             //2つ目のRTVを作成
             device->CreateRenderTargetView(
                 swapChainResources[1],
@@ -1204,7 +1208,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //transitionバリアーを張る
             commandList->ResourceBarrier(1, &barrier);
             ///
-            D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+          //  D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap,descriptorSizeDSV,0);
             commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], FALSE, &dsvHandle);
             //
             //クリアカラー
