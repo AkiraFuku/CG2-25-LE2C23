@@ -25,4 +25,5 @@ struct Transform{
 struct VertexData{
     Vector4 position; // 4D position vector
     Vector2 texcoord; // 2D texture coordinate vector
+    Vector3 normal;
 }; 

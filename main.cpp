@@ -735,15 +735,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
             //InputLayoutの設定
-            D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+            D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
             inputElementDescs[0].SemanticName = "POSITION";
             inputElementDescs[0].SemanticIndex = 0;
             inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
             inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+            //
             inputElementDescs[1].SemanticName = "TEXCOORD";
             inputElementDescs[1].SemanticIndex = 0;
             inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
             inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+            //
+            inputElementDescs[2].SemanticName = "NORMAL";
+            inputElementDescs[2].SemanticIndex = 0;
+            inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+            inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+
             D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
             inputLayoutDesc.pInputElementDescs = inputElementDescs;
             inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -900,6 +908,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                             1.0f-float(latIndex)/float(kSubdivision)
 
                         
+                        },
+                        { 
+                            std::cosf(lat)* std::cosf(lon),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon)
                         }
                     };
                     VertexData verB={
@@ -913,6 +926,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                               float(lonIndex)/float(kSubdivision),
                             1.0f-float(latIndex+1)/float(kSubdivision)
                         
+                        },
+                        { 
+                            std::cosf(lat+kLatEvery)* std::cosf(lon),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon)
                         }
                     };
                     VertexData verC={
@@ -926,7 +944,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
                           float(lonIndex+1)/float(kSubdivision),
                             1.0f-float(latIndex)/float(kSubdivision)
+                        },
+                        {
+                            std::cosf(lat)* std::cosf(lon+kLonEvery),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon+kLonEvery)
                         }
+
                     };
                     VertexData verD={
                         {
@@ -939,16 +963,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                               float(lonIndex+1)/float(kSubdivision),
                             1.0f-float(latIndex+1)/float(kSubdivision)
                         
+                        },
+                        {
+                            std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon+kLonEvery)
                         }
+
                     };
                     uint32_t startIndex=(latIndex*kSubdivision+lonIndex)*6;
                     vertexDataSphere[startIndex+0]=verA;
+                   // vertexDataSphere[startIndex+0].normal.x=vertexDataSphere[startIndex+0].position.x;
+                    //vertexDataSphere[startIndex+0].normal.y=vertexDataSphere[startIndex+0].position.y;
+                    //vertexDataSphere[startIndex+0].normal.z=vertexDataSphere[startIndex+0].position.z;
+
                     vertexDataSphere[startIndex+1]=verB;
+                   // vertexDataSphere[startIndex+1].normal.x=vertexDataSphere[startIndex+1].position.x;
+                    //vertexDataSphere[startIndex+1].normal.y=vertexDataSphere[startIndex+1].position.y;
+                    //vertexDataSphere[startIndex+1].normal.z=vertexDataSphere[startIndex+1].position.z;
+
                     vertexDataSphere[startIndex+2]=verC;
+                    //vertexDataSphere[startIndex+2].normal.x=vertexDataSphere[startIndex+2].position.x;
+                    //vertexDataSphere[startIndex+2].normal.y=vertexDataSphere[startIndex+2].position.y;
+                    //vertexDataSphere[startIndex+2].normal.z=vertexDataSphere[startIndex+2].position.z;
 
                     vertexDataSphere[startIndex+3]=verC;
+                    //vertexDataSphere[startIndex+3].normal.x=vertexDataSphere[startIndex+3].position.x;
+                    //vertexDataSphere[startIndex+3].normal.y=vertexDataSphere[startIndex+3].position.y;
+                    //vertexDataSphere[startIndex+3].normal.z=vertexDataSphere[startIndex+3].position.z;
+
                     vertexDataSphere[startIndex+4]=verB;
+                    //vertexDataSphere[startIndex+4].normal.x=vertexDataSphere[startIndex+4].position.x;
+                    //vertexDataSphere[startIndex+4].normal.y=vertexDataSphere[startIndex+4].position.y;
+                    //vertexDataSphere[startIndex+4].normal.z=vertexDataSphere[startIndex+4].position.z;
+
                     vertexDataSphere[startIndex+5]=verD;
+                    //vertexDataSphere[startIndex+5].normal.x=vertexDataSphere[startIndex+5].position.x;
+                    //vertexDataSphere[startIndex+5].normal.y=vertexDataSphere[startIndex+5].position.y;
+                    //vertexDataSphere[startIndex+5].normal.z=vertexDataSphere[startIndex+5].position.z;
 
 
 
@@ -1119,21 +1171,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             vertexResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
             vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
+            vertexDataSprite[0].normal = { 0.0f,0.0f, -1.0f };
             
             vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
             vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
-           
+            vertexDataSprite[1].normal = { 0.0f,0.0f, -1.0f };
+
             vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
+            vertexDataSprite[2].normal = { 0.0f,0.0f, -1.0f };
             
             vertexDataSprite[3].position = { 0.0f, 0.0f, 0.0f, 1.0f };
             vertexDataSprite[3].texcoord = { 0.0f, 0.0f };
+            vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
             
             vertexDataSprite[4].position = { 640.0f, 0.0f, 0.0f, 1.0f };
             vertexDataSprite[4].texcoord = { 1.0f, 0.0f };
+            vertexDataSprite[4].normal = { 0.0f,0.0f, -1.0f };
            
             vertexDataSprite[5].position = { 640.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
+            vertexDataSprite[5].normal = { 0.0f,0.0f, -1.0f };
 
             ID3D12Resource* transformationMatrixResourseSprite = CreateBufferResource(device, sizeof(Matrix4x4));
             //スプライトの行列データの設定
