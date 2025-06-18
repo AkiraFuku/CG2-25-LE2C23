@@ -973,35 +973,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                     };
                     uint32_t startIndex=(latIndex*kSubdivision+lonIndex)*6;
                     vertexDataSphere[startIndex+0]=verA;
-                   // vertexDataSphere[startIndex+0].normal.x=vertexDataSphere[startIndex+0].position.x;
-                    //vertexDataSphere[startIndex+0].normal.y=vertexDataSphere[startIndex+0].position.y;
-                    //vertexDataSphere[startIndex+0].normal.z=vertexDataSphere[startIndex+0].position.z;
 
                     vertexDataSphere[startIndex+1]=verB;
-                   // vertexDataSphere[startIndex+1].normal.x=vertexDataSphere[startIndex+1].position.x;
-                    //vertexDataSphere[startIndex+1].normal.y=vertexDataSphere[startIndex+1].position.y;
-                    //vertexDataSphere[startIndex+1].normal.z=vertexDataSphere[startIndex+1].position.z;
 
                     vertexDataSphere[startIndex+2]=verC;
-                    //vertexDataSphere[startIndex+2].normal.x=vertexDataSphere[startIndex+2].position.x;
-                    //vertexDataSphere[startIndex+2].normal.y=vertexDataSphere[startIndex+2].position.y;
-                    //vertexDataSphere[startIndex+2].normal.z=vertexDataSphere[startIndex+2].position.z;
 
                     vertexDataSphere[startIndex+3]=verC;
-                    //vertexDataSphere[startIndex+3].normal.x=vertexDataSphere[startIndex+3].position.x;
-                    //vertexDataSphere[startIndex+3].normal.y=vertexDataSphere[startIndex+3].position.y;
-                    //vertexDataSphere[startIndex+3].normal.z=vertexDataSphere[startIndex+3].position.z;
 
                     vertexDataSphere[startIndex+4]=verB;
-                    //vertexDataSphere[startIndex+4].normal.x=vertexDataSphere[startIndex+4].position.x;
-                    //vertexDataSphere[startIndex+4].normal.y=vertexDataSphere[startIndex+4].position.y;
-                    //vertexDataSphere[startIndex+4].normal.z=vertexDataSphere[startIndex+4].position.z;
 
                     vertexDataSphere[startIndex+5]=verD;
-                    //vertexDataSphere[startIndex+5].normal.x=vertexDataSphere[startIndex+5].position.x;
-                    //vertexDataSphere[startIndex+5].normal.y=vertexDataSphere[startIndex+5].position.y;
-                    //vertexDataSphere[startIndex+5].normal.z=vertexDataSphere[startIndex+5].position.z;
-
 
 
                 }
@@ -1203,9 +1184,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //行列の初期化
             *transformationMatrixDataSprite = Makeidetity4x4();
 
+             ///マテリアルリソース
+            ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material) );
+            //マテリアルデータの設定
+            Material* materialDataSprite = nullptr;
+            //書き込む為のアドレス
+            materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
+            //データの設定
+            materialDataSprite->color =  Vector4(1.0f, 1.0f, 1.0f, 1.0f );
+            materialDataSprite->enableLighting =false;
+
             Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
             //スプライトの行列の初期化
-
             Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
             Matrix4x4 viewMatrixSprite = Makeidetity4x4();
             Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
@@ -1349,7 +1339,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            
            
 
-
+            commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite->GetGPUVirtualAddress());
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
@@ -1458,6 +1448,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     pixelShaderBlob->Release();
     //マテリアルリソースの解放
     materialResource->Release();
+    materialResourceSprite->Release();
+
     //WVP行列リソースの解放
     wvpResource->Release();
     //トランスフォーム行列リソースの解放
