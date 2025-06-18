@@ -1032,13 +1032,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///
 
             ///マテリアルリソース
-            ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4) );
+            ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Material) );
             //マテリアルデータの設定
-            Vector4* materialData = nullptr;
+            Material* materialData = nullptr;
             //書き込む為のアドレス
             materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
             //データの設定
-            *materialData =  Vector4(1.0f, 1.0f, 1.0f, 1.0f );
+            materialData->color =  Vector4(1.0f, 1.0f, 1.0f, 1.0f );
+            materialData->enableLighting =true;
 
             ///WVP行列リソースの設定
             ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -1260,7 +1261,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
           
 
                         ImGui::Begin("MaterialData");
-            ImGui::ColorEdit4("Color", &(*materialData).x);
+            ImGui::ColorEdit4("Color", &(materialData->color).x);
 
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
             ImGui::DragFloat3("rotate",&(transform.rotate.x));

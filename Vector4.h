@@ -27,3 +27,9 @@ struct VertexData{
     Vector2 texcoord; // 2D texture coordinate vector
     Vector3 normal;
 }; 
+struct Material 
+{
+    Vector4 color;
+    int32_t enableLighting;
+
+};
