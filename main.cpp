@@ -1154,12 +1154,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
             *transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
+            bool useMonstorBall =true;
+
             
 
 
          
 
-
+                 
           
         
 
@@ -1204,7 +1206,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
             ImGui::DragFloat3("rotate",&(transform.rotate.x));
-           
+            ImGui::Checkbox("useMonsterBall",&useMonstorBall);
             ImGui::End();
              Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
              Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -1279,7 +1281,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //WVP行列リソースの設定
             commandList->SetGraphicsRootConstantBufferView(1,wvpResource->GetGPUVirtualAddress());
             ///
-            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
+            commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU);
             //
             commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
             ///
@@ -1289,7 +1291,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            
 
 
-
+            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
             commandList->DrawInstanced(6, 1, 0, 0);
