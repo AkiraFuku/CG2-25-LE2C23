@@ -33,3 +33,7 @@ struct Material
     int32_t enableLighting;
 
 };
+struct TransformationMatrix{
+    Matrix4x4 WVP;
+    Matrix4x4 World;
+};
