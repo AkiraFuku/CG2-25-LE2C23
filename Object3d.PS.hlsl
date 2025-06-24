@@ -5,6 +5,14 @@ struct Material
     float32_t4 Color;
     int32_t enableLighting;
 };
+struct DirectionalLight
+{
+    float32_t4 color; //ライトの色
+    float32_t3 direction; //ライトの向き
+    float Intensity; // 明るさ
+
+
+};
 ConstantBuffer<Material> gMaterial : register(b0);
 struct PixelShaderOutput{
     float32_t4 color : SV_TARGET0;

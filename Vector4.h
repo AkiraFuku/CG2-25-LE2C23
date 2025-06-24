@@ -39,3 +39,10 @@ struct TransformationMatrix
     Matrix4x4 World;
 
 };
+struct DirectionalLight{
+    Vector4 color;//ライトの色
+    Vector3 direction;//ライトの向き
+    float Intensity;// 明るさ
+
+
+};
