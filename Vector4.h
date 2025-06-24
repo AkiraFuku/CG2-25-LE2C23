@@ -31,5 +31,11 @@ struct Material
 {
     Vector4 color;
     int32_t enableLighting;
+};
+
+struct TransformationMatrix
+{
+    Matrix4x4 WVP;
+    Matrix4x4 World;
 
 };

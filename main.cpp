@@ -1023,13 +1023,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             materialData->enableLighting =true;
 
             ///WVP行列リソースの設定
-            ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+            ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(TransformationMatrix));
             //WVP行列データの設定
-            Matrix4x4* wvpData = nullptr;
+            TransformationMatrix* wvpData = nullptr;
             //書き込む為のアドレス
             wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
             //行列の初期化
-            *wvpData = Makeidetity4x4();
+            wvpData->WVP = Makeidetity4x4();
+            wvpData->World = Makeidetity4x4();
 
 
             //コマンドリストの初期化
@@ -1260,7 +1261,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
              Matrix4x4 viewMatrix = Inverse(cameraMatrix);
               Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-            *wvpData = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
+            wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
+            wvpData->World=worldMatrix;
 
 
             ///////
