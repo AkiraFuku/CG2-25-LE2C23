@@ -9,11 +9,12 @@ struct DirectionalLight
 {
     float32_t4 color; //ライトの色
     float32_t3 direction; //ライトの向き
-    float Intensity; // 明るさ
+    float intensity; // 明るさ
 
 
 };
 ConstantBuffer<Material> gMaterial : register(b0);
+ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 struct PixelShaderOutput{
     float32_t4 color : SV_TARGET0;
 };

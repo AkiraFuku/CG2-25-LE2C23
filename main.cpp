@@ -681,7 +681,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
             ///ルートパラメータの設定
-            D3D12_ROOT_PARAMETER rootParameters[3]{};
+            D3D12_ROOT_PARAMETER rootParameters[4]{};
             rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
@@ -692,6 +692,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
             rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//ディスクリプタレンジの数
+            rootParameters[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+            rootParameters[3].ShaderVisibility= D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
+            rootParameters[3].Descriptor.ShaderRegister=1;
+
             descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
             descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
@@ -1091,13 +1095,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
             srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
             srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);//最初のミップマップ
-            //SRVを作成するdescriptorの取得
-           // D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-           // D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-            //SRVのハンドルをずらす
-          //  textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ;
-           // textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
+           
           D3D12_CPU_DESCRIPTOR_HANDLE  textureSrvHandleCPU2= GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,2);
            D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2= GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,2);
             //SRVの設定
@@ -1122,13 +1120,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
             srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);//最初のミップマップ
-            //SRVを作成するdescriptorの取得
-           // D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-           // D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-            //SRVのハンドルをずらす
-          //  textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ;
-           // textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
+           
           D3D12_CPU_DESCRIPTOR_HANDLE  textureSrvHandleCPU= GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,1);
            D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU= GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,1);
             //SRVの設定
@@ -1205,6 +1197,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             *transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
             bool useMonstorBall =true;
+
+            //平行光源
+             ID3D12Resource* directionalLightResourse=CreateBufferResource(device,sizeof(DirectionalLight));
+             DirectionalLight* directionalLightData=nullptr;
+             directionalLightResourse->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+             directionalLightData->color={1.0f,1.0f,1.0f,1.0f};
+             directionalLightData->direction={0.0f,-1.0f,0.0f};
+             directionalLightData->intensity=1.0f;
+
+
 
             
 
