@@ -885,7 +885,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //リソース先頭アドレス
             vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6*kSubdivision*kSubdivision;
+            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6*kSubdivision*(kSubdivision+1);
             vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 
             VertexData* vertexDataSphere=nullptr;
@@ -1168,14 +1168,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
             vertexDataSprite[5].normal = { 0.0f,0.0f, -1.0f };
 
-            ID3D12Resource* transformationMatrixResourseSprite = CreateBufferResource(device, sizeof(Matrix4x4));
+            ID3D12Resource* transformationMatrixResourseSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
             //スプライトの行列データの設定
-            Matrix4x4* transformationMatrixDataSprite = nullptr;
+            TransformationMatrix* transformationMatrixDataSprite = nullptr;
             //書き込む為のアドレス
             transformationMatrixResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 
             //行列の初期化
-            *transformationMatrixDataSprite = Makeidetity4x4();
+            transformationMatrixDataSprite->WVP = Makeidetity4x4();
+            transformationMatrixDataSprite->World = Makeidetity4x4();
 
              ///マテリアルリソース
             ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material) );
@@ -1194,7 +1195,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
             //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
             Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-            *transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
+            transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
+            transformationMatrixDataSprite->World=worldMatrixSprite;
 
             bool useMonstorBall =true;
 
@@ -1442,7 +1444,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //
     graphicsPipelineState->Release();
     //
-    signatureBlob->Release();
+   
     //エラーログの解放
     if (errorBlob != nullptr) {
         errorBlob->Release();
@@ -1472,10 +1474,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     vertexResourceSphere->Release();
     //transformationMatrixResourseSphere->Release();
+    
 
 
-
-
+    directionalLightResourse->Release();
     
 
 
