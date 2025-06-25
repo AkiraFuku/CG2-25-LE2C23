@@ -1204,6 +1204,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              ID3D12Resource* directionalLightResourse=CreateBufferResource(device,sizeof(DirectionalLight));
              DirectionalLight* directionalLightData=nullptr;
              directionalLightResourse->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+
              directionalLightData->color={1.0f,1.0f,1.0f,1.0f};
              directionalLightData->direction={0.0f,-1.0f,0.0f};
              directionalLightData->intensity=1.0f;
@@ -1256,17 +1257,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
           
 
                         ImGui::Begin("MaterialData");
-            ImGui::ColorEdit4("Color", &(materialData->color).x);
 
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
+            ImGui::DragFloat3("Camera Transrate",&(cameraTransform.rotate.x));
+            ImGui::ColorEdit4("Color", &(materialData->color).x); 
+            bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
+            ImGui::Checkbox("enable", &enableLighting);
+            materialData->enableLighting = enableLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate",&(transform.rotate.x));
             ImGui::Checkbox("useMonsterBall",&useMonstorBall);
+            ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x); 
+            ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
+            ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
+            ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
+            ImGui::InputFloat("intensity",&(directionalLightData->intensity));
             ImGui::End();
-             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
-             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-              Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
+            Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
+            Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+            Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
             wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
             wvpData->World=worldMatrix;
+            Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
+            Matrix4x4 viewMatrixSprite = Makeidetity4x4();
+            Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
+            transformationMatrixDataSprite->WVP =  Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
+            transformationMatrixDataSprite->World=worldMatrixSprite;
 
 
             ///////
