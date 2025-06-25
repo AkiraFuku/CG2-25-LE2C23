@@ -24,7 +24,16 @@ PixelShaderOutput main(VertexShaderOutput input)
 {
     float32_t4 textureColor = gTexture.Sample(gSampler, input.texCoord);
     PixelShaderOutput output;
+    
+    if (gMaterial.enableLighting != 0)
+    {
+        float cos = saturate(dot(normalize(input.normal), -gDirectionalLight.direction));
+        output.color = gMaterial.Color * textureColor*gDirectionalLight.color*cos*gDirectionalLight.intensity;
+    }
+    else
+    {
     output.color = gMaterial.Color*textureColor; // Red color
+    }
     
     return output;
 }
