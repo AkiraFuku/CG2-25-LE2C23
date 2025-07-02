@@ -1131,43 +1131,36 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
 
 
-        /*    //スプライトリソース
-            ID3D12Resource* vertexResourseSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
+           //スプライトリソース
+            ID3D12Resource* vertexResourseSprite = CreateBufferResource(device, sizeof(VertexData) * 4);
             //スプライトの頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
             //リソース先頭アドレス
             vertexBufferViewSprite.BufferLocation = vertexResourseSprite->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+            vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
             vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
             
             VertexData* vertexDataSprite = nullptr;
             //書き込む為のアドレス
             vertexResourseSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+            // 左下
             vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
             vertexDataSprite[0].normal = { 0.0f,0.0f, -1.0f };
-            
+            // 左上
             vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
             vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
             vertexDataSprite[1].normal = { 0.0f,0.0f, -1.0f };
-
+            // 右下
             vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
             vertexDataSprite[2].normal = { 0.0f,0.0f, -1.0f };
-            
-            vertexDataSprite[3].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-            vertexDataSprite[3].texcoord = { 0.0f, 0.0f };
+            // 右上
+            vertexDataSprite[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };
+            vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
             vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
             
-            vertexDataSprite[4].position = { 640.0f, 0.0f, 0.0f, 1.0f };
-            vertexDataSprite[4].texcoord = { 1.0f, 0.0f };
-            vertexDataSprite[4].normal = { 0.0f,0.0f, -1.0f };
-           
-            vertexDataSprite[5].position = { 640.0f, 360.0f, 0.0f, 1.0f };
-            vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
-            vertexDataSprite[5].normal = { 0.0f,0.0f, -1.0f };
-            */
  ///インデックスリソース
              ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6 );
              //インデックスバッファビューの設定
@@ -1185,9 +1178,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              indexDataSprite[0] = 0;
              indexDataSprite[1] = 1;
              indexDataSprite[2] = 2;
-             indexDataSprite[3] = 1;
-             indexDataSprite[4] = 3;
-             indexDataSprite[5] = 2;
+             indexDataSprite[3] = 2;
+             indexDataSprite[4] = 1;
+             indexDataSprite[5] = 3;
 
 
             ID3D12Resource* transformationMatrixResourseSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -1388,7 +1381,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite->GetGPUVirtualAddress());
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-            //commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
             commandList->IASetIndexBuffer(&indexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
             //commandList->DrawInstanced(6, 1, 0, 0);
@@ -1512,7 +1505,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     dsvDescriptorHeap->Release();
 
     //
-   // vertexResourseSprite->Release();
+    vertexResourseSprite->Release();
     transformationMatrixResourseSprite->Release();
 
     vertexResourceSphere->Release();
