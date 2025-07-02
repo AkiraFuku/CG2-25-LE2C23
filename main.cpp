@@ -1131,7 +1131,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
 
 
-            //スプライトリソース
+        /*    //スプライトリソース
             ID3D12Resource* vertexResourseSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
             //スプライトの頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
@@ -1167,6 +1167,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             vertexDataSprite[5].position = { 640.0f, 360.0f, 0.0f, 1.0f };
             vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
             vertexDataSprite[5].normal = { 0.0f,0.0f, -1.0f };
+            */
+ ///インデックスリソース
+             ID3D12Resource* indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6 );
+             //インデックスバッファビューの設定
+             D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+             //リソース先頭アドレス
+             indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
+             //リソースのサイズ
+             indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+             indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;//32ビット整数
+
+             uint32_t* indexDataSprite = nullptr;
+             //書き込む為のアドレス
+             indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+             //インデックスの設定
+             indexDataSprite[0] = 0;
+             indexDataSprite[1] = 1;
+             indexDataSprite[2] = 2;
+             indexDataSprite[3] = 1;
+             indexDataSprite[4] = 3;
+             indexDataSprite[5] = 2;
+
 
             ID3D12Resource* transformationMatrixResourseSprite = CreateBufferResource(device, sizeof(TransformationMatrix));
             //スプライトの行列データの設定
@@ -1204,14 +1226,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              ID3D12Resource* directionalLightResourse=CreateBufferResource(device,sizeof(DirectionalLight));
              DirectionalLight* directionalLightData=nullptr;
              directionalLightResourse->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-             
-            
-
              directionalLightData->color={1.0f,1.0f,1.0f,1.0f};
              directionalLightData->direction= {0.0f,-1.0f,0.0f};
              directionalLightData->intensity=1.0f;
 
 
+
+            
 
             
 
@@ -1367,9 +1388,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite->GetGPUVirtualAddress());
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+            //commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+            commandList->IASetIndexBuffer(&indexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-            commandList->DrawInstanced(6, 1, 0, 0);
+            //commandList->DrawInstanced(6, 1, 0, 0);
+            commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
             
 
             
@@ -1489,7 +1512,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     dsvDescriptorHeap->Release();
 
     //
-    vertexResourseSprite->Release();
+   // vertexResourseSprite->Release();
     transformationMatrixResourseSprite->Release();
 
     vertexResourceSphere->Release();
@@ -1498,6 +1521,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
     directionalLightResourse->Release();
+    indexResourceSprite->Release();
     
 
 
