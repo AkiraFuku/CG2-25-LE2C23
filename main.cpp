@@ -880,16 +880,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
                // 球の描画
             const uint32_t kSubdivision=32;
-            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, (sizeof(VertexData) * 6)*kSubdivision*(kSubdivision+1));
+            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, (sizeof(VertexData) * 4)*kSubdivision*(kSubdivision+1));
             D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
             //リソース先頭アドレス
             vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 6*kSubdivision*(kSubdivision+1);
+            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 4*kSubdivision*(kSubdivision+1);
             vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
 
             VertexData* vertexDataSphere=nullptr;
             vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+            //インデックスバッファビューの設定
+            
+            ID3D12Resource* indexResourceSphere =CreateBufferResource(device, (sizeof(uint32_t) * 6)*kSubdivision*(kSubdivision+1));
+            D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
+
+            indexBufferViewSphere.BufferLocation =indexResourceSphere ->GetGPUVirtualAddress();
+            indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * (kSubdivision + 1);
+            indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;//頂点のフォーマット
+            uint32_t* indexDataSphere = nullptr;
+            indexResourceSphere ->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
+
             const float kLonEvery =std::numbers::pi_v<float>*2.0f/static_cast<float>(kSubdivision);//経度
             const float kLatEvery =std::numbers::pi_v<float>/static_cast<float>(kSubdivision);//緯度
             for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
@@ -900,6 +911,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                    
                     float lon=lonIndex*kLonEvery + std::numbers::pi_v<float> / 2.0f;
 
+                    //頂点データの設定
+                    //A,B,C,Dの4つの頂点を設定
+
+                    //左上の頂点A
                     VertexData verA={
                         {
                             std::cosf(lat)* std::cosf(lon),
@@ -919,6 +934,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                             std::cosf(lat)* std::sinf(lon)
                         }
                     };
+                    //右上の頂点B
                     VertexData verB={
                         {
                             std::cosf(lat+kLatEvery)* std::cosf(lon),
@@ -937,6 +953,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                             std::cosf(lat+kLatEvery)* std::sinf(lon)
                         }
                     };
+
+                    //左下の頂点C
                     VertexData verC={
                         {
                             std::cosf(lat)* std::cosf(lon+kLonEvery),
@@ -956,6 +974,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                         }
 
                     };
+                    //右下の頂点D
                     VertexData verD={
                         {
                             std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
@@ -975,18 +994,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                         }
 
                     };
-                    uint32_t startIndex=(latIndex*kSubdivision+lonIndex)*6;
-                    vertexDataSphere[startIndex+0]=verA;
+                    uint32_t vertexStartIndex =(latIndex*kSubdivision+lonIndex)*4;
+                    //頂点データの設定
+                       
+                    vertexDataSphere[vertexStartIndex+0]=verA;
 
-                    vertexDataSphere[startIndex+1]=verB;
+                    vertexDataSphere[vertexStartIndex+1]=verB;
 
-                    vertexDataSphere[startIndex+2]=verC;
+                    vertexDataSphere[vertexStartIndex+2]=verC;
 
-                    vertexDataSphere[startIndex+3]=verC;
+                    vertexDataSphere[vertexStartIndex+3]=verD;
 
-                    vertexDataSphere[startIndex+4]=verB;
+                    //vertexDataSphere[startIndex+4]=verB;
 
-                    vertexDataSphere[startIndex+5]=verD;
+                    //vertexDataSphere[startIndex+5]=verD;
+
+                    //インデックスデータの設定
+                     uint32_t   StartIndex =(latIndex*kSubdivision+lonIndex)*6;
+                     indexDataSphere[StartIndex + 0] = vertexStartIndex + 0; // A
+                     indexDataSphere[StartIndex + 1] = vertexStartIndex + 1; // B
+                     indexDataSphere[StartIndex + 2] = vertexStartIndex + 2; // C
+                     indexDataSphere[StartIndex + 3] = vertexStartIndex + 1; // B
+                     indexDataSphere[StartIndex + 4] = vertexStartIndex + 3; // D
+                     indexDataSphere[StartIndex + 5] = vertexStartIndex + 2; // C
+
 
 
                 }
@@ -1361,6 +1392,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetPipelineState(graphicsPipelineState);
             //VBVの設定
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+            //IBVの設定
+            commandList->IASetIndexBuffer(&indexBufferViewSphere);
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1372,7 +1405,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             // 追加: 平行光源CBVをバインド
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse->GetGPUVirtualAddress());
             //
-            commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
+            //描画コマンド
+            commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
+            //commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -1515,6 +1550,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     directionalLightResourse->Release();
     indexResourceSprite->Release();
+    indexResourceSphere->Release();
     
 
 
