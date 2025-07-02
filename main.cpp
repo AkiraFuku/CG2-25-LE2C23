@@ -1250,7 +1250,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///Update
             ///////
 
-            //transform.rotate.y += 0.03f;
+            transform.rotate.y += 0.03f;
           
 
 
