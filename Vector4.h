@@ -8,6 +8,9 @@ struct Vector4{
 struct Matrix4x4{
    float m[4][4];
 };
+struct Matrix3x3{
+   float m[3][3];
+};
 struct Vector2{
     float x;
     float y;
@@ -31,6 +34,8 @@ struct Material
 {
     Vector4 color;
     int32_t enableLighting;
+    Matrix3x3 uvTransform; // UV変換行列
+    
 };
 
 struct TransformationMatrix
