@@ -35,7 +35,7 @@ struct Material
     Vector4 color;
     int32_t enableLighting;
     float padding[3]; // パディングを追加してアライメントを調整
-    Matrix3x3 uvTransform; // UV変換行列
+    Matrix4x4 uvTransform; // UV変換行列
 };
 
 struct TransformationMatrix
