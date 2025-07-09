@@ -408,6 +408,7 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
              Vector4 position;
              s >> position.x >> position.y >> position.z;//頂点座標を読み込み
              position.w = 1.0f; // w成分を1.0に設定
+           //  position.x *= -1.0f; // X軸を反転
              positions.push_back(position);//頂点座標を追加
          } else if(identifier=="vt"){
              Vector2 texcoord;
@@ -416,9 +417,11 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
          } else if(identifier=="vn"){
              Vector3 normal;
              s >> normal.x >> normal.y >> normal.z;//法線ベクトルを読み込み
+           //  normal.x *= -1.0f; // X軸を反転
              normals.push_back(normal);
 
          } else if(identifier=="f"){
+            // VertexData Triangle[3];
             //面は三角形限定
              for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++){
                  std::string vertexDefinition;
@@ -435,6 +438,7 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
                  Vector4 position = positions[elementIndices[0] - 1];//1から始まるので-1
                  Vector2 texcoord = texcoords[elementIndices[1] - 1];//1から始まるので-1
                  Vector3 normal = normals[elementIndices[2] - 1];//1から始まるので-1
+                 
                  VertexData vertex = { position, texcoord, normal };//頂点データを構築
                  modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
 
@@ -909,183 +913,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
             ///
-
-            //ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
-            /////
-            ////頂点バッファビューの設定
-            //D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-            ////リソース先頭アドレス
-            //vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-            ////リソースのサイズ
-            //vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
-            //vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-            ////頂点データの設定
-            //VertexData* vertexData = nullptr;
-            ////書き込む為のアドレス
-            //vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-            ////データの設定
-            //vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
-            //vertexData[0] .texcoord= { 0.0f, 1.0f };
-
-            //vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
-            //vertexData[1].texcoord = { 0.5f, 0.0f };
-
-            //vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
-            //vertexData[2].texcoord = { 1.0f, 1.0f };
-
-            //vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
-            //vertexData[3].texcoord = { 0.0f, 1.0f };
-
-            //vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-            //vertexData[4].texcoord = { 0.5f, 0.0f };
-
-            //vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
-            //vertexData[5].texcoord = { 1.0f, 1.0f };
-
-               // 球の描画
-            const uint32_t kSubdivision=32;
-            ID3D12Resource* vertexResource =CreateBufferResource(device, (sizeof(VertexData) * 4)*kSubdivision*(kSubdivision+1));
+            ModelData modelData = LoadObjFile("resources", "plane.obj");
+            //頂点リソース
+            ID3D12Resource* vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
+            //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-            //リソース先頭アドレス
-            vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-            //リソースのサイズ
-            vertexBufferView.SizeInBytes = sizeof(VertexData) * 4*kSubdivision*(kSubdivision+1);
-            vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-            VertexData* vertexData=nullptr;
+            vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();//リソースの先頭アドレス
+            vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());//リソースのサイズ
+            vertexBufferView.StrideInBytes = sizeof(VertexData);//頂点のサイズ
+            //頂点データの書き込み
+            VertexData* vertexData = nullptr;
             vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-            //インデックスバッファビューの設定
-            
-            ID3D12Resource* indexResource =CreateBufferResource(device, (sizeof(uint32_t) * 6)*kSubdivision*(kSubdivision+1));
-            D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+            std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
 
-            indexBufferView.BufferLocation =indexResource ->GetGPUVirtualAddress();
-            indexBufferView.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * (kSubdivision + 1);
-            indexBufferView.Format = DXGI_FORMAT_R32_UINT;//頂点のフォーマット
-            uint32_t* indexData = nullptr;
-            indexResource ->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-
-            const float kLonEvery =std::numbers::pi_v<float>*2.0f/static_cast<float>(kSubdivision);//経度
-            const float kLatEvery =std::numbers::pi_v<float>/static_cast<float>(kSubdivision);//緯度
-            for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
-            {
-                float lat =-std::numbers::pi_v<float>/2.0f+kLatEvery*latIndex;
-                for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex)
-                {
-                   
-                    float lon=lonIndex*kLonEvery + std::numbers::pi_v<float> / 2.0f;
-
-                    //頂点データの設定
-                    //A,B,C,Dの4つの頂点を設定
-
-                    //左上の頂点A
-                    VertexData verA={
-                        {
-                            std::cosf(lat)* std::cosf(lon),
-                            std::sinf(lat),
-                            std::cosf(lat)* std::sinf(lon),
-                            1.0f
-                        },
-                        {
-                            float(lonIndex)/float(kSubdivision),
-                            1.0f-float(latIndex)/float(kSubdivision)
-
-                        
-                        },
-                        { 
-                            std::cosf(lat)* std::cosf(lon),
-                            std::sinf(lat),
-                            std::cosf(lat)* std::sinf(lon)
-                        }
-                    };
-                    //右上の頂点B
-                    VertexData verB={
-                        {
-                            std::cosf(lat+kLatEvery)* std::cosf(lon),
-                            std::sinf(lat+kLatEvery),
-                            std::cosf(lat+kLatEvery)* std::sinf(lon),
-                            1.0f
-                        },
-                        {
-                              float(lonIndex)/float(kSubdivision),
-                            1.0f-float(latIndex+1)/float(kSubdivision)
-                        
-                        },
-                        { 
-                            std::cosf(lat+kLatEvery)* std::cosf(lon),
-                            std::sinf(lat+kLatEvery),
-                            std::cosf(lat+kLatEvery)* std::sinf(lon)
-                        }
-                    };
-
-                    //左下の頂点C
-                    VertexData verC={
-                        {
-                            std::cosf(lat)* std::cosf(lon+kLonEvery),
-                            std::sinf(lat),
-                            std::cosf(lat)* std::sinf(lon+kLonEvery),
-                            1.0f
-                        },
-                        {
-
-                          float(lonIndex+1)/float(kSubdivision),
-                            1.0f-float(latIndex)/float(kSubdivision)
-                        },
-                        {
-                            std::cosf(lat)* std::cosf(lon+kLonEvery),
-                            std::sinf(lat),
-                            std::cosf(lat)* std::sinf(lon+kLonEvery)
-                        }
-
-                    };
-                    //右下の頂点D
-                    VertexData verD={
-                        {
-                            std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
-                            std::sinf(lat+kLatEvery),
-                            std::cosf(lat+kLatEvery)* std::sinf(lon+kLonEvery),
-                            1.0f
-                        },
-                        {
-                              float(lonIndex+1)/float(kSubdivision),
-                            1.0f-float(latIndex+1)/float(kSubdivision)
-                        
-                        },
-                        {
-                            std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
-                            std::sinf(lat+kLatEvery),
-                            std::cosf(lat+kLatEvery)* std::sinf(lon+kLonEvery)
-                        }
-
-                    };
-                    uint32_t vertexStartIndex =(latIndex*kSubdivision+lonIndex)*4;
-                    //頂点データの設定
-                       
-                    vertexData[vertexStartIndex+0]=verA;
-
-                    vertexData[vertexStartIndex+1]=verB;
-
-                    vertexData[vertexStartIndex+2]=verC;
-
-                    vertexData[vertexStartIndex+3]=verD;
-
-                    //インデックスデータの設定
-                     uint32_t   StartIndex =(latIndex*kSubdivision+lonIndex)*6;
-                     indexData[StartIndex + 0] = vertexStartIndex + 0; // A
-                     indexData[StartIndex + 1] = vertexStartIndex + 1; // B
-                     indexData[StartIndex + 2] = vertexStartIndex + 2; // C
-                     indexData[StartIndex + 3] = vertexStartIndex + 1; // B
-                     indexData[StartIndex + 4] = vertexStartIndex + 3; // D
-                     indexData[StartIndex + 5] = vertexStartIndex + 2; // C
-
-
-
-                }
-
-
-            }
-
+           
 
 
 
@@ -1364,7 +1205,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///Update
             ///////
 
-            transform.rotate.y += 0.03f;
+           // transform.rotate.y += 0.03f;
           
 
 
@@ -1471,7 +1312,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //VBVの設定
             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             //IBVの設定
-            commandList->IASetIndexBuffer(&indexBufferView);
+          //  commandList->IASetIndexBuffer(&indexBufferView);
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1484,8 +1325,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse->GetGPUVirtualAddress());
             //
             //描画コマンド
-            commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-            //commandList->DrawInstanced(6*kSubdivision*kSubdivision, 1, 0, 0);
+            
+         //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
+            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -1628,7 +1470,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     directionalLightResourse->Release();
     indexResourceSprite->Release();
-    indexResource->Release();
+   // indexResource->Release();
     
 
 
