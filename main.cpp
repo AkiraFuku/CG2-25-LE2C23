@@ -408,7 +408,7 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
              Vector4 position;
              s >> position.x >> position.y >> position.z;//頂点座標を読み込み
              position.w = 1.0f; // w成分を1.0に設定
-           //  position.x *= -1.0f; // X軸を反転
+             position.x *= -1.0f; // X軸を反転
              positions.push_back(position);//頂点座標を追加
          } else if(identifier=="vt"){
              Vector2 texcoord;
@@ -417,19 +417,19 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
          } else if(identifier=="vn"){
              Vector3 normal;
              s >> normal.x >> normal.y >> normal.z;//法線ベクトルを読み込み
-           //  normal.x *= -1.0f; // X軸を反転
+             normal.x *= -1.0f; // X軸を反転
              normals.push_back(normal);
 
          } else if(identifier=="f"){
-            // VertexData Triangle[3];
+            VertexData Triangle[3];
             //面は三角形限定
-             for (int32_t faceVertex = 0; faceVertex < 3; faceVertex++){
+             for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex){
                  std::string vertexDefinition;
                  s >> vertexDefinition;//頂点定義を読み込み
                  //頂点の要素へのIndexは「位置/UV/法線」の順番で格納されているので、分解して取得
                  std::istringstream v(vertexDefinition);
                  uint32_t elementIndices[3];//位置、UV、法線のインデックス
-                 for (uint32_t element = 0; element < 3; element++){
+                 for (uint32_t element = 0; element < 3; ++element){
                      std::string index;
                      std::getline(v, index, '/');//スラッシュで区切って取得
                      elementIndices[element] = std::stoi(index);//文字列を整数に変換
@@ -439,13 +439,18 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
                  Vector2 texcoord = texcoords[elementIndices[1] - 1];//1から始まるので-1
                  Vector3 normal = normals[elementIndices[2] - 1];//1から始まるので-1
                  
-                 VertexData vertex = { position, texcoord, normal };//頂点データを構築
-                 modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
-
+             //    VertexData vertex = { position, texcoord, normal };//頂点データを構築
+             //    modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
+                 Triangle[faceVertex] = { position, texcoord, normal };//頂点データを構築
              }
+             modelData.vertices.push_back(Triangle[2]);
+             modelData.vertices.push_back(Triangle[1]);
+             modelData.vertices.push_back(Triangle[0]);
          }
       
     }
+   
+
 
     //4. モデルデータを返す
     return modelData;
