@@ -34,7 +34,8 @@ struct Material
 {
     Vector4 color;
     int32_t enableLighting;
-    Matrix3x3 uvTransform; // UV変換行列
+    float padding[3]; // パディングを追加してサイズを揃える
+    Matrix4x4 uvTransform; // UV変換行列
     
 };
 
