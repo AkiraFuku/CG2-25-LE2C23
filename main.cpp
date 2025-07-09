@@ -444,6 +444,7 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
     }
 
     //4. モデルデータを返す
+    return modelData;
    
 }
 
@@ -944,26 +945,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
                // 球の描画
             const uint32_t kSubdivision=32;
-            ID3D12Resource* vertexResourceSphere =CreateBufferResource(device, (sizeof(VertexData) * 4)*kSubdivision*(kSubdivision+1));
-            D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
+            ID3D12Resource* vertexResource =CreateBufferResource(device, (sizeof(VertexData) * 4)*kSubdivision*(kSubdivision+1));
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
             //リソース先頭アドレス
-            vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
+            vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
             //リソースのサイズ
-            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 4*kSubdivision*(kSubdivision+1);
-            vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
+            vertexBufferView.SizeInBytes = sizeof(VertexData) * 4*kSubdivision*(kSubdivision+1);
+            vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-            VertexData* vertexDataSphere=nullptr;
-            vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+            VertexData* vertexData=nullptr;
+            vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
             //インデックスバッファビューの設定
             
-            ID3D12Resource* indexResourceSphere =CreateBufferResource(device, (sizeof(uint32_t) * 6)*kSubdivision*(kSubdivision+1));
-            D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
+            ID3D12Resource* indexResource =CreateBufferResource(device, (sizeof(uint32_t) * 6)*kSubdivision*(kSubdivision+1));
+            D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
-            indexBufferViewSphere.BufferLocation =indexResourceSphere ->GetGPUVirtualAddress();
-            indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * (kSubdivision + 1);
-            indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;//頂点のフォーマット
-            uint32_t* indexDataSphere = nullptr;
-            indexResourceSphere ->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
+            indexBufferView.BufferLocation =indexResource ->GetGPUVirtualAddress();
+            indexBufferView.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * (kSubdivision + 1);
+            indexBufferView.Format = DXGI_FORMAT_R32_UINT;//頂点のフォーマット
+            uint32_t* indexData = nullptr;
+            indexResource ->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
             const float kLonEvery =std::numbers::pi_v<float>*2.0f/static_cast<float>(kSubdivision);//経度
             const float kLatEvery =std::numbers::pi_v<float>/static_cast<float>(kSubdivision);//緯度
@@ -1061,26 +1062,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                     uint32_t vertexStartIndex =(latIndex*kSubdivision+lonIndex)*4;
                     //頂点データの設定
                        
-                    vertexDataSphere[vertexStartIndex+0]=verA;
+                    vertexData[vertexStartIndex+0]=verA;
 
-                    vertexDataSphere[vertexStartIndex+1]=verB;
+                    vertexData[vertexStartIndex+1]=verB;
 
-                    vertexDataSphere[vertexStartIndex+2]=verC;
+                    vertexData[vertexStartIndex+2]=verC;
 
-                    vertexDataSphere[vertexStartIndex+3]=verD;
-
-                    //vertexDataSphere[startIndex+4]=verB;
-
-                    //vertexDataSphere[startIndex+5]=verD;
+                    vertexData[vertexStartIndex+3]=verD;
 
                     //インデックスデータの設定
                      uint32_t   StartIndex =(latIndex*kSubdivision+lonIndex)*6;
-                     indexDataSphere[StartIndex + 0] = vertexStartIndex + 0; // A
-                     indexDataSphere[StartIndex + 1] = vertexStartIndex + 1; // B
-                     indexDataSphere[StartIndex + 2] = vertexStartIndex + 2; // C
-                     indexDataSphere[StartIndex + 3] = vertexStartIndex + 1; // B
-                     indexDataSphere[StartIndex + 4] = vertexStartIndex + 3; // D
-                     indexDataSphere[StartIndex + 5] = vertexStartIndex + 2; // C
+                     indexData[StartIndex + 0] = vertexStartIndex + 0; // A
+                     indexData[StartIndex + 1] = vertexStartIndex + 1; // B
+                     indexData[StartIndex + 2] = vertexStartIndex + 2; // C
+                     indexData[StartIndex + 3] = vertexStartIndex + 1; // B
+                     indexData[StartIndex + 4] = vertexStartIndex + 3; // D
+                     indexData[StartIndex + 5] = vertexStartIndex + 2; // C
 
 
 
@@ -1472,9 +1469,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //PSOの設定
             commandList->SetPipelineState(graphicsPipelineState);
             //VBVの設定
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             //IBVの設定
-            commandList->IASetIndexBuffer(&indexBufferViewSphere);
+            commandList->IASetIndexBuffer(&indexBufferView);
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1494,14 +1491,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
            
            
-
+            ///スプライトの描画
             commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite->GetGPUVirtualAddress());
             commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
             commandList->IASetIndexBuffer(&indexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
             //commandList->DrawInstanced(6, 1, 0, 0);
-            commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+          //  commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
             
 
             
@@ -1624,14 +1621,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     vertexResourseSprite->Release();
     transformationMatrixResourseSprite->Release();
 
-    vertexResourceSphere->Release();
+    vertexResource->Release();
     //transformationMatrixResourseSphere->Release();
     
 
 
     directionalLightResourse->Release();
     indexResourceSprite->Release();
-    indexResourceSphere->Release();
+    indexResource->Release();
     
 
 
