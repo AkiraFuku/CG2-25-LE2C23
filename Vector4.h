@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 struct Vector4{
     float x;
     float y;
@@ -55,4 +56,8 @@ struct DirectionalLight{
 };
 struct ModelData{
     std::vector<VertexData> vertices; // 頂点データの配列
+};
+struct MaterialData
+{
+    std::string textureFilePath;
 };

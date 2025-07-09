@@ -413,6 +413,8 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
          } else if(identifier=="vt"){
              Vector2 texcoord;
              s >> texcoord.x >> texcoord.y;//テクスチャ座標を読み込み
+             // OpenGLとDirectXでY軸の方向が異なるため、Y座標を反転
+             texcoord.y = 1.0f - texcoord.y;
              texcoords.push_back(texcoord);//テクスチャ座標を追加
          } else if(identifier=="vn"){
              Vector3 normal;
@@ -449,13 +451,38 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
          }
       
     }
-   
-
-
     //4. モデルデータを返す
     return modelData;
    
 }
+
+//MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
+//  
+//    //1. 変数の宣言
+//        
+//    MaterialData materialData;
+//    std::string line;
+//    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+//    //2. ファイルを開く
+//     assert(file.is_open());//ファイルが開けたか確認
+//    //3. ファイルからデータを読み込みマテリアルデータを作成
+//     while (std::getline(file,line)){
+//         std::string identifier;
+//         std::istringstream s(line);
+//         s >> identifier;//行の先頭を識別子として取得
+//
+//         if (identifier=="map_kd"){
+//
+//             std::string textureFileName;
+//                s >> textureFileName;//テクスチャファイル名を読み込み
+//                //テクスチャのパスを設定
+//                materialData.textureFilePath = directryPath + "/" + textureFileName;
+//         } 
+//     }
+//    
+//    //4. マテリアルデータを返す
+//     return materialData;
+//}
 
 
 
@@ -1152,7 +1179,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
             transformationMatrixDataSprite->World=worldMatrixSprite;
 
-            bool useMonstorBall =true;
+            bool useMonstorBall =false;
 
             //平行光源
              ID3D12Resource* directionalLightResourse=CreateBufferResource(device,sizeof(DirectionalLight));
