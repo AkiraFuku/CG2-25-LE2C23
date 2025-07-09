@@ -1327,9 +1327,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
             ImGui::InputFloat("intensity",&(directionalLightData->intensity));
 
-            ImGui::DragFloat2("uvTransformSprite", &(uvTransformSprite.traslate.x));
-            ImGui::DragFloat2("uvScaleSprite", &(uvTransformSprite.scale.x));
-            ImGui::SliderAngle("uvRotateSprite", &(uvTransformSprite.rotate.z));
+            ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x,0.01f,-10.0f,10.0f);
+            ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
+            ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
             ImGui::End();
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
