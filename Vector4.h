@@ -56,6 +56,7 @@ struct DirectionalLight{
 };
 struct ModelData{
     std::vector<VertexData> vertices; // 頂点データの配列
+    MaterialData material; // マテリアルデータ
 };
 struct MaterialData
 {
