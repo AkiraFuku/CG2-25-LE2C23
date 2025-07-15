@@ -386,6 +386,34 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     return handleGPU;
 }
 
+MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
+  
+    //1. 変数の宣言
+        
+    MaterialData materialData;
+    std::string line;
+    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+    //2. ファイルを開く
+     assert(file.is_open());//ファイルが開けたか確認
+    //3. ファイルからデータを読み込みマテリアルデータを作成
+     while (std::getline(file,line)){
+         std::string identifier;
+         std::istringstream s(line);
+         s >> identifier;//行の先頭を識別子として取得
+
+        if (identifier=="map_kd"){
+
+             std::string textureFileName;
+                s >> textureFileName;//テクスチャファイル名を読み込み
+                //テクスチャのパスを設定
+                materialData.textureFilePath = directryPath + "/" + textureFileName;
+        } 
+     }
+    
+    //4. マテリアルデータを返す
+     return materialData;
+}
+
 ModelData LoadObjFile(const std::string& directryPath, const std::string& filename) 
 {
     //1. 変数の宣言
@@ -448,8 +476,7 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
              modelData.vertices.push_back(Triangle[2]);
              modelData.vertices.push_back(Triangle[1]);
              modelData.vertices.push_back(Triangle[0]);
-         } else if(identifier=="mtllib")//マテリアルライブラリの読み込み
-         {
+         } else if(identifier=="mtllib"){
              std::string materialFileName;
              s >> materialFileName;//マテリアルファイル名を読み込み
              //マテリアルデータを読み込む
@@ -462,33 +489,7 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
    
 }
 
-MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
-  
-    //1. 変数の宣言
-        
-    MaterialData materialData;
-    std::string line;
-    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
-    //2. ファイルを開く
-     assert(file.is_open());//ファイルが開けたか確認
-    //3. ファイルからデータを読み込みマテリアルデータを作成
-     while (std::getline(file,line)){
-         std::string identifier;
-         std::istringstream s(line);
-         s >> identifier;//行の先頭を識別子として取得
 
-        if (identifier=="map_kd"){
-
-             std::string textureFileName;
-                s >> textureFileName;//テクスチャファイル名を読み込み
-                //テクスチャのパスを設定
-                materialData.textureFilePath = directryPath + "/" + textureFileName;
-        } 
-     }
-    
-    //4. マテリアルデータを返す
-     return materialData;
-}
 
 
 
