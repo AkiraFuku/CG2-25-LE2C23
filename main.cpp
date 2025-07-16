@@ -378,6 +378,12 @@ D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     handleCPU.ptr+=(descriptorSize*index);
     return handleCPU;
 }
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr< ID3D12DescriptorHeap>& descriptorHeap,uint32_t descriptorSize,uint32_t index)
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr+=(descriptorSize*index);
+    return handleCPU;
+}
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap,uint32_t descriptorSize,uint32_t index)
 {
@@ -563,7 +569,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                   //ウィンドウを表示
             ShowWindow(hwnd, SW_SHOW);
             // DXGIファクトリーの作成
-            IDXGIFactory7* dxgiFactory = nullptr;
+            Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory=nullptr;
+           // IDXGIFactory7* dxgiFactory = nullptr;
             // 
             HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
             //
@@ -700,6 +707,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
 
             //ディスクプリプターヒープの作成
+            //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap =  CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);;
             ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
             //スワップチェーンからリソースをひっぱる
             ID3D12Resource* swapChainResources[2] = {nullptr};
@@ -734,8 +742,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &rtvDesc,
                 rtvHandles[1]
             );
-
       //fenceのさくせい
+           // Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
             ID3D12Fence* fence = nullptr;
             uint64_t fenceValue = 0;
             hr = device->CreateFence(
@@ -952,6 +960,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
             ModelData modelData = LoadObjFile("resources", "plane.obj");
+            
             //頂点リソース
             ID3D12Resource* vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
             //頂点バッファビューの設定
@@ -1036,6 +1045,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             *transformatiomationMatrixDate = worldViewProjectionMatrix;
 
             //srvの設定
+
             ID3D12DescriptorHeap* srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
             IMGUI_CHECKVERSION();
@@ -1055,6 +1065,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
              DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
             const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+           // Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = CreateTextureResourse(device, metadata2);
             ID3D12Resource* textureResource2 = CreateTextureResourse(device, metadata2);
             //テクスチャのアップロード
             ID3D12Resource*intermediateResource2= UploadTextureData(textureResource2, mipImages2,device,commandList);
@@ -1260,6 +1271,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::Checkbox("enable", &enableLighting);
             materialData->enableLighting = enableLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate",&(transform.rotate.x));
+            ImGui::DragFloat3("traslate", &(transform.traslate.x));
             ImGui::Checkbox("useMonsterBall",&useMonstorBall);
             ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x); 
             ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
@@ -1378,7 +1390,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->IASetIndexBuffer(&indexBufferViewSprite);
             commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
             //commandList->DrawInstanced(6, 1, 0, 0);
-          //  commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+            commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
             
 
             
@@ -1434,9 +1446,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     fence->Release();
  //RTVの解放
     rtvDescriptorHeap->Release();
-
-    //SRVの解放
+ //SRVの解放
     srvDescriptorHeap->Release();
+   
+
     //テクスチャの解放
     textureResource->Release();
     textureResource2->Release();
@@ -1458,7 +1471,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //アダプターの解放
     useAdapter->Release();
     //DXGIファクトリーの解放
-    dxgiFactory->Release();
+  //  dxgiFactory->Release();
     
     dxcCompiler->Release();
     dxcUtils->Release();
