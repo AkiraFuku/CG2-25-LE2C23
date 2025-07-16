@@ -20,6 +20,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MassFunction.cpp" />
+    <ClCompile Include="ResourceObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Object3d.PS.hlsl">
@@ -45,6 +46,7 @@
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="MassFunction.h" />
+    <ClInclude Include="ResourceObject.h" />
     <ClInclude Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
