@@ -607,13 +607,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
             //アダプターの作成
-            IDXGIAdapter4* useAdapter = nullptr;
+            Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
+            //IDXGIAdapter4* useAdapter = nullptr;
             //良い順番のアダプターを探す
             for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
                 IID_PPV_ARGS(&useAdapter))!=DXGI_ERROR_NOT_FOUND ; ++i){
                 ///アダプターの情報を取得
                 DXGI_ADAPTER_DESC3 adapterDesc{};
-                hr = useAdapter->GetDesc3(&adapterDesc);
+                hr = useAdapter.Get()->GetDesc3(&adapterDesc);
                 assert(SUCCEEDED(hr));
                 if (!(adapterDesc.Flags&DXGI_ADAPTER_FLAG3_SOFTWARE)){
                     Log(logStream,ConvertString(std::format(L"Use Adapter:{}\n",adapterDesc.Description)));
@@ -631,7 +632,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             const char* featureLevelStrings[] = {"12_2", "12_1", "12_0"};
             for (size_t i = 0; i < _countof(featureLevels); i++){
                 hr = D3D12CreateDevice(
-                    useAdapter,
+                    useAdapter.Get(),
                     featureLevels[i],
                     IID_PPV_ARGS(&device));
 
@@ -1485,7 +1486,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //デバイスの解放
     device->Release();
     //アダプターの解放
-    useAdapter->Release();
+    //useAdapter->Release();
     //DXGIファクトリーの解放
   //  dxgiFactory->Release();
     
