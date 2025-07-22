@@ -494,6 +494,19 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
    
 }
 
+struct D3DResourceLeakChecker{
+    ~D3DResourceLeakChecker(){
+        // D3D12デバッグレイヤーを有効にしている場合、リソースのリークをチェック
+        Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+        if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+        debug->ReportLiveObjects(DXGI_DEBUG_ALL,DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_APP,DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_D3D12,DXGI_DEBUG_RLO_ALL);
+
+       
+        }
+    }
+};
 
 
 
@@ -504,6 +517,9 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
 std::wstring wstr = L"Hello,DirectX!";
 //winmain
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
+
+    D3DResourceLeakChecker LeakCheck;
+    //D3D12の初期化
     CoInitializeEx(0, COINIT_MULTITHREADED);
 
     SetUnhandledExceptionFilter(ExportDump);
@@ -743,8 +759,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 rtvHandles[1]
             );
       //fenceのさくせい
-           // Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
-            ID3D12Fence* fence = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+            //ID3D12Fence* fence = nullptr;
             uint64_t fenceValue = 0;
             hr = device->CreateFence(
                 fenceValue,
@@ -1411,12 +1427,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             swapChain->Present(1, 0);
             ///gpuの完了を待つ
             fenceValue++;
-            commandQueue->Signal(fence, fenceValue);
+            commandQueue->Signal(fence.Get(), fenceValue);
             ///
-            if (fence->GetCompletedValue()<fenceValue)
+            if (fence.Get()->GetCompletedValue()<fenceValue)
             {
 
-                fence->SetEventOnCompletion(fenceValue, fenceEvent);
+                fence.Get()->SetEventOnCompletion(fenceValue, fenceEvent);
                 WaitForSingleObject(fenceEvent, INFINITE);
             }
             //コマンドアロケーターをリセット
@@ -1443,7 +1459,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //リソースの解放
     CloseHandle(fenceEvent);
-    fence->Release();
+    //fence->Release();
  //RTVの解放
     rtvDescriptorHeap->Release();
  //SRVの解放
@@ -1541,7 +1557,9 @@ CoUninitialize();
 #endif
     CloseWindow(hwnd);
 
-    IDXGIDebug1* debug;
+    ///デバッグレイヤーのライブオブジェクトのレポート
+
+   /* IDXGIDebug1* debug;
     if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
         debug->ReportLiveObjects(DXGI_DEBUG_ALL,DXGI_DEBUG_RLO_ALL);
         debug->ReportLiveObjects(DXGI_DEBUG_APP,DXGI_DEBUG_RLO_ALL);
@@ -1549,7 +1567,7 @@ CoUninitialize();
 
         debug->Release();
     }
- 
+ */
 
     
 	return 0;
