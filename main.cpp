@@ -195,7 +195,7 @@ std::ofstream& os
 
 
 };
-ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes){
+ID3D12Resource* CreateBufferResource( Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes){
     //リソース用ヒープ
             D3D12_HEAP_PROPERTIES uploadHeapProperties{};
             uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//アップロードヒープ
@@ -213,7 +213,7 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes){
             resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
             //リソースを作る
             ID3D12Resource* resource = nullptr;
-           HRESULT hr = device->CreateCommittedResource(
+           HRESULT hr = device.Get()->CreateCommittedResource(
                 &uploadHeapProperties,
                 D3D12_HEAP_FLAG_NONE,
                 &resourceDesc,
@@ -226,7 +226,7 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes){
 
 
 };
-ID3D12DescriptorHeap* CreateDescriptorHeap( ID3D12Device* device,D3D12_DESCRIPTOR_HEAP_TYPE heepType,UINT numDescriptors,bool shaderVisible)
+ID3D12DescriptorHeap* CreateDescriptorHeap(  Microsoft::WRL::ComPtr<ID3D12Device> device,D3D12_DESCRIPTOR_HEAP_TYPE heepType,UINT numDescriptors,bool shaderVisible)
 {
     //ディスクリプタヒープの設定
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
@@ -234,7 +234,7 @@ ID3D12DescriptorHeap* CreateDescriptorHeap( ID3D12Device* device,D3D12_DESCRIPTO
     heapDesc.Type = heepType;
     heapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     ID3D12DescriptorHeap* descriptorHeap = nullptr;
-    HRESULT hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
+    HRESULT hr = device.Get()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
     assert(SUCCEEDED(hr));
     return descriptorHeap;
 }
@@ -271,7 +271,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath)
 
 }
 
-ID3D12Resource* CreateTextureResourse(ID3D12Device* device , const DirectX::TexMetadata& metadata)
+ID3D12Resource* CreateTextureResourse( Microsoft::WRL::ComPtr<ID3D12Device> device , const DirectX::TexMetadata& metadata)
 {
     ///metadataを基にリソースを作成
     D3D12_RESOURCE_DESC resourceDesc = {};
@@ -287,7 +287,7 @@ ID3D12Resource* CreateTextureResourse(ID3D12Device* device , const DirectX::TexM
     heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//デフォルトヒープ
     //リソースの生成
     ID3D12Resource* resource = nullptr;
-    HRESULT hr = device->CreateCommittedResource(
+    HRESULT hr = device.Get()->CreateCommittedResource(
         &heapProperties,
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,
@@ -301,12 +301,12 @@ ID3D12Resource* CreateTextureResourse(ID3D12Device* device , const DirectX::TexM
 
 }
 [[nodiscard]] //戻り値を無視しないようにするアトリビュート
-ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchImage& mipImages,ID3D12Device* device,
+ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device,
     ID3D12GraphicsCommandList* commandlist)
 {
     std::vector<D3D12_SUBRESOURCE_DATA> subresources;
     DirectX::PrepareUpload(
-        device,
+        device.Get(),
         mipImages.GetImages(),
         mipImages.GetImageCount(),
         mipImages.GetMetadata(),
@@ -340,7 +340,7 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
     
 }
 
-ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width,int32_t height){
+ID3D12Resource* CreateDepthStencilTextureResource( Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width,int32_t height){
     D3D12_RESOURCE_DESC resourceDesc{};
     resourceDesc.Width = width;//幅
     resourceDesc.Height = height;//高さ
@@ -624,7 +624,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             }
             assert(useAdapter != nullptr);
 
-            ID3D12Device* device = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12Device>  device= nullptr;
+           
 
             D3D_FEATURE_LEVEL featureLevels[] ={
                 D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0,
@@ -1072,7 +1073,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::StyleColorsDark();
             ImGui_ImplWin32_Init(hwnd);
             ImGui_ImplDX12_Init(
-                device,
+                device.Get(),
                 swapChainDesc.BufferCount,
                 rtvDesc.Format,
                 srvDescriptorHeap,
@@ -1486,7 +1487,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //コマンドキューの解放
     commandQueue->Release();
     //デバイスの解放
-    device->Release();
+   // device->Release();
     //アダプターの解放
     //useAdapter->Release();
     //DXGIファクトリーの解放
