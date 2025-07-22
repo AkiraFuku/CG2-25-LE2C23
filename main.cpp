@@ -302,7 +302,7 @@ ID3D12Resource* CreateTextureResourse( Microsoft::WRL::ComPtr<ID3D12Device> devi
 }
 [[nodiscard]] //戻り値を無視しないようにするアトリビュート
 ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device,
-    ID3D12GraphicsCommandList* commandlist)
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>  commandlist)
 {
     std::vector<D3D12_SUBRESOURCE_DATA> subresources;
     DirectX::PrepareUpload(
@@ -319,7 +319,7 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
     );
     ID3D12Resource* intermediateResource = CreateBufferResource(device,intermediateSize);
     UpdateSubresources(
-        commandlist,
+        commandlist.Get(),
         textur,//転送先のテクスチャ
         intermediateResource,//転送元のリソース
         0,//転送元のオフセット
@@ -335,7 +335,7 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;//全てのサブリソース
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;//コピー先の状態
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;//読み取り可能な状態
-    commandlist->ResourceBarrier(1, &barrier);//バリアを設定
+    commandlist.Get()->ResourceBarrier(1, &barrier);//バリアを設定
     return intermediateResource;
     
 }
@@ -689,7 +689,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 IID_PPV_ARGS(&commandAllocator));
             assert(SUCCEEDED(hr));
             //コマンドリストの作成
-            ID3D12GraphicsCommandList* commandList = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
+            //ID3D12GraphicsCommandList* commandList = nullptr;
             hr =device->CreateCommandList(
                 0,
                 D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -1413,7 +1414,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             ///
 
-            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
             //transitionバリアーを張る
             commandList->ResourceBarrier(1, &barrier);
             ///
@@ -1421,7 +1422,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             hr = commandList->Close();
             assert(SUCCEEDED(hr));
             //GPUにコマンドリストを実行
-            ID3D12CommandList* commandLists[] = { commandList };
+            ID3D12CommandList* commandLists[] = { commandList.Get() };
             commandQueue->ExecuteCommandLists(1, commandLists);
             //スワップチェーンをフリップ
             swapChain->Present(1, 0);
@@ -1478,7 +1479,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //スワップチェーンの解放
    // swapChain->Release();
     //コマンドリストの解放
-    commandList->Release();
+   // commandList->Release();
     commandAllocator->Release();
     //コマンドキューの解放
     commandQueue->Release();
