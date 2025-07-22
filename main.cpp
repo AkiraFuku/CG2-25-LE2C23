@@ -698,7 +698,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
             //スワップチェーンの作成
-            IDXGISwapChain4* swapChain = nullptr;
+            Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain=nullptr;
+           // IDXGISwapChain4* swapChain = nullptr;
             DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
             swapChainDesc.Width = kClientWidth;//画像の幅
             swapChainDesc.Height = kClientHeight;//画像の高さ
@@ -714,7 +715,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 &swapChainDesc,
                 nullptr,
                 nullptr,
-                reinterpret_cast<IDXGISwapChain1**>(&swapChain)
+                reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf())
             );
             assert(SUCCEEDED(hr));
 
@@ -1475,7 +1476,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
   //  swapChainResources[0]->Release();
     //swapChainResources[1]->Release();
     //スワップチェーンの解放
-    swapChain->Release();
+   // swapChain->Release();
     //コマンドリストの解放
     commandList->Release();
     commandAllocator->Release();
