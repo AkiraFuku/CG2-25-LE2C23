@@ -378,12 +378,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     handleCPU.ptr+=(descriptorSize*index);
     return handleCPU;
 }
-D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr< ID3D12DescriptorHeap>& descriptorHeap,uint32_t descriptorSize,uint32_t index)
-{
-    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr+=(descriptorSize*index);
-    return handleCPU;
-}
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap,uint32_t descriptorSize,uint32_t index)
 {
@@ -728,7 +722,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap =  CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);;
             ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
             //スワップチェーンからリソースをひっぱる
-            ID3D12Resource* swapChainResources[2] = {nullptr};
+            Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr };
+            //ID3D12Resource* swapChainResources[2] = {nullptr};
             hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
             assert(SUCCEEDED(hr));
             hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
@@ -747,7 +742,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //rtvHandles[0] = rtvStartHandle;
             rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,0);
             device->CreateRenderTargetView(
-                swapChainResources[0],
+                swapChainResources[0].Get(),
                 &rtvDesc,
                 rtvHandles[0]
             );
@@ -756,7 +751,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rtvHandles[1]= GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,1);
             //2つ目のRTVを作成
             device->CreateRenderTargetView(
-                swapChainResources[1],
+                swapChainResources[1].Get(),
                 &rtvDesc,
                 rtvHandles[1]
             );
@@ -1339,7 +1334,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //noneにする
             barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
             //バリアを得るリソース。バックアップｂufferのインデックスを取得
-            barrier.Transition.pResource = swapChainResources[backBufferIndex];
+            barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
             //遷移前（現在）のリソース状態
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
             //遷移後のリソース状態
@@ -1477,8 +1472,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
    
 //スワップチェーンの解放
 
-    swapChainResources[0]->Release();
-    swapChainResources[1]->Release();
+  //  swapChainResources[0]->Release();
+    //swapChainResources[1]->Release();
     //スワップチェーンの解放
     swapChain->Release();
     //コマンドリストの解放
