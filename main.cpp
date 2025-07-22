@@ -134,8 +134,8 @@ const std::wstring& filePath,
 //　compilerに使用するprofile
 const wchar_t* profile,
 //
-IDxcUtils* dxcUtils,
-IDxcCompiler3* dxcCompiler,
+ Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils,
+ Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler,
 IDxcIncludeHandler* includeHandler,
 std::ofstream& os
 
@@ -776,8 +776,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///
 
             //DXCCompileの初期化
-            IDxcUtils* dxcUtils = nullptr;
-            IDxcCompiler3* dxcCompiler = nullptr;
+            Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+           // IDxcUtils* dxcUtils = nullptr;
+            Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+           // IDxcCompiler3* dxcCompiler = nullptr;
             hr = DxcCreateInstance(
                 CLSID_DxcUtils,
                 IID_PPV_ARGS(&dxcUtils)
@@ -1490,8 +1492,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //DXGIファクトリーの解放
   //  dxgiFactory->Release();
     
-    dxcCompiler->Release();
-    dxcUtils->Release();
+    //dxcCompiler->Release();
+    //dxcUtils->Release();
     //includeHandlerの解放
     includeHandler->Release();
     //ルートシグネチャの解放
