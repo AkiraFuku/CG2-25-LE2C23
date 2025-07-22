@@ -298,10 +298,10 @@ ID3D12Resource* CreateTextureResourse( Microsoft::WRL::ComPtr<ID3D12Device> devi
     assert(SUCCEEDED(hr));
     return resource;
 
-
+    
 }
 [[nodiscard]] //戻り値を無視しないようにするアトリビュート
-ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device,
+ID3D12Resource* UploadTextureData(  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device,
     ID3D12GraphicsCommandList* commandlist)
 {
     std::vector<D3D12_SUBRESOURCE_DATA> subresources;
@@ -313,14 +313,14 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
         subresources
     );
     uint64_t intermediateSize = GetRequiredIntermediateSize(
-        textur,
+        textur.Get(),
         0,//最初のサブリソース
         UINT(subresources.size())//全てのサブリソース
     );
     ID3D12Resource* intermediateResource = CreateBufferResource(device,intermediateSize);
     UpdateSubresources(
         commandlist,
-        textur,//転送先のテクスチャ
+        textur.Get(),//転送先のテクスチャ
         intermediateResource,//転送元のリソース
         0,//転送元のオフセット
         0,//転送先のオフセット
@@ -331,7 +331,7 @@ ID3D12Resource* UploadTextureData(ID3D12Resource* textur,const DirectX::ScratchI
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;//リソースの遷移
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;//フラグなし
-    barrier.Transition.pResource = textur;//遷移するリソース
+    barrier.Transition.pResource = textur.Get();//遷移するリソース
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;//全てのサブリソース
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;//コピー先の状態
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;//読み取り可能な状態
@@ -378,12 +378,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descrip
     handleCPU.ptr+=(descriptorSize*index);
     return handleCPU;
 }
-D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr< ID3D12DescriptorHeap>& descriptorHeap,uint32_t descriptorSize,uint32_t index)
-{
-    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr+=(descriptorSize*index);
-    return handleCPU;
-}
+
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap,uint32_t descriptorSize,uint32_t index)
 {
@@ -1085,8 +1080,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
              DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
             const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-           // Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = CreateTextureResourse(device, metadata2);
-            ID3D12Resource* textureResource2 = CreateTextureResourse(device, metadata2);
+            Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = CreateTextureResourse(device, metadata2);
+            //ID3D12Resource* textureResource2 = CreateTextureResourse(device, metadata2);
             //テクスチャのアップロード
             ID3D12Resource*intermediateResource2= UploadTextureData(textureResource2, mipImages2,device,commandList);
            
@@ -1103,7 +1098,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2= GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,2);
             //SRVの設定
             device->CreateShaderResourceView(
-                textureResource2,
+                textureResource2.Get(),
                 &srvDesc2,
                 textureSrvHandleCPU2
             );
@@ -1111,7 +1106,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //
             DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
             const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-            ID3D12Resource* textureResource = CreateTextureResourse(device, metadata);
+             Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = CreateTextureResourse(device, metadata);
+            //ID3D12Resource* textureResource = CreateTextureResourse(device, metadata);
             //テクスチャのアップロード
             ID3D12Resource*intermediateResource= UploadTextureData(textureResource, mipImages,device,commandList);
            
@@ -1128,7 +1124,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU= GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,1);
             //SRVの設定
             device->CreateShaderResourceView(
-                textureResource,
+                textureResource.Get(),
                 &srvDesc,
                 textureSrvHandleCPU
             );
