@@ -128,7 +128,7 @@ static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception){
 /// <param name="dxcCompiler"></param>
 /// <param name="includeHandler"></param>
 /// <returns></returns>
-IDxcBlob* CompileShader(
+Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 // compilerするshaderファイルのパス
 const std::wstring& filePath,
 //　compilerに使用するprofile
@@ -165,7 +165,7 @@ std::ofstream& os
        
     };
 
-    IDxcResult* shaderResult = nullptr;
+    Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
     hr = dxcCompiler->Compile(
         &shaderSoursBuffer,
         arguments,
@@ -176,7 +176,7 @@ std::ofstream& os
     assert(SUCCEEDED(hr));
 
     //警告・エラー確認
-    IDxcBlobUtf8* shaderError = nullptr;
+    Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
     shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
     if (shaderError != nullptr&&shaderError->GetStringLength()!=0) {
         //エラーがあった場合
@@ -184,18 +184,16 @@ std::ofstream& os
         assert(false);
     }
     //compile結果をうけとってわたす
-    IDxcBlob* shaderBlob = nullptr;
+    Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
     hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
     assert(SUCCEEDED(hr));
     Log(os,ConvertString(std::format(L"Compile Succeeded, path:{},profiale:{}\n", filePath, profile)));
     //解放
-    shaderSource->Release();
-    shaderResult->Release();
     return shaderBlob;
 
 
 };
-ID3D12Resource* CreateBufferResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes){
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes){
     //リソース用ヒープ
             D3D12_HEAP_PROPERTIES uploadHeapProperties{};
             uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//アップロードヒープ
@@ -212,7 +210,7 @@ ID3D12Resource* CreateBufferResource( const  Microsoft::WRL::ComPtr<ID3D12Device
             //
             resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
             //リソースを作る
-            ID3D12Resource* resource = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
            HRESULT hr = device.Get()->CreateCommittedResource(
                 &uploadHeapProperties,
                 D3D12_HEAP_FLAG_NONE,
@@ -226,14 +224,14 @@ ID3D12Resource* CreateBufferResource( const  Microsoft::WRL::ComPtr<ID3D12Device
 
 
 };
-ID3D12DescriptorHeap* CreateDescriptorHeap(  const  Microsoft::WRL::ComPtr<ID3D12Device> device,D3D12_DESCRIPTOR_HEAP_TYPE heepType,UINT numDescriptors,bool shaderVisible)
+Microsoft::WRL::ComPtr <ID3D12DescriptorHeap>CreateDescriptorHeap(const  Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible)
 {
     //ディスクリプタヒープの設定
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
     heapDesc.NumDescriptors = numDescriptors;
     heapDesc.Type = heepType;
     heapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    ID3D12DescriptorHeap* descriptorHeap = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
     HRESULT hr = device.Get()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
     assert(SUCCEEDED(hr));
     return descriptorHeap;
@@ -271,7 +269,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath)
 
 }
 
-ID3D12Resource* CreateTextureResourse( const  Microsoft::WRL::ComPtr<ID3D12Device> device , const DirectX::TexMetadata& metadata)
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse( const  Microsoft::WRL::ComPtr<ID3D12Device> device , const DirectX::TexMetadata& metadata)
 {
     ///metadataを基にリソースを作成
     D3D12_RESOURCE_DESC resourceDesc = {};
@@ -286,7 +284,7 @@ ID3D12Resource* CreateTextureResourse( const  Microsoft::WRL::ComPtr<ID3D12Devic
     D3D12_HEAP_PROPERTIES heapProperties = {};
     heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//デフォルトヒープ
     //リソースの生成
-    ID3D12Resource* resource = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
     HRESULT hr = device.Get()->CreateCommittedResource(
         &heapProperties,
         D3D12_HEAP_FLAG_NONE,
@@ -301,7 +299,7 @@ ID3D12Resource* CreateTextureResourse( const  Microsoft::WRL::ComPtr<ID3D12Devic
 
 }
 [[nodiscard]] //戻り値を無視しないようにするアトリビュート
-ID3D12Resource* UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, const  Microsoft::WRL::ComPtr<ID3D12Device> device,
+Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, const  Microsoft::WRL::ComPtr<ID3D12Device> device,
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>  commandlist)
 {
     std::vector<D3D12_SUBRESOURCE_DATA> subresources;
@@ -317,11 +315,11 @@ ID3D12Resource* UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource>
         0,//最初のサブリソース
         UINT(subresources.size())//全てのサブリソース
     );
-    ID3D12Resource* intermediateResource = CreateBufferResource(device,intermediateSize);
+   Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource = CreateBufferResource(device,intermediateSize);
     UpdateSubresources(
         commandlist.Get(),
         textur.Get(),//転送先のテクスチャ
-        intermediateResource,//転送元のリソース
+        intermediateResource.Get(),//転送元のリソース
         0,//転送元のオフセット
         0,//転送先のオフセット
         UINT(subresources.size()),//サブリソースの数
@@ -340,7 +338,7 @@ ID3D12Resource* UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource>
     
 }
 
-ID3D12Resource* CreateDepthStencilTextureResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width,int32_t height){
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width,int32_t height){
     D3D12_RESOURCE_DESC resourceDesc{};
     resourceDesc.Width = width;//幅
     resourceDesc.Height = height;//高さ
@@ -358,7 +356,7 @@ ID3D12Resource* CreateDepthStencilTextureResource( const  Microsoft::WRL::ComPtr
     depthClearValue.DepthStencil.Depth = 1.0f;//深度値のクリア値
     depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット
     //リソースの生成
-    ID3D12Resource* resource = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
     HRESULT hr = device->CreateCommittedResource(
         &heapProperties,
         D3D12_HEAP_FLAG_NONE,
@@ -589,7 +587,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 #ifdef _DEBUG
 
             //デバッグレイヤーの有効
-            ID3D12Debug1* debugController = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
             if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))){
                 debugController->EnableDebugLayer();
                 //デバッグレイヤーの詳細な情報を取得
@@ -644,7 +642,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 #ifdef _DEBUG
-            ID3D12InfoQueue* infoQueue = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
             if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
             {
                 ///深刻なエラーを出力・停止
@@ -653,8 +651,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
                 ///警告を出力/停止
                 infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
-                ///解放
-                infoQueue->Release();
                 //メッセージID
                 D3D12_MESSAGE_ID denyIds[]={
                     D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
@@ -1465,86 +1461,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //リソースの解放
     CloseHandle(fenceEvent);
-    //fence->Release();
- //RTVの解放
-   // rtvDescriptorHeap->Release();
- //SRVの解放
-  //  srvDescriptorHeap->Release();
-   
-
-    //テクスチャの解放
-    //textureResource->Release();
-    //textureResource2->Release();
-
-   
-//スワップチェーンの解放
-
-  //  swapChainResources[0]->Release();
-    //swapChainResources[1]->Release();
-    //スワップチェーンの解放
-   // swapChain->Release();
-    //コマンドリストの解放
-   // commandList->Release();
-    //commandAllocator->Release();
-    //コマンドキューの解放
-    //commandQueue->Release();
-    //デバイスの解放
-   // device->Release();
-    //アダプターの解放
-    //useAdapter->Release();
-    //DXGIファクトリーの解放
-  //  dxgiFactory->Release();
-    
-    //dxcCompiler->Release();
-    //dxcUtils->Release();
-    //includeHandlerの解放
-  //  includeHandler->Release();
-    //ルートシグネチャの解放
-   // rootSignature->Release();
-    //シリアライズしたバイナリの解放
-    //signatureBlob->Release();
-    // //頂点リソースの解放
-   // vertexResource->Release();
-    //
-    //graphicsPipelineState->Release();
-    //
-   
-    //エラーログの解放
-   /* if (errorBlob != nullptr) {
-        errorBlob->Release();
-    }*/
-    //シェーダーの解放
-    //vertexShaderBlob->Release();
-    //pixelShaderBlob->Release();
-    //マテリアルリソースの解放
-   // materialResource->Release();
-   // materialResourceSprite->Release();
-
-    //WVP行列リソースの解放
-    //wvpResource->Release();
-    //トランスフォーム行列リソースの解放
-    //transformatiomationMatrixResource->Release();
-    //intermediateResource->Release(); 
-    //intermediateResource2->Release(); 
-
-
-    //depthStencilResourceの解放
-    //depthStencilResource->Release();
-    //dsvDescriptorHeap->Release();
-
-    //
-    //vertexResourseSprite->Release();
-    //transformationMatrixResourseSprite->Release();
-
-    //vertexResource->Release();
-    //transformationMatrixResourseSphere->Release();
-    
-
-
-    //directionalLightResourse->Release();
-   // indexResourceSprite->Release();
-   // indexResource->Release();
-    
+ 
 
 
 
@@ -1558,22 +1475,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     
 CoUninitialize();
     //デバッグレイヤーの解放
-#ifdef _DEBUG
-    debugController->Release();
-#endif
+
     CloseWindow(hwnd);
 
     ///デバッグレイヤーのライブオブジェクトのレポート
 
-   /* IDXGIDebug1* debug;
-    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-        debug->ReportLiveObjects(DXGI_DEBUG_ALL,DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_APP,DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_D3D12,DXGI_DEBUG_RLO_ALL);
-
-        debug->Release();
-    }
- */
+  
 
     
 	return 0;
