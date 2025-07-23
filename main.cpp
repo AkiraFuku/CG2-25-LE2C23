@@ -134,9 +134,9 @@ const std::wstring& filePath,
 //　compilerに使用するprofile
 const wchar_t* profile,
 //
- Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils,
- Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler,
- Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler,
+ const Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils,
+  const Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler,
+ const  Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler,
 std::ofstream& os
 
 
@@ -195,7 +195,7 @@ std::ofstream& os
 
 
 };
-ID3D12Resource* CreateBufferResource( Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes){
+ID3D12Resource* CreateBufferResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes){
     //リソース用ヒープ
             D3D12_HEAP_PROPERTIES uploadHeapProperties{};
             uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//アップロードヒープ
@@ -226,7 +226,7 @@ ID3D12Resource* CreateBufferResource( Microsoft::WRL::ComPtr<ID3D12Device> devic
 
 
 };
-ID3D12DescriptorHeap* CreateDescriptorHeap(  Microsoft::WRL::ComPtr<ID3D12Device> device,D3D12_DESCRIPTOR_HEAP_TYPE heepType,UINT numDescriptors,bool shaderVisible)
+ID3D12DescriptorHeap* CreateDescriptorHeap(  const  Microsoft::WRL::ComPtr<ID3D12Device> device,D3D12_DESCRIPTOR_HEAP_TYPE heepType,UINT numDescriptors,bool shaderVisible)
 {
     //ディスクリプタヒープの設定
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
@@ -271,7 +271,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath)
 
 }
 
-ID3D12Resource* CreateTextureResourse( Microsoft::WRL::ComPtr<ID3D12Device> device , const DirectX::TexMetadata& metadata)
+ID3D12Resource* CreateTextureResourse( const  Microsoft::WRL::ComPtr<ID3D12Device> device , const DirectX::TexMetadata& metadata)
 {
     ///metadataを基にリソースを作成
     D3D12_RESOURCE_DESC resourceDesc = {};
@@ -301,7 +301,7 @@ ID3D12Resource* CreateTextureResourse( Microsoft::WRL::ComPtr<ID3D12Device> devi
 
 }
 [[nodiscard]] //戻り値を無視しないようにするアトリビュート
-ID3D12Resource* UploadTextureData( Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, Microsoft::WRL::ComPtr<ID3D12Device> device,
+ID3D12Resource* UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, const  Microsoft::WRL::ComPtr<ID3D12Device> device,
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>  commandlist)
 {
     std::vector<D3D12_SUBRESOURCE_DATA> subresources;
@@ -340,7 +340,7 @@ ID3D12Resource* UploadTextureData( Microsoft::WRL::ComPtr<ID3D12Resource> textur
     
 }
 
-ID3D12Resource* CreateDepthStencilTextureResource( Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width,int32_t height){
+ID3D12Resource* CreateDepthStencilTextureResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width,int32_t height){
     D3D12_RESOURCE_DESC resourceDesc{};
     resourceDesc.Width = width;//幅
     resourceDesc.Height = height;//高さ
@@ -372,14 +372,14 @@ ID3D12Resource* CreateDepthStencilTextureResource( Microsoft::WRL::ComPtr<ID3D12
 }
 
 
-D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle( Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
+D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
     handleCPU.ptr+=(descriptorSize*index);
     return handleCPU;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle( Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
+D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
 {
     D3D12_GPU_DESCRIPTOR_HANDLE handleGPU=descriptorHeap->GetGPUDescriptorHandleForHeapStart();
     handleGPU.ptr+=(descriptorSize*index);
