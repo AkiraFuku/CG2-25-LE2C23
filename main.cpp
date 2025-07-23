@@ -676,14 +676,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 #endif // _DEBUG
 
             //コマンドキューの作成
-            ID3D12CommandQueue* commandQueue = nullptr;
+              Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue=nullptr;
+           // ID3D12CommandQueue* commandQueue = nullptr;
             D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
             hr = device->CreateCommandQueue(
                 &commandQueueDesc,
                 IID_PPV_ARGS(&commandQueue));
             assert(SUCCEEDED(hr));
             //コマンドアロケーターの作成
-            ID3D12CommandAllocator* commandAllocator = nullptr;
+            Microsoft::WRL::ComPtr<ID3D12CommandAllocator>commandAllocator=nullptr;
+            //ID3D12CommandAllocator* commandAllocator = nullptr;
             hr = device->CreateCommandAllocator(
                 D3D12_COMMAND_LIST_TYPE_DIRECT,
                 IID_PPV_ARGS(&commandAllocator));
@@ -694,7 +696,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             hr =device->CreateCommandList(
                 0,
                 D3D12_COMMAND_LIST_TYPE_DIRECT,
-                commandAllocator, nullptr,
+                commandAllocator.Get(), nullptr,
                 IID_PPV_ARGS(&commandList)
             );
             assert(SUCCEEDED(hr));
@@ -711,7 +713,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//写したら破棄
             // コマンドキュー,ウィンドウハンドル、設定して生成
             hr = dxgiFactory->CreateSwapChainForHwnd(
-                commandQueue,
+                commandQueue.Get(),
                 hwnd,
                 &swapChainDesc,
                 nullptr,
@@ -1440,7 +1442,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             hr = commandAllocator->Reset();
             assert(SUCCEEDED(hr));
             //コマンドリストをリセット
-            hr = commandList->Reset(commandAllocator, nullptr);
+            hr = commandList->Reset(commandAllocator.Get(), nullptr);
             assert(SUCCEEDED(hr));
             /////
 
@@ -1480,9 +1482,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
    // swapChain->Release();
     //コマンドリストの解放
    // commandList->Release();
-    commandAllocator->Release();
+    //commandAllocator->Release();
     //コマンドキューの解放
-    commandQueue->Release();
+    //commandQueue->Release();
     //デバイスの解放
    // device->Release();
     //アダプターの解放
