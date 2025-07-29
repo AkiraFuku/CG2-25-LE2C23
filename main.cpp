@@ -554,7 +554,29 @@ SoundData SoundLoadWave(const char* filename){
     return soundData;
 
 }
+void SoundUnload(SoundData* soundData){
 
+    delete[] soundData->pBuffer; // バッファの解放
+    soundData->pBuffer = 0; // ポインタをnullptrに設定
+    soundData->bufferSize = 0; // バッファサイズを0に設定
+    soundData->wfex = {}; // 波形フォーマットを初期化
+}
+
+void SoundPlayWave(IXAudio2* xAudio2,const SoundData& SoundData){
+    HRESULT result;
+    IXAudio2SourceVoice* pSourceVoice = nullptr;
+    result= xAudio2->CreateSourceVoice(&pSourceVoice,&SoundData.wfex);
+    assert(SUCCEEDED(result));
+
+    //音声データの再生
+    XAUDIO2_BUFFER buf = {};
+    buf.pAudioData = SoundData.pBuffer; // 音声データのポインタ
+    buf.AudioBytes = SoundData.bufferSize; // 音声データのサイズ
+    buf.Flags = XAUDIO2_END_OF_STREAM; // ストリームの終端を示すフラグ
+
+    result = pSourceVoice->SubmitSourceBuffer(&buf);
+    result = pSourceVoice->Start(); // 音声の再生を開始
+}
 
 
 
@@ -1285,6 +1307,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                  {0.0f,0.0f,0.0f},
                  {0.0f,0.0f,0.0f}
              };
+
              Microsoft::WRL::ComPtr<IXAudio2> xAudio2 ;
              IXAudio2MasteringVoice* masterVoice ;
 
@@ -1292,6 +1315,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              assert(SUCCEEDED(result));
              result = xAudio2->CreateMasteringVoice(&masterVoice);
              assert(SUCCEEDED(result));
+
+
 
             
 
