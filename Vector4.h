@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-#include <string>#include <xaudio2.h>
-#pragma comment(lib,"xaudio2.lib")
+#include <string>
 
 struct Vector4{
     float x;
@@ -65,30 +64,3 @@ struct ModelData{
     MaterialData material; // マテリアルデータ
 };
 
-
-struct ChunkHeader
-{
-    char id[4];      // チャンクID（例: "fmt "や"data"など）
-    int32_t size;   // チャンクサイズ
-};
-struct RiffHeader
-{
-     ChunkHeader chunk;
-     char type[4]; // RIFFタイプ（例: "WAVE"）
-};
-
-struct FormatChunk
-{
-    ChunkHeader chunk;
-    WAVEFORMATEX fmt; // WAVEフォーマット情報
-};
-
-struct SoundData
-{
-    //波形フォーマット
-    WAVEFORMATEX wfex; // 波形フォーマット
-    // バッファ先頭アドレス
-    BYTE* pBuffer;
-    // バッファサイズ
-    unsigned int bufferSize;
-};

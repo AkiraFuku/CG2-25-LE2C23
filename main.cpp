@@ -502,9 +502,38 @@ struct D3DResourceLeakChecker{
     }
 };
 
+
+
+struct ChunkHeader
+{
+    char id[4];      // チャンクID（例: "fmt "や"data"など）
+    int32_t size;   // チャンクサイズ
+};
+struct RiffHeader
+{
+     ChunkHeader chunk;
+     char type[4]; // RIFFタイプ（例: "WAVE"）
+};
+
+struct FormatChunk
+{
+    ChunkHeader chunk;
+    WAVEFORMATEX fmt; // WAVEフォーマット情報
+};
+
+struct SoundData
+{
+    //波形フォーマット
+    WAVEFORMATEX wfex; // 波形フォーマット
+    // バッファ先頭アドレス
+    BYTE* pBuffer;
+    // バッファサイズ
+    unsigned int bufferSize;
+};
+
 SoundData SoundLoadWave(const char* filename){
 
-    HRESULT result;
+  
     //ファイルオープン
     std::ifstream file;
     file.open(filename, std::ios_base::binary);
@@ -1317,7 +1346,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              assert(SUCCEEDED(result));
 
 
-
+             SoundData soundData1 = SoundLoadWave("resources/fanfare.wav");
             
 
             
@@ -1335,7 +1364,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
        
 
           
-
+ SoundPlayWave(xAudio2.Get(), soundData1);
             
     
 
@@ -1359,14 +1388,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
            // transform.rotate.y += 0.03f;
           
+          
+            
 
-
-
+            
            // ImGui::ShowDemoWindow();
           
 
-                        ImGui::Begin("MaterialData");
-
+            ImGui::Begin("MaterialData");
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
             ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
             ImGui::ColorEdit4("Color", &(materialData->color).x); 
@@ -1546,7 +1575,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //リソースの解放
     CloseHandle(fenceEvent);
- 
+    xAudio2.Reset();
+    SoundUnload(&soundData1);
 
 
 
