@@ -26,9 +26,11 @@
 #include"externals/DirectXTex/d3dx12.h"
 #include<vector>
 #include<numbers>
-#include<fstream>
 #include<sstream>
+#include <xaudio2.h>
+#pragma comment(lib,"xaudio2.lib")
 
+//using namespace Microsoft::WRL;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -976,7 +978,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
             ///
-            ModelData modelData = LoadObjFile("resources", "plane.obj");
+            ModelData modelData = LoadObjFile("resources", "axis.obj");
             
             //頂点リソース
               Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
@@ -1230,8 +1232,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                  {0.0f,0.0f,0.0f},
                  {0.0f,0.0f,0.0f}
              };
+             Microsoft::WRL::ComPtr<IXAudio2> xAudio2 ;
+             IXAudio2MasteringVoice* masterVoice ;
 
-
+             HRESULT result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
+             assert(SUCCEEDED(result));
+             result = xAudio2->CreateMasteringVoice(&masterVoice);
+             assert(SUCCEEDED(result));
 
             
 
