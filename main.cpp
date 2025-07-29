@@ -505,7 +505,56 @@ struct D3DResourceLeakChecker{
 SoundData SoundLoadWave(const char* filename){
 
     HRESULT result;
+    //ファイルオープン
+    std::ifstream file;
+    file.open(filename, std::ios_base::binary);
+
+    assert(file.is_open());
+
+    //wavdataの読み込み
+    RiffHeader riff;
+    file.read((char*)&riff,sizeof(riff));
+    if(strncmp(riff.chunk.id,"RIFF",4)!=0){
+        assert(0);
+    }
+    if(strncmp(riff.type,"WAVE",4)!=0){
+        assert(0);
+    }
+
+    FormatChunk format={};
+
+    file.read((char*)&format, sizeof(ChunkHeader));
+    if (strncmp(format.chunk.id,"fmt ",4)!=0){
+        assert(0);
+    }
+    assert(format.chunk.size <= sizeof(format.fmt));
+    file.read((char*)&format.fmt, format.chunk.size);
+    ChunkHeader data;
+    file.read((char*)&data, sizeof(data));
+
+    if (strncmp(data.id, "JUNK", 4) == 0) {
+        file.seekg(data.size, std::ios_base::cur); // JUNKチャンクをスキップ
+        file.read((char*)&data, sizeof(data)); // 次のチャンクを読み込む
+    }   
+    if (strncmp(data.id, "data", 4) != 0) {
+        assert(0);
+    }   
+
+    char* pBuffer = new char[data.size];
+    file.read(pBuffer, data.size);
+    //ファイルを閉じる
+    file.close();
+    //読み込んだデータを構造体に格納
+    SoundData soundData{};
+
+    soundData.wfex = format.fmt; // 波形フォーマット
+    soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer); // バッファ先頭アドレス
+    soundData.bufferSize = data.size; // バッファサイズ
+
+    return soundData;
+
 }
+
 
 
 
