@@ -27,8 +27,10 @@
 #include<vector>
 #include<numbers>
 #include<sstream>
-#include <xaudio2.h>
-#pragma comment(lib,"xaudio2.lib")
+#include"Audio.h"
+#include <memory>
+//#include <xaudio2.h>
+//#pragma comment(lib,"xaudio2.lib")
 
 //using namespace Microsoft::WRL;
 
@@ -504,108 +506,7 @@ struct D3DResourceLeakChecker{
 
 
 
-struct ChunkHeader
-{
-    char id[4];      // チャンクID（例: "fmt "や"data"など）
-    int32_t size;   // チャンクサイズ
-};
-struct RiffHeader
-{
-     ChunkHeader chunk;
-     char type[4]; // RIFFタイプ（例: "WAVE"）
-};
 
-struct FormatChunk
-{
-    ChunkHeader chunk;
-    WAVEFORMATEX fmt; // WAVEフォーマット情報
-};
-
-struct SoundData
-{
-    //波形フォーマット
-    WAVEFORMATEX wfex; // 波形フォーマット
-    // バッファ先頭アドレス
-    BYTE* pBuffer;
-    // バッファサイズ
-    unsigned int bufferSize;
-};
-
-SoundData SoundLoadWave(const char* filename){
-
-  
-    //ファイルオープン
-    std::ifstream file;
-    file.open(filename, std::ios_base::binary);
-
-    assert(file.is_open());
-
-    //wavdataの読み込み
-    RiffHeader riff;
-    file.read((char*)&riff,sizeof(riff));
-    if(strncmp(riff.chunk.id,"RIFF",4)!=0){
-        assert(0);
-    }
-    if(strncmp(riff.type,"WAVE",4)!=0){
-        assert(0);
-    }
-
-    FormatChunk format={};
-
-    file.read((char*)&format, sizeof(ChunkHeader));
-    if (strncmp(format.chunk.id,"fmt ",4)!=0){
-        assert(0);
-    }
-    assert(format.chunk.size <= sizeof(format.fmt));
-    file.read((char*)&format.fmt, format.chunk.size);
-    ChunkHeader data;
-    file.read((char*)&data, sizeof(data));
-
-    if (strncmp(data.id, "JUNK", 4) == 0) {
-        file.seekg(data.size, std::ios_base::cur); // JUNKチャンクをスキップ
-        file.read((char*)&data, sizeof(data)); // 次のチャンクを読み込む
-    }   
-    if (strncmp(data.id, "data", 4) != 0) {
-        assert(0);
-    }   
-
-    char* pBuffer = new char[data.size];
-    file.read(pBuffer, data.size);
-    //ファイルを閉じる
-    file.close();
-    //読み込んだデータを構造体に格納
-    SoundData soundData{};
-
-    soundData.wfex = format.fmt; // 波形フォーマット
-    soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer); // バッファ先頭アドレス
-    soundData.bufferSize = data.size; // バッファサイズ
-
-    return soundData;
-
-}
-void SoundUnload(SoundData* soundData){
-
-    delete[] soundData->pBuffer; // バッファの解放
-    soundData->pBuffer = 0; // ポインタをnullptrに設定
-    soundData->bufferSize = 0; // バッファサイズを0に設定
-    soundData->wfex = {}; // 波形フォーマットを初期化
-}
-
-void SoundPlayWave(IXAudio2* xAudio2,const SoundData& SoundData){
-    HRESULT result;
-    IXAudio2SourceVoice* pSourceVoice = nullptr;
-    result= xAudio2->CreateSourceVoice(&pSourceVoice,&SoundData.wfex);
-    assert(SUCCEEDED(result));
-
-    //音声データの再生
-    XAUDIO2_BUFFER buf = {};
-    buf.pAudioData = SoundData.pBuffer; // 音声データのポインタ
-    buf.AudioBytes = SoundData.bufferSize; // 音声データのサイズ
-    buf.Flags = XAUDIO2_END_OF_STREAM; // ストリームの終端を示すフラグ
-
-    result = pSourceVoice->SubmitSourceBuffer(&buf);
-    result = pSourceVoice->Start(); // 音声の再生を開始
-}
 
 
 
@@ -1337,7 +1238,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                  {0.0f,0.0f,0.0f}
              };
 
-             Microsoft::WRL::ComPtr<IXAudio2> xAudio2 ;
+            /* Microsoft::WRL::ComPtr<IXAudio2> xAudio2 ;
              IXAudio2MasteringVoice* masterVoice ;
 
              HRESULT result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
@@ -1346,8 +1247,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              assert(SUCCEEDED(result));
 
 
-             SoundData soundData1 = SoundLoadWave("resources/fanfare.wav");
+             SoundData soundData1 = SoundLoadWave("resources/fanfare.wav");*/
+             
+             Audio* audio = new Audio();
+             audio->Initialize();
+             Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.wav");
             
+             audio->PlayAudio(soundData1);
 
             
 
@@ -1364,7 +1270,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
        
 
           
- SoundPlayWave(xAudio2.Get(), soundData1);
+ //SoundPlayWave(xAudio2.Get(), soundData1);
             
     
 
@@ -1575,8 +1481,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //リソースの解放
     CloseHandle(fenceEvent);
-    xAudio2.Reset();
-    SoundUnload(&soundData1);
+    /*xAudio2.Reset();
+    SoundUnload(&soundData1);*/
+    delete audio;
 
 
 
