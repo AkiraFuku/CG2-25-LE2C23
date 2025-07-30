@@ -29,10 +29,12 @@
 #include<sstream>
 #include"Audio.h"
 #include <memory>
-//#include <xaudio2.h>
-//#pragma comment(lib,"xaudio2.lib")
 
-//using namespace Microsoft::WRL;
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+#pragma comment(lib,"dinput8.lib")
+#pragma comment(lib,"dxguid.lib")
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -583,6 +585,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
                   //ウィンドウを表示
             ShowWindow(hwnd, SW_SHOW);
+            //
+
+            //描画初期化処理
             // DXGIファクトリーの作成
             Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory=nullptr;
            // IDXGIFactory7* dxgiFactory = nullptr;
@@ -647,6 +652,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             const uint32_t descriptorSizeSRV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             const uint32_t descriptorSizeRTV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
             const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+
 
 #ifdef _DEBUG
             Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
@@ -1238,16 +1245,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                  {0.0f,0.0f,0.0f}
              };
 
-            /* Microsoft::WRL::ComPtr<IXAudio2> xAudio2 ;
-             IXAudio2MasteringVoice* masterVoice ;
-
-             HRESULT result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-             assert(SUCCEEDED(result));
-             result = xAudio2->CreateMasteringVoice(&masterVoice);
-             assert(SUCCEEDED(result));
-
-
-             SoundData soundData1 = SoundLoadWave("resources/fanfare.wav");*/
+           
              
              Audio* audio = new Audio();
              audio->Initialize();
@@ -1267,10 +1265,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
           
 
            
-       
-
-          
- //SoundPlayWave(xAudio2.Get(), soundData1);
             
     
 
@@ -1481,8 +1475,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     //リソースの解放
     CloseHandle(fenceEvent);
-    /*xAudio2.Reset();
-    SoundUnload(&soundData1);*/
+ 
     delete audio;
 
 
