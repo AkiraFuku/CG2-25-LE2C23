@@ -653,6 +653,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             const uint32_t descriptorSizeRTV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
             const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
+            //ここから書く　外部入力
+
 
 
 #ifdef _DEBUG
