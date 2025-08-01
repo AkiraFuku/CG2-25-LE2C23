@@ -997,13 +997,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                     kUseModelResourse,
                     kUseModelSphere,
                     kUseModelTeapot,
+                    kUseModelBunny
 
              };
          
              UseModel useModel = kUseModelTeapot;
                  
             ///
+            ModelData modelData3 = LoadObjFile("resources", "bunny.obj");
             
+            //頂点リソース
+
+                 Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource3 =CreateBufferResource(device, sizeof(VertexData)*modelData3.vertices.size());
+            //頂点バッファビューの設定
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferView3{};
+            vertexBufferView3.BufferLocation = vertexResource3->GetGPUVirtualAddress();//リソースの先頭アドレス
+            vertexBufferView3.SizeInBytes = UINT(sizeof(VertexData) * modelData3.vertices.size());//リソースのサイズ
+            vertexBufferView3.StrideInBytes = sizeof(VertexData);//頂点のサイズ
+            //頂点データの書き込み
+            VertexData* vertexData3 = nullptr;
+            vertexResource3.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData3));
+            std::memcpy(vertexData3, modelData3.vertices.data(), sizeof(VertexData)* modelData3.vertices.size());
+
+
             ModelData modelData2 = LoadObjFile("resources", "teapot.obj");
             
             //頂点リソース
@@ -1499,7 +1515,7 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
           
 
             ImGui::Begin("MaterialData");
-            const char* modelItems[] = { "Resource", "Sphere", "Teapot" };
+            const char* modelItems[] = { "Resource", "Sphere", "Teapot","Bunny" };
             static int currentModel = useModel;
             if (ImGui::Combo("Draw Model", &currentModel, modelItems, IM_ARRAYSIZE(modelItems))) {
             useModel = static_cast<UseModel>(currentModel);
@@ -1640,6 +1656,12 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             //IBVの設定
             commandList->IASetIndexBuffer(&indexBufferViewSphere);
                 commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
+                break;
+
+            case kUseModelBunny:
+                commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU);
+                commandList->IASetVertexBuffers(0, 1, &vertexBufferView3);
+                commandList->DrawInstanced(UINT(modelData3.vertices.size()), 1, 0, 0);
                 break;
             default:
                 break;
