@@ -1006,6 +1006,155 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             vertexResource.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
             std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
 
+
+
+                 // 球の描画
+            const uint32_t kSubdivision=32;
+           Microsoft::WRL::ComPtr<ID3D12Resource>vertexResourceSphere =CreateBufferResource(device, (sizeof(VertexData) * 4)*kSubdivision*(kSubdivision+1));
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSphere{};
+            //リソース先頭アドレス
+            vertexBufferViewSphere.BufferLocation = vertexResourceSphere->GetGPUVirtualAddress();
+            //リソースのサイズ
+            vertexBufferViewSphere.SizeInBytes = sizeof(VertexData) * 4*kSubdivision*(kSubdivision+1);
+            vertexBufferViewSphere.StrideInBytes = sizeof(VertexData);
+
+            VertexData* vertexDataSphere=nullptr;
+            vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+            //インデックスバッファビューの設定
+            
+            Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSphere =CreateBufferResource(device, (sizeof(uint32_t) * 6)*kSubdivision*(kSubdivision+1));
+            D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
+
+            indexBufferViewSphere.BufferLocation =indexResourceSphere ->GetGPUVirtualAddress();
+            indexBufferViewSphere.SizeInBytes = sizeof(uint32_t) * 6 * kSubdivision * (kSubdivision + 1);
+            indexBufferViewSphere.Format = DXGI_FORMAT_R32_UINT;//頂点のフォーマット
+            uint32_t* indexDataSphere = nullptr;
+            indexResourceSphere ->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
+
+            const float kLonEvery =std::numbers::pi_v<float>*2.0f/static_cast<float>(kSubdivision);//経度
+            const float kLatEvery =std::numbers::pi_v<float>/static_cast<float>(kSubdivision);//緯度
+            for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex)
+            {
+                float lat =-std::numbers::pi_v<float>/2.0f+kLatEvery*latIndex;
+                for (uint32_t lonIndex = 0; lonIndex <= kSubdivision; ++lonIndex)
+                {
+                   
+                    float lon=lonIndex*kLonEvery + std::numbers::pi_v<float> / 2.0f;
+
+                    //頂点データの設定
+                    //A,B,C,Dの4つの頂点を設定
+
+                    //左上の頂点A
+                    VertexData verA={
+                        {
+                            std::cosf(lat)* std::cosf(lon),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon),
+                            1.0f
+                        },
+                        {
+                            float(lonIndex)/float(kSubdivision),
+                            1.0f-float(latIndex)/float(kSubdivision)
+
+                        
+                        },
+                        { 
+                            std::cosf(lat)* std::cosf(lon),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon)
+                        }
+                    };
+                    //右上の頂点B
+                    VertexData verB={
+                        {
+                            std::cosf(lat+kLatEvery)* std::cosf(lon),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon),
+                            1.0f
+                        },
+                        {
+                              float(lonIndex)/float(kSubdivision),
+                            1.0f-float(latIndex+1)/float(kSubdivision)
+                        
+                        },
+                        { 
+                            std::cosf(lat+kLatEvery)* std::cosf(lon),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon)
+                        }
+                    };
+
+                    //左下の頂点C
+                    VertexData verC={
+                        {
+                            std::cosf(lat)* std::cosf(lon+kLonEvery),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon+kLonEvery),
+                            1.0f
+                        },
+                        {
+
+                          float(lonIndex+1)/float(kSubdivision),
+                            1.0f-float(latIndex)/float(kSubdivision)
+                        },
+                        {
+                            std::cosf(lat)* std::cosf(lon+kLonEvery),
+                            std::sinf(lat),
+                            std::cosf(lat)* std::sinf(lon+kLonEvery)
+                        }
+
+                    };
+                    //右下の頂点D
+                    VertexData verD={
+                        {
+                            std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon+kLonEvery),
+                            1.0f
+                        },
+                        {
+                              float(lonIndex+1)/float(kSubdivision),
+                            1.0f-float(latIndex+1)/float(kSubdivision)
+                        
+                        },
+                        {
+                            std::cosf(lat+kLatEvery)*std::cosf(lon+kLonEvery),
+                            std::sinf(lat+kLatEvery),
+                            std::cosf(lat+kLatEvery)* std::sinf(lon+kLonEvery)
+                        }
+
+                    };
+                    uint32_t vertexStartIndex =(latIndex*kSubdivision+lonIndex)*4;
+                    //頂点データの設定
+                       
+                    vertexDataSphere[vertexStartIndex+0]=verA;
+
+                    vertexDataSphere[vertexStartIndex+1]=verB;
+
+                    vertexDataSphere[vertexStartIndex+2]=verC;
+
+                    vertexDataSphere[vertexStartIndex+3]=verD;
+
+                    //vertexDataSphere[startIndex+4]=verB;
+
+                    //vertexDataSphere[startIndex+5]=verD;
+
+                    //インデックスデータの設定
+                     uint32_t   StartIndex =(latIndex*kSubdivision+lonIndex)*6;
+                     indexDataSphere[StartIndex + 0] = vertexStartIndex + 0; // A
+                     indexDataSphere[StartIndex + 1] = vertexStartIndex + 1; // B
+                     indexDataSphere[StartIndex + 2] = vertexStartIndex + 2; // C
+                     indexDataSphere[StartIndex + 3] = vertexStartIndex + 1; // B
+                     indexDataSphere[StartIndex + 4] = vertexStartIndex + 3; // D
+                     indexDataSphere[StartIndex + 5] = vertexStartIndex + 2; // C
+
+
+
+                }
+
+
+            }
+
            
 
 
