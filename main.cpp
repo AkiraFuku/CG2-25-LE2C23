@@ -1199,6 +1199,13 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             scissorRect.top = 0;
             scissorRect.bottom = kClientHeight;
             ///
+            enum class LightingType
+            {
+                kNone,
+                kDirectional,
+                kHarfLambert,
+            };
+            LightingType lightingType = LightingType::kHarfLambert;
 
             ///マテリアルリソース
               Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device, sizeof(Material) );
