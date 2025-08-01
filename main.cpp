@@ -1571,9 +1571,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 break;
             case kUseModelSphere:
                  //VBVの設定
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             //IBVの設定
-            commandList->IASetIndexBuffer(&indexBufferView);
+            commandList->IASetIndexBuffer(&indexBufferViewSphere);
                 commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
                 break;
             case kUseModelSuzanne:
