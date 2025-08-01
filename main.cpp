@@ -1469,6 +1469,12 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
           
 
             ImGui::Begin("MaterialData");
+            const char* modelItems[] = { "Resource", "Sphere", "Suzanne" };
+            static int currentModel = useModel;
+            if (ImGui::Combo("Draw Model", &currentModel, modelItems, IM_ARRAYSIZE(modelItems))) {
+            useModel = static_cast<UseModel>(currentModel);
+            }
+
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
             ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
             ImGui::ColorEdit4("Color", &(materialData->color).x); 
@@ -1480,6 +1486,7 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             materialData->HarfLambertLighting = HarfLambertLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate",&(transform.rotate.x));
             ImGui::DragFloat3("traslate", &(transform.traslate.x));
+            ImGui::DragFloat3("scale", &(transform.scale.x));
             ImGui::Checkbox("useMonsterBall",&useMonstorBall);
             ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x); 
             ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
