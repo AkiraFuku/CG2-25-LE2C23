@@ -996,15 +996,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              {
                     kUseModelResourse,
                     kUseModelSphere,
-                    kUseModelSuzanne,
+                    kUseModelTeapot,
 
              };
          
-             UseModel useModel = kUseModelSuzanne;
+             UseModel useModel = kUseModelTeapot;
                  
             ///
             
-            ModelData modelData2 = LoadObjFile("resources", "Suzanne.obj");
+            ModelData modelData2 = LoadObjFile("resources", "teapot.obj");
             
             //頂点リソース
 
@@ -1270,6 +1270,36 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
 
             ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
 
+
+
+               DirectX::ScratchImage mipImages3 = LoadTexture(modelData2.material.textureFilePath);
+            const DirectX::TexMetadata& metadata3 = mipImages3.GetMetadata();
+             Microsoft::WRL::ComPtr<ID3D12Resource>textureResource3= CreateTextureResourse(device, metadata3);
+            //ID3D12Resource* textureResource = CreateTextureResourse(device, metadata);
+            //テクスチャのアップロード
+              Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource3= UploadTextureData(textureResource3, mipImages3,device,commandList);
+           
+
+            //metaDataを基にSRVの設定
+            //
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc3{};
+            srvDesc3.Format = metadata3.format;
+            srvDesc3.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            srvDesc3.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            srvDesc3.Texture2D.MipLevels = UINT(metadata3.mipLevels);//最初のミップマップ
+           
+          D3D12_CPU_DESCRIPTOR_HANDLE  textureSrvHandleCPU3= GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,3);
+           D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU3= GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,3);
+            //SRVの設定
+            device->CreateShaderResourceView(
+                textureResource3.Get(),
+                &srvDesc3,
+                textureSrvHandleCPU3
+            );
+
+
+
+
              DirectX::ScratchImage mipImages2 = LoadTexture("resources/monsterBall.png");
             const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
             Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = CreateTextureResourse(device, metadata2);
@@ -1469,7 +1499,7 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
           
 
             ImGui::Begin("MaterialData");
-            const char* modelItems[] = { "Resource", "Sphere", "Suzanne" };
+            const char* modelItems[] = { "Resource", "Sphere", "Teapot" };
             static int currentModel = useModel;
             if (ImGui::Combo("Draw Model", &currentModel, modelItems, IM_ARRAYSIZE(modelItems))) {
             useModel = static_cast<UseModel>(currentModel);
@@ -1585,7 +1615,7 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             //WVP行列リソースの設定
             commandList->SetGraphicsRootConstantBufferView(1,wvpResource.Get()->GetGPUVirtualAddress());
             ///
-            commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU);
+            
             // 追加: 平行光源CBVをバインド
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
             //
@@ -1594,14 +1624,17 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             {
 
             case kUseModelResourse:
+                commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU);
                  commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
                   commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
                 break;
-            case kUseModelSuzanne:
+            case kUseModelTeapot:
+                commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU3);
                commandList->IASetVertexBuffers(0, 1, &vertexBufferView2);
                   commandList->DrawInstanced(UINT(modelData2.vertices.size()), 1, 0, 0);
                 break;
             case kUseModelSphere:
+                commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU);
                  //VBVの設定
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             //IBVの設定
