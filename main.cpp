@@ -475,9 +475,9 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
              //    modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
                  Triangle[faceVertex] = { position, texcoord, normal };//頂点データを構築
              }
-             modelData.vertices.push_back(Triangle[2]);
-             modelData.vertices.push_back(Triangle[1]);
              modelData.vertices.push_back(Triangle[0]);
+             modelData.vertices.push_back(Triangle[1]);
+             modelData.vertices.push_back(Triangle[2]);
          } else if(identifier=="mtllib")//マテリアルライブラリの読み込み
          {
              std::string materialFileName;
@@ -914,7 +914,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             D3D12_COLOR_WRITE_ENABLE_ALL;
             //RasteriwrStateの設定
             D3D12_RASTERIZER_DESC rasterizerDesc{};
-            rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;//カリングなし
+            rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;//カリングなし
                 //BACK;
 
             rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
@@ -991,10 +991,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 IID_PPV_ARGS(&graphicsPipelineState)
             );
             assert(SUCCEEDED(hr));
+
+             enum UseModel
+             {
+                    kUseModelResourse,
+                    kUseModelSphere,
+                    kUseModelSuzanne,
+
+             };
+         
+             UseModel useModel = kUseModelSuzanne;
+                 
             ///
-            ModelData modelData = LoadObjFile("resources", "axis.obj");
+            
+            ModelData modelData2 = LoadObjFile("resources", "Suzanne.obj");
             
             //頂点リソース
+
+                 Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource2 =CreateBufferResource(device, sizeof(VertexData)*modelData2.vertices.size());
+            //頂点バッファビューの設定
+            D3D12_VERTEX_BUFFER_VIEW vertexBufferView2{};
+            vertexBufferView2.BufferLocation = vertexResource2->GetGPUVirtualAddress();//リソースの先頭アドレス
+            vertexBufferView2.SizeInBytes = UINT(sizeof(VertexData) * modelData2.vertices.size());//リソースのサイズ
+            vertexBufferView2.StrideInBytes = sizeof(VertexData);//頂点のサイズ
+            //頂点データの書き込み
+            VertexData* vertexData2 = nullptr;
+            vertexResource2.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData2));
+            std::memcpy(vertexData2, modelData2.vertices.data(), sizeof(VertexData)* modelData2.vertices.size());
+
+ModelData modelData = LoadObjFile("resources", "axis.obj");
               Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
             //頂点バッファビューの設定
             D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -1005,6 +1030,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             VertexData* vertexData = nullptr;
             vertexResource.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
             std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
+
 
 
 
@@ -1135,10 +1161,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
                     vertexDataSphere[vertexStartIndex+3]=verD;
 
-                    //vertexDataSphere[startIndex+4]=verB;
-
-                    //vertexDataSphere[startIndex+5]=verD;
-
                     //インデックスデータの設定
                      uint32_t   StartIndex =(latIndex*kSubdivision+lonIndex)*6;
                      indexDataSphere[StartIndex + 0] = vertexStartIndex + 0; // A
@@ -1245,7 +1267,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
 
-             DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
+             DirectX::ScratchImage mipImages2 = LoadTexture("resources/monsterBall.png");
             const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
             Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = CreateTextureResourse(device, metadata2);
             //ID3D12Resource* textureResource2 = CreateTextureResourse(device, metadata2);
@@ -1271,7 +1293,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
 
             //
-            DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+            DirectX::ScratchImage mipImages = LoadTexture(modelData.material.textureFilePath);
             const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
              Microsoft::WRL::ComPtr<ID3D12Resource>textureResource= CreateTextureResourse(device, metadata);
             //ID3D12Resource* textureResource = CreateTextureResourse(device, metadata);
@@ -1406,16 +1428,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             
 
-             enum UseModel
-             {
-                    kUseModelResourse,
-                    kUseModelSphere,
-                    kUseModelSuzanne,
-
-             };
-         
-             UseModel useModel = kUseModelSphere;
-                 
+            
           
         
 
@@ -1549,7 +1562,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //PSOの設定
             commandList->SetPipelineState(graphicsPipelineState.Get());
             //VBVの設定
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+           
             //IBVの設定
            // commandList->IASetIndexBuffer(&indexBufferView);
             //形状の設定
@@ -1566,8 +1579,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //描画コマンド
             switch (useModel)
             {
+
             case kUseModelResourse:
-                commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+                 commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+                  commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+                break;
+            case kUseModelSuzanne:
+               commandList->IASetVertexBuffers(0, 1, &vertexBufferView2);
+                  commandList->DrawInstanced(UINT(modelData2.vertices.size()), 1, 0, 0);
                 break;
             case kUseModelSphere:
                  //VBVの設定
@@ -1575,8 +1594,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //IBVの設定
             commandList->IASetIndexBuffer(&indexBufferViewSphere);
                 commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-                break;
-            case kUseModelSuzanne:
                 break;
             default:
                 break;
