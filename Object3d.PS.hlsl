@@ -5,6 +5,7 @@ struct Material
     float32_t4 Color;
     int32_t enableLighting;
     float32_t4x4 uvTransform; // UV変換行列
+    int32_t HarfLambertLighting;
 };
 struct DirectionalLight
 {
@@ -29,9 +30,22 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     if (gMaterial.enableLighting != 0)
     {
-        float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(Ndotl * 0.5f + 0.5f, 2.0f);
-        output.color = gMaterial.Color * textureColor*gDirectionalLight.color*cos*gDirectionalLight.intensity;
+        if (gMaterial.HarfLambertLighting != 0)
+        {
+            // ハーフランバートシェーディング
+            float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
+            float cos = Ndotl * 0.5f + 0.5f;
+            output.color = gMaterial.Color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        }
+        else
+        {
+            // 通常のランバートシェーディング
+            float cos = saturate(dot(normalize(input.normal), -gDirectionalLight.direction));
+            output.color = gMaterial.Color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+
+
+        }
+       //output.color = gMaterial.Color * textureColor*gDirectionalLight.color*cos*gDirectionalLight.intensity;
     }
     else
     {

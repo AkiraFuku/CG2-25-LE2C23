@@ -1199,13 +1199,8 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             scissorRect.top = 0;
             scissorRect.bottom = kClientHeight;
             ///
-            enum class LightingType
-            {
-                kNone,
-                kDirectional,
-                kHarfLambert,
-            };
-            LightingType lightingType = LightingType::kHarfLambert;
+            
+         
 
             ///マテリアルリソース
               Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device, sizeof(Material) );
@@ -1215,8 +1210,9 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
             //データの設定
             materialData->color =  Vector4(1.0f, 1.0f, 1.0f, 1.0f );
-            materialData->enableLighting =true;
+            materialData->enableLighting =false;
             materialData->uvTransform = Makeidetity4x4();
+            materialData->HarfLambertLighting = false;
 
             ///WVP行列リソースの設定
               Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = CreateBufferResource(device, sizeof(TransformationMatrix));
@@ -1478,7 +1474,10 @@ ModelData modelData = LoadObjFile("resources", "axis.obj");
             ImGui::ColorEdit4("Color", &(materialData->color).x); 
             bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
             ImGui::Checkbox("enable", &enableLighting);
+            bool HarfLambertLighting = materialData->HarfLambertLighting !=0;
+            ImGui::Checkbox(" HarfLambert", &HarfLambertLighting);
             materialData->enableLighting = enableLighting; // Update the original value after modification
+            materialData->HarfLambertLighting = HarfLambertLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate",&(transform.rotate.x));
             ImGui::DragFloat3("traslate", &(transform.traslate.x));
             ImGui::Checkbox("useMonsterBall",&useMonstorBall);
