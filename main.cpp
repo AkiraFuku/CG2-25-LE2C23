@@ -1414,7 +1414,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
              };
          
-             UseModel useModel = kUseModelResourse;
+             UseModel useModel = kUseModelSphere;
                  
           
         
@@ -1551,7 +1551,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //VBVの設定
             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             //IBVの設定
-          //  commandList->IASetIndexBuffer(&indexBufferView);
+           // commandList->IASetIndexBuffer(&indexBufferView);
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1570,6 +1570,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
                 break;
             case kUseModelSphere:
+                 //VBVの設定
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+            //IBVの設定
+            commandList->IASetIndexBuffer(&indexBufferView);
                 commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
                 break;
             case kUseModelSuzanne:
