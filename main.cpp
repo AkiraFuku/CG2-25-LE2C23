@@ -1406,9 +1406,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             
 
+             enum UseModel
+             {
+                    kUseModelResourse,
+                    kUseModelSphere,
+                    kUseModelSuzanne,
 
+             };
          
-
+             UseModel useModel = kUseModelResourse;
                  
           
         
@@ -1558,9 +1564,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
             //
             //描画コマンド
+            switch (useModel)
+            {
+            case kUseModelResourse:
+                commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+                break;
+            case kUseModelSphere:
+                commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
+                break;
+            case kUseModelSuzanne:
+                break;
+            default:
+                break;
+            }
             
-         //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+            
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
