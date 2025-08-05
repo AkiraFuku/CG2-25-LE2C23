@@ -668,6 +668,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard = nullptr;
             hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, nullptr);
             assert(SUCCEEDED(hr));
+            hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
+            assert(SUCCEEDED(hr));
+            hr = keyboard->SetCooperativeLevel(
+                hwnd,
+                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
+            );
+            assert(SUCCEEDED(hr));
+            // マウスデバイスの作成
+            Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse = nullptr;
+            hr = directInput->CreateDevice(GUID_SysMouse, &mouse, nullptr);
+            assert(SUCCEEDED(hr));
+            hr = mouse->SetDataFormat(&c_dfDIMouse);
+            assert(SUCCEEDED(hr));
+            hr = mouse->SetCooperativeLevel(
+                hwnd,
+                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
+            );
+            assert(SUCCEEDED(hr));
+
+            
 
             
             
