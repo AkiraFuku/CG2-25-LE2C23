@@ -654,8 +654,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
             //ここから書く　外部入力
+            // DirectInputの初期化
+            Microsoft::WRL::ComPtr<IDirectInput8> directInput = nullptr;
+             hr = DirectInput8Create(
+                wc.hInstance,
+                DIRECTINPUT_VERSION,
+                IID_IDirectInput8,
+                (void**)&directInput,
+                nullptr
+            );
+            assert(SUCCEEDED(hr));
+            // キーボードデバイスの作成
+            Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard = nullptr;
+            hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, nullptr);
+            assert(SUCCEEDED(hr));
 
-
+            
+            
 
 #ifdef _DEBUG
             Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
