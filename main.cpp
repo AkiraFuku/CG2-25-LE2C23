@@ -666,9 +666,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             // キーボードデバイスの作成
             Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard = nullptr;
-            hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, nullptr);
+            hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
             assert(SUCCEEDED(hr));
-
+            // キーボードの設定
+            hr= keyboard->SetCooperativeLevel(
+                hwnd,
+                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
+            );
+            assert(SUCCEEDED(hr));
+            Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse = nullptr;
+            // マウスデバイスの作成
+            hr = directInput->CreateDevice(GUID_SysMouse, &mouse, NULL);
+            assert(SUCCEEDED(hr));
+            hr = mouse->SetCooperativeLevel(
+                hwnd,
+                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
+            );
+            assert(SUCCEEDED(hr));
             
             
 
@@ -1290,22 +1304,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //メインループ
     MSG msg{};
     while (msg.message != WM_QUIT) {
+           
+
         //メッセージがある限りGetMessageを呼び出す
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+
+ 
         } else{
+           
             ImGui_ImplDX12_NewFrame();
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
+ 
+           // 例:
+           keyboard->Acquire();
+        BYTE key[256] = {};
+         keyboard->GetDeviceState(sizeof(key), key);
+       
+        
+            // キー入力判定
+            if (key[DIK_D]) {
+                OutputDebugStringA("DIK_D\n");
+                transform.rotate.y += 0.1f; // 右に移動
+            }
+        
 
             ///////
             ///Update
             ///////
-
-           // transform.rotate.y += 0.03f;
+            
+           // 
           
-          
+           /* if (key[DIK_D])
+            {
+              
+                OutputDebugString(L"Right\n");
+            }*/
             
 
             
