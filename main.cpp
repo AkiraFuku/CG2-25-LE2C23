@@ -674,6 +674,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
             );
             assert(SUCCEEDED(hr));
+            hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
+            assert(SUCCEEDED(hr));
             Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse = nullptr;
             // マウスデバイスの作成
             hr = directInput->CreateDevice(GUID_SysMouse, &mouse, NULL);
@@ -1322,6 +1324,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            keyboard->Acquire();
         BYTE key[256] = {};
          keyboard->GetDeviceState(sizeof(key), key);
+        // keyboard->SetDataFormat(&c_dfDIKeyboard);
        
         
             // キー入力判定
