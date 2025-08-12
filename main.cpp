@@ -1301,7 +1301,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
     
 
-
+              BYTE preKey[256] = {};
+              keyboard->GetDeviceState(sizeof(preKey), preKey);
 
             //メインループ
     MSG msg{};
@@ -1322,7 +1323,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
  
            // 例:
            keyboard->Acquire();
-        BYTE key[256] = {};
+           BYTE key[256] = {};
          keyboard->GetDeviceState(sizeof(key), key);
         // keyboard->SetDataFormat(&c_dfDIKeyboard);
        
@@ -1514,8 +1515,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             hr = commandList->Reset(commandAllocator.Get(), nullptr);
             assert(SUCCEEDED(hr));
             /////
-
-
+           
+              
+              std::memcpy(preKey, key, sizeof(key));
         }
        
     }
