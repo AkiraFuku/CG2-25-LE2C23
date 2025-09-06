@@ -36,14 +36,23 @@
 #pragma comment(lib,"dxguid.lib")
 
 
+
+
+
 namespace DirectEngine {
 
 
-  
+    /// <summary>
+    /// エンジン初期化
+    /// </summary>
     void Initialize(const std::wstring& title = L"LE2C_24_フク_アキラ");
-
+    /// <summary>
+    /// エンジン終了
+    /// </summary>
     void Finalize();
-    
+    /// <summary>
+    /// エンジン更新
+    /// </summary>
     void Update();
 
 }

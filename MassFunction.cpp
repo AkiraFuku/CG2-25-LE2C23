@@ -1,4 +1,5 @@
 #include "MassFunction.h"
+ namespace DirectEngine{
 //
 // 
 // 
@@ -418,4 +419,5 @@ Matrix4x4 MakeRotateZMatrix(float radian)
 		Vector3 result = { 0.0f, 0.0f, 0.0f };
 		return result;
 //
-	}
+    }
+}

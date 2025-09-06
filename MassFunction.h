@@ -1,13 +1,14 @@
 #pragma once
-///
 #define _USE_MATH_DEFINES
 #define PI 3.14159265358979323846f
 #include <cmath>
 #include "Vector4.h"
 #include <assert.h>
-///using namespace std;
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
+namespace DirectEngine
+{
+
 
 ///
 ///透視投影行列
@@ -122,3 +123,4 @@ Matrix4x4 MakeRotateZMatrix( float radian);
 	/// <param name="v">ベクトル</param>
 	/// <returns>正規化数</returns>
 	Vector3 Normalize(const Vector3& v);
+}

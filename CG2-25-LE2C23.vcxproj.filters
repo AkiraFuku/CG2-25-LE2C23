@@ -16,8 +16,11 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{f538c2a4-3f24-48c0-922a-6f2e3e7f0fdb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="base">
-      <UniqueIdentifier>{5a53fc6a-c010-4e21-81c7-ccd77fde0c72}</UniqueIdentifier>
+    <Filter Include="Base">
+      <UniqueIdentifier>{0b8c2d3a-c946-4822-99cb-4c4f4dd63193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー ファイル">
+      <UniqueIdentifier>{0a11e06c-9f2a-4ac3-9194-0e029b6c66a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -54,13 +57,20 @@
     <ClCompile Include="DirectEngine.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DX12Comon.cpp">
-      <Filter>base</Filter>
+    <ClCompile Include="base\DX12Comon.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="WinApp.cpp">
+      <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.VS.hlsl" />
-    <FxCompile Include="Object3d.PS.hlsl" />
+    <FxCompile Include="Object3d.PS.hlsl">
+      <Filter>シェーダー ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Object3d.VS.hlsl">
+      <Filter>シェーダー ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vector4.h">
@@ -99,8 +109,11 @@
     <ClInclude Include="DirectEngine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DX12Comon.h">
-      <Filter>base</Filter>
+    <ClInclude Include="base\DX12Comon.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="WinApp.h">
+      <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +122,8 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli" />
+    <None Include="Object3d.hlsli">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
   </ItemGroup>
 </Project>
