@@ -2,6 +2,9 @@
 #include <Windows.h>
 #include <cstdint>
 #include <string>
+#include"externals/imgui/imgui.h"
+#include"externals/imgui/imgui_impl_dx12.h"
+#include"externals/imgui/imgui_impl_win32.h"
 
 namespace DirectEngine {
     /// <summary>
@@ -67,9 +70,13 @@ namespace DirectEngine {
         /// <summary>
         /// ウィンドウハンドルの取得
         /// </summary>
-        HWND GetHwnd() { return hwnd_;}
+        HWND GetHwnd() const {
+            return hwnd_;
+        }
 
-        HINSTANCE GetHInstance() {return wc_.hInstance;}
+        HINSTANCE GetHInstance() const {
+            return wc_.hInstance;
+        }
 
         /// <summary>
         /// フルスクリーンの設定
