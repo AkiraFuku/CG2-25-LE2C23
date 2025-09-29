@@ -17,8 +17,8 @@
 #pragma comment(lib,"dxguid.lib")
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
-#include"Vector4.h"
-#include"MassFunction.h"
+//#include"Vector4.h"
+#include"engine/math/MassFunction.h"
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
@@ -27,7 +27,7 @@
 #include<vector>
 #include<numbers>
 #include<sstream>
-#include"Audio.h"
+#include"engine/audio/Audio.h"
 #include <memory>
 
 #define DIRECTINPUT_VERSION 0x0800
@@ -998,7 +998,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
             //shaderのコンパイル
               Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(
-                L"Object3D.vs.hlsl",
+                L"resources/Object3d/Object3D.vs.hlsl",
                 L"vs_6_0",
                 dxcUtils,
                 dxcCompiler,
@@ -1008,7 +1008,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(vertexShaderBlob.Get() != nullptr);
 
               Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(
-                L"Object3D.ps.hlsl",
+                L"resources/Object3d/Object3D.ps.hlsl",
                 L"ps_6_0",
                 dxcUtils,
                 dxcCompiler,
