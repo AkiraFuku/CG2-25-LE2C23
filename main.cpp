@@ -988,8 +988,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///
             // BlendStateの設定
             D3D12_BLEND_DESC blendDesc{};
-            blendDesc.RenderTarget[0].RenderTargetWriteMask=
-            D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//デストの係数
+            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
             //RasteriwrStateの設定
             D3D12_RASTERIZER_DESC rasterizerDesc{};
             rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;//カリングなし

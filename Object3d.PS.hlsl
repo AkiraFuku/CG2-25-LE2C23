@@ -27,11 +27,15 @@ PixelShaderOutput main(VertexShaderOutput input)
     float32_t4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
     PixelShaderOutput output;
     
+    
     if (gMaterial.enableLighting != 0)
     {
         float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
         float cos = pow(Ndotl * 0.5f + 0.5f, 2.0f);
-        output.color = gMaterial.Color * textureColor*gDirectionalLight.color*cos*gDirectionalLight.intensity;
+        
+        output.color.rgb = gMaterial.Color.rgb * textureColor*gDirectionalLight.color.rgb*cos*gDirectionalLight.intensity;
+        output.color.a = gMaterial.Color.a * textureColor.a;
+        
     }
     else
     {
