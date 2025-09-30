@@ -64,3 +64,23 @@ struct ModelData{
     MaterialData material; // マテリアルデータ
 };
 
+
+enum BlendMode
+{
+    //　ブレンドなし
+    kBrendMode_None,
+    //通常のブレンド
+    kBrendMode_Alpha,
+    //加算ブレンド
+    kBrendMode_Add,
+    //減算ブレンド
+    kBrendMode_Sub,
+    //乗算ブレンド
+    kBrendMode_Mul,
+    //スクリーンブレンド
+    kBrendMode_Screen,
+    //利用禁止
+    kCountOfBlendMode,
+
+
+};

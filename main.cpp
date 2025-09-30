@@ -553,6 +553,80 @@ bool isPushKeyUp(int8_t keys,int8_t preKeys) {
     return false;
 }
 
+void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
+{
+    switch (blendoMode)
+    {
+
+    case kBrendMode_Alpha:
+         
+           blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+           blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+           blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
+           blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+           blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//デストの係数
+           blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+           blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+           blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+        break;
+    case kBrendMode_Add:
+        
+            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlend =D3D12_BLEND_ONE;//デストの係数
+            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+        break;
+    case kBrendMode_Sub:
+        
+            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;//加算
+            blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの係数
+            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+        break;
+    case kBrendMode_None:
+            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].BlendEnable = false;//ブレンドしない
+            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;//デストの係数
+            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+
+        break;
+    case kBrendMode_Mul:
+        
+            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;//デストの係数
+            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+        break;
+    case kBrendMode_Screen:
+        
+            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの係数
+            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+        break;
+    }
+
+}
 
 
 
@@ -988,14 +1062,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ///
             // BlendStateの設定
             D3D12_BLEND_DESC blendDesc{};
-            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
-            blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
-            blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
-            blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-            blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//デストの係数
-            blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
-            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
-            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
+            BlendMode blendMode = BlendMode::kBrendMode_Alpha;
+
+            changeBlendMode(blendDesc, blendMode);
+           // blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
+            //blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
+            //blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
+           // blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+           // blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//デストの係数
+           // blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
+           // blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+           // blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
             //RasteriwrStateの設定
             D3D12_RASTERIZER_DESC rasterizerDesc{};
             rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;//カリングなし
@@ -1411,13 +1488,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
             ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
             ImGui::ColorEdit4("Color", &(materialData->color).x); 
+            // ImGuiウィンドウ内（ImGui::Begin("MaterialData"); ～ ImGui::End(); の間）に追加
+            static int blendModeIndex = 0;
+            const char* blendModeItems[] = {
+             "Alpha", "Add", "Sub", "None", "Mul", "Screen"
+            };
+            ImGui::Combo("BlendMode", &blendModeIndex, blendModeItems, IM_ARRAYSIZE(blendModeItems));
+
             bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
             ImGui::Checkbox("enable", &enableLighting);
             materialData->enableLighting = enableLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate",&(transform.rotate.x));
             ImGui::DragFloat3("traslate", &(transform.traslate.x));
             ImGui::Checkbox("useMonsterBall",&useMonstorBall);
-            ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x); 
+            ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x);
+            //ImGui::ColorPicker4("ColorPicker", &(materialDataSprite->color).x);
+
             ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
             ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
             ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
@@ -1443,6 +1529,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
              uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
              materialDataSprite->uvTransform = uvTransformMatrix;
+
+             //// ImGui::End(); の直前や、描画前の適切な場所で
+             //   BlendMode newBlendMode = static_cast<BlendMode>(blendModeIndex);
+             //   static BlendMode currentBlendMode = BlendMode::kBrendMode_Alpha;
+             //   if (newBlendMode != currentBlendMode) {
+             //    // ブレンドステートを更新
+             //    changeBlendMode(blendDesc, newBlendMode);
+
+             //     // PSOを再生成
+             //    graphicPipelineStateDesc.BlendState = blendDesc;
+             //       hr = device->CreateGraphicsPipelineState(
+             //     &graphicPipelineStateDesc,
+             //       IID_PPV_ARGS(&graphicsPipelineState)
+             //        );
+             //        assert(SUCCEEDED(hr));
+
+             //        currentBlendMode = newBlendMode;
+             //   }
 
 
             ///////
