@@ -557,7 +557,7 @@ void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
 {
     switch (blendoMode)
     {
-
+        //alphaブレンド
     case kBrendMode_Alpha:
          
            blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -569,6 +569,7 @@ void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
            blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
            blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
         break;
+        //加算ブレンド
     case kBrendMode_Add:
         
             blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -580,6 +581,7 @@ void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
             blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
             blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
         break;
+        //減算ブレンド
     case kBrendMode_Sub:
         
             blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -591,6 +593,7 @@ void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
             blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
             blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
         break;
+        //ブレンドなし
     case kBrendMode_None:
             blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
             blendDesc.RenderTarget[0].BlendEnable = false;//ブレンドしない
@@ -602,6 +605,7 @@ void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
             blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
 
         break;
+        //乗算ブレンド
     case kBrendMode_Mul:
         
             blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -613,6 +617,7 @@ void changeBlendMode(D3D12_BLEND_DESC& blendDesc,BlendMode blendoMode)
             blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
             blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
         break;
+        //スクリーンブレンド
     case kBrendMode_Screen:
         
             blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -1488,6 +1493,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
             ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
             ImGui::ColorEdit4("Color", &(materialData->color).x); 
+          
             // ImGuiウィンドウ内（ImGui::Begin("MaterialData"); ～ ImGui::End(); の間）に追加
             static int blendModeIndex = 0;
             const char* blendModeItems[] = {
@@ -1531,22 +1537,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              materialDataSprite->uvTransform = uvTransformMatrix;
 
              //// ImGui::End(); の直前や、描画前の適切な場所で
-             //   BlendMode newBlendMode = static_cast<BlendMode>(blendModeIndex);
-             //   static BlendMode currentBlendMode = BlendMode::kBrendMode_Alpha;
-             //   if (newBlendMode != currentBlendMode) {
-             //    // ブレンドステートを更新
-             //    changeBlendMode(blendDesc, newBlendMode);
+                BlendMode newBlendMode = static_cast<BlendMode>(blendModeIndex);
+                static BlendMode currentBlendMode = BlendMode::kBrendMode_Alpha;
+                if (newBlendMode != currentBlendMode) {
+                 // ブレンドステートを更新
+                 changeBlendMode(blendDesc, newBlendMode);
 
-             //     // PSOを再生成
-             //    graphicPipelineStateDesc.BlendState = blendDesc;
-             //       hr = device->CreateGraphicsPipelineState(
-             //     &graphicPipelineStateDesc,
-             //       IID_PPV_ARGS(&graphicsPipelineState)
-             //        );
-             //        assert(SUCCEEDED(hr));
+                  // PSOを再生成
+                 graphicPipelineStateDesc.BlendState = blendDesc;
+                    hr = device->CreateGraphicsPipelineState(
+                  &graphicPipelineStateDesc,
+                    IID_PPV_ARGS(&graphicsPipelineState)
+                     );
+                     assert(SUCCEEDED(hr));
 
-             //        currentBlendMode = newBlendMode;
-             //   }
+                     currentBlendMode = newBlendMode;
+                }
 
 
             ///////

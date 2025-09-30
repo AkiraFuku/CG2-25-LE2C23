@@ -67,14 +67,15 @@ struct ModelData{
 
 enum BlendMode
 {
-    //　ブレンドなし
-    kBrendMode_None,
+  
     //通常のブレンド
     kBrendMode_Alpha,
     //加算ブレンド
     kBrendMode_Add,
     //減算ブレンド
     kBrendMode_Sub,
+    //　ブレンドなし
+    kBrendMode_None,
     //乗算ブレンド
     kBrendMode_Mul,
     //スクリーンブレンド
