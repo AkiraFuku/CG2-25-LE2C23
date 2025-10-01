@@ -998,7 +998,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
             //shaderのコンパイル
               Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(
-                L"resources/Object3d/Object3D.vs.hlsl",
+                L"resources/shaders/Object3d/Object3D.vs.hlsl",
                 L"vs_6_0",
                 dxcUtils,
                 dxcCompiler,
@@ -1008,7 +1008,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(vertexShaderBlob.Get() != nullptr);
 
               Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(
-                L"resources/Object3d/Object3D.ps.hlsl",
+                L"resources/shaders/Object3d/Object3D.ps.hlsl",
                 L"ps_6_0",
                 dxcUtils,
                 dxcCompiler,
