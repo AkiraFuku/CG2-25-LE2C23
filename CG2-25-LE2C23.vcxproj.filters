@@ -16,12 +16,39 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{f538c2a4-3f24-48c0-922a-6f2e3e7f0fdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{052f9c7c-ffd0-4dd9-b740-1765e8054e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\Audio">
+      <UniqueIdentifier>{e9c003f6-41ed-4be5-910a-dfe417e92265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\math">
+      <UniqueIdentifier>{568326af-b7fc-4d23-887d-4ad37cf4a57c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\2d">
+      <UniqueIdentifier>{79f0c1f7-1598-4e90-bde2-5ea60fa2637a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー ファイル">
+      <UniqueIdentifier>{7c0b9070-b01f-4ba4-ad0d-1e389ba64581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\3d">
+      <UniqueIdentifier>{8e5f47b6-b7b6-45a7-a1fb-db3004412e5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\base">
+      <UniqueIdentifier>{db6c1153-66bc-4c64-8848-d9474d9029ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\scene">
+      <UniqueIdentifier>{d0b0505b-1c36-4229-bd35-512f3496fd14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\App">
+      <UniqueIdentifier>{aac9a291-1ec1-419d-a78b-4b6475066212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine\io">
+      <UniqueIdentifier>{7cf8d20a-921e-4b99-b150-b77089f72e52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\math\MassFunction.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -46,20 +73,21 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="engine\audio\Audio.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>engine\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\math\MassFunction.cpp">
+      <Filter>engine\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\Object3d\Object3d.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
+      <Filter>シェーダー ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d\Object3d.VS.hlsl">
+      <Filter>シェーダー ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\2d\Vector4.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\MassFunction.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -85,7 +113,13 @@
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="engine\audio\Audio.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>engine\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\MassFunction.h">
+      <Filter>engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\2d\Vector4.h">
+      <Filter>engine\2d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +128,8 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\Object3d\Object3d.hlsli" />
+    <None Include="resources\shaders\Object3d\Object3d.hlsli">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
   </ItemGroup>
 </Project>
