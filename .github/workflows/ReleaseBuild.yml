@@ -4,7 +4,7 @@ on:
     branches:
       - master
 env:
-  SOLUTION_FILE_PATH: project/CG2-25-LE2C23.sln
+  SOLUTION_FILE_PATH: CG2-25-LE2C23.sln
 
   CONFIGURATION: Release
 jobs:
@@ -20,5 +20,5 @@ jobs:
            msbuild-architecture: x64
       -  name: Build
          run: |
-           masbuild ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64,Configuration=${{env.CONFIGURATION}}
+           msbuild ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64,Configuration=${{env.CONFIGURATION}}
     
