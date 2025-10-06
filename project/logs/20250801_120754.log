@@ -1,0 +1,18 @@
+WSTRINGHello,DirectX!
+
+Use Adapter:NVIDIA GeForce RTX 4060 Laptop GPU
+
+Use FeatureLevel : 12_2
+
+Complete create D3D12Device!!!
+
+Bigin CompileShader, path:Object3D.vs.hlsl,profiale:vs_6_0
+
+Compile Succeeded, path:Object3D.vs.hlsl,profiale:vs_6_0
+
+Bigin CompileShader, path:Object3D.ps.hlsl,profiale:ps_6_0
+
+Object3D.ps.hlsl:45:79: error: use of undeclared identifier 'cos'
+        output.color = gMaterial.Color * textureColor*gDirectionalLight.color*cos*gDirectionalLight.intensity;
+                                                                              ^
+
