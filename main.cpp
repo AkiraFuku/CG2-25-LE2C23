@@ -1158,7 +1158,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
             ///
-            ModelData modelData = LoadObjFile("resources", "axis.obj");
+            ModelData modelData = LoadObjFile("resources", "fence.obj");
             
             //頂点リソース
               Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
