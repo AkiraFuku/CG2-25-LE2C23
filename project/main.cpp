@@ -1161,6 +1161,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
+            ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
             ImGui::StyleColorsDark();
             ImGui_ImplWin32_Init(hwnd);
             ImGui_ImplDX12_Init(
