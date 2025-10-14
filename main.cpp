@@ -1086,7 +1086,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
             //shaderのコンパイル
               Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(
-                L"Object3D.vs.hlsl",
+                L"Object3d.vs.hlsl",
                 L"vs_6_0",
                 dxcUtils,
                 dxcCompiler,
@@ -1096,7 +1096,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(vertexShaderBlob.Get() != nullptr);
 
               Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(
-                L"Object3D.ps.hlsl",
+                L"Object3d.ps.hlsl",
                 L"ps_6_0",
                 dxcUtils,
                 dxcCompiler,
@@ -1158,7 +1158,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
             ///
-            ModelData modelData = LoadObjFile("resources", "fence.obj");
+            ModelData modelData = LoadObjFile("resources", "plane.obj");
             
             //頂点リソース
               Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
@@ -1424,7 +1424,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
 
 
-         
+
+         //インスタンスカウント
+             UINT instanceCount = 10;
+
            
                  
            
@@ -1631,7 +1634,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //描画コマンド
             
          //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+            commandList->DrawInstanced(UINT(modelData.vertices.size()), instanceCount, 0, 0);
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

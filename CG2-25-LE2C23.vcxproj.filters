@@ -16,6 +16,12 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{f538c2a4-3f24-48c0-922a-6f2e3e7f0fdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル">
+      <UniqueIdentifier>{6958cdc5-8795-420f-bff6-f17ad1c5e595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダーファイル\Object3d">
+      <UniqueIdentifier>{42cdfcc7-fbac-4584-b829-d2302c422fe9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,8 +56,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.VS.hlsl" />
-    <FxCompile Include="Object3d.PS.hlsl" />
+    <FxCompile Include="Object3d.PS.hlsl">
+      <Filter>シェーダーファイル\Object3d</Filter>
+    </FxCompile>
+    <FxCompile Include="Object3d.VS.hlsl">
+      <Filter>シェーダーファイル\Object3d</Filter>
+    </FxCompile>
+    <FxCompile Include="Particle.VS.hlsl">
+      <Filter>シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Particle.PS.hlsl">
+      <Filter>シェーダーファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vector4.h">
@@ -94,6 +110,11 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli" />
+    <None Include="Object3d.hlsli">
+      <Filter>シェーダーファイル\Object3d</Filter>
+    </None>
+    <None Include="Particle.hlsli">
+      <Filter>シェーダーファイル</Filter>
+    </None>
   </ItemGroup>
 </Project>
