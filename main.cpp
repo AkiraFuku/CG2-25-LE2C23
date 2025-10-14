@@ -972,8 +972,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             descriptorRange[0].NumDescriptors = 1;//ディスクリプタの数1つ
             descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
             descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
-            ///
-          
+            ///インスタンス用のディスクプリプターレンジの作成
+           D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1]{};
+           descriptorRangeForInstancing[0].BaseShaderRegister = 0;//シェーダーのレジスタ番号0
+           descriptorRangeForInstancing[0].NumDescriptors = 1;//ディスクリプタの数1つ
+           descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+           descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
 
 
 
@@ -989,13 +993,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+        
             rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
+            rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;//ディスクリプタレンジの設定
+            rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);//ディスクリプタレンジの数
             rootParameters[1].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+            
             rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//ディスクリプタテーブルを使う
             rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
             rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//ディスクリプタレンジの数
+            
             rootParameters[3].ParameterType=D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[3].ShaderVisibility= D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[3].Descriptor.ShaderRegister=1;
