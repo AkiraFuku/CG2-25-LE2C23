@@ -62,10 +62,10 @@
     <FxCompile Include="Object3d.VS.hlsl">
       <Filter>シェーダーファイル\Object3d</Filter>
     </FxCompile>
-    <FxCompile Include="Particle.VS.hlsl">
+    <FxCompile Include="Particle.PS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
-    <FxCompile Include="Particle.PS.hlsl">
+    <FxCompile Include="Particle.VS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
   </ItemGroup>
