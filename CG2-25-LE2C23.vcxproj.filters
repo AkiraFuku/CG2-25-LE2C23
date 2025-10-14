@@ -22,6 +22,9 @@
     <Filter Include="シェーダーファイル\Object3d">
       <UniqueIdentifier>{42cdfcc7-fbac-4584-b829-d2302c422fe9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダーファイル\Particle">
+      <UniqueIdentifier>{dc4eadcb-33e6-48a8-b602-842ed965286b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,10 +66,10 @@
       <Filter>シェーダーファイル\Object3d</Filter>
     </FxCompile>
     <FxCompile Include="Particle.PS.hlsl">
-      <Filter>シェーダーファイル</Filter>
+      <Filter>シェーダーファイル\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Particle.VS.hlsl">
-      <Filter>シェーダーファイル</Filter>
+      <Filter>シェーダーファイル\Particle</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,7 +117,7 @@
       <Filter>シェーダーファイル\Object3d</Filter>
     </None>
     <None Include="Particle.hlsli">
-      <Filter>シェーダーファイル</Filter>
+      <Filter>シェーダーファイル\Particle</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
-struct VertexShaderOutput{
-    float4 position : SV_POSITION; // Position in clip space
-    float2 texCoord : TEXCOORD0; // Texture coordinates
-    float3 normal : NORMAL0;
+struct VertexShaderOutput
+{
+    float32_t4 position : SV_POSITION; // Position in clip space
+    float32_t2 texCoord : TEXCOORD0; // Texture coordinates
+    float32_t3 normal : NORMAL0;
     
 };
