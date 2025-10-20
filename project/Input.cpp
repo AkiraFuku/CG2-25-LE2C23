@@ -1,10 +1,9 @@
 #include "Input.h"
-#include "wrl.h"
 #include "assert.h"
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
+#include <memory>
+
 
 
 void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
@@ -20,7 +19,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
             );
             assert(SUCCEEDED(hr));
             // キーボードデバイスの作成
-            Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard = nullptr;
+             keyboard= nullptr;
             hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
             assert(SUCCEEDED(hr));
    hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
@@ -42,9 +41,20 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
                 DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
             );
             assert(SUCCEEDED(hr));
+
+            
+              BYTE preKey[256] = {};
+              keyboard->GetDeviceState(sizeof(preKey), preKey);
             
 }
 
 void Input::Update()
 {
+       // 例:
+           keyboard->Acquire();
+           BYTE key[256] = {};
+         keyboard->GetDeviceState(sizeof(key), key);
+
+
+            std::memcpy(preKey, key, sizeof(key));
 }

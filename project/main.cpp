@@ -1322,8 +1322,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
     
 
-              BYTE preKey[256] = {};
-              keyboard->GetDeviceState(sizeof(preKey), preKey);
 
             //メインループ
     MSG msg{};
@@ -1342,10 +1340,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
  
-           // 例:
-           keyboard->Acquire();
-           BYTE key[256] = {};
-         keyboard->GetDeviceState(sizeof(key), key);
+        input->Update();
         // keyboard->SetDataFormat(&c_dfDIKeyboard);
        
         
@@ -1541,7 +1536,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             /////
            
               
-              std::memcpy(preKey, key, sizeof(key));
+           
         }
        
     }
