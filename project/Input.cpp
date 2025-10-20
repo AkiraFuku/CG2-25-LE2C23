@@ -31,7 +31,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
             );
             assert(SUCCEEDED(hr));
            // マウスデバイスの作成
-            Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse = nullptr;
+             mouse = nullptr;
             hr = directInput->CreateDevice(GUID_SysMouse, &mouse, NULL);
             assert(SUCCEEDED(hr));
             hr=mouse->SetDataFormat(&c_dfDIMouse);
@@ -51,12 +51,14 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
 void Input::Update()
 {
        // 例:
+
+         std::memcpy(preKey, key, sizeof(key));
            keyboard->Acquire();
        
          keyboard->GetDeviceState(sizeof(key), key);
 
 
-            std::memcpy(preKey, key, sizeof(key));
+           
 }
 
 bool Input::PushedKeyDown(BYTE keys)
@@ -70,7 +72,7 @@ bool Input::PushedKeyDown(BYTE keys)
     return false;
 }
 
-bool Input::isPushedKeyUp(BYTE keys)
+bool Input::PushedKeyUp(BYTE keys)
 {
     //キーボードのキーが離した状態かどうかを確認
     //GetAsyncKeyState関数を使用してキーの状態を取得
@@ -87,7 +89,7 @@ bool Input::isPushedKeyUp(BYTE keys)
     return false;
 }
 
-bool Input::isPushKeyDown(BYTE keys)
+bool Input::TriggerKeyDown(BYTE keys)
 {
     if (key[keys]&&!preKey[keys])
     {
@@ -100,7 +102,7 @@ bool Input::isPushKeyDown(BYTE keys)
     return false;
 }
 
-bool Input::isPushKeyUp(BYTE keys)
+bool Input::TriggerKeyUp(BYTE keys)
 {
     //キーボードのキーを離した瞬間かどうかを確認
     if (!key[keys]&&preKey[keys])

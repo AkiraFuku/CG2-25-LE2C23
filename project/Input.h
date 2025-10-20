@@ -15,13 +15,14 @@ public:
     void Update();
 
     bool PushedKeyDown(BYTE keys);
-    bool isPushedKeyUp(BYTE keys);
-    bool isPushKeyDown(BYTE keys);
-    bool isPushKeyUp(BYTE keys);
+    bool PushedKeyUp(BYTE keys);
+    bool TriggerKeyDown(BYTE keys);
+    bool TriggerKeyUp(BYTE keys);
 
 
 private:
     ComPtr<IDirectInputDevice8> keyboard;
+    ComPtr<IDirectInputDevice8> mouse;
     BYTE preKey[256] = {};
     BYTE key[256] = {};
 };

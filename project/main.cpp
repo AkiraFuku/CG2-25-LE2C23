@@ -1300,7 +1300,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
        
         
             // キー入力判定
-            if (input->PushedKeyDown(DIK_D)) {
+            if (input->TriggerKeyDown(DIK_D)) {
                 OutputDebugStringA("DIK_D\n");
                 transform.rotate.y += 0.1f; // 右に移動
             }
@@ -1312,7 +1312,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
            // 
           
-            if (input->PushedKeyDown(DIK_A))
+            if (input->TriggerKeyDown(DIK_A))
             {
                 OutputDebugStringA("DIK_A\n");
                 transform.rotate.y -= 0.1f; // 左に移動
