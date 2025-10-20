@@ -43,7 +43,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
             assert(SUCCEEDED(hr));
 
             
-              BYTE preKey[256] = {};
+          
               keyboard->GetDeviceState(sizeof(preKey), preKey);
             
 }
@@ -52,9 +52,63 @@ void Input::Update()
 {
        // 例:
            keyboard->Acquire();
-           BYTE key[256] = {};
+       
          keyboard->GetDeviceState(sizeof(key), key);
 
 
             std::memcpy(preKey, key, sizeof(key));
+}
+
+bool Input::PushedKeyDown(BYTE keys)
+{
+
+    if (key[keys]&&preKey[keys])
+    {
+        return true;    
+
+    }
+    return false;
+}
+
+bool Input::isPushedKeyUp(BYTE keys)
+{
+    //キーボードのキーが離した状態かどうかを確認
+    //GetAsyncKeyState関数を使用してキーの状態を取得
+    if (!key[keys]&&!preKey[keys])
+    {
+        //キーが押されている状態で、前回のキー状態も押されている場合
+        //つまり、キーが離された状態ではない
+        return true;
+
+    }
+
+    //キーが離されているかどうかを確認
+    //低位ビットが1であればキーが離されている
+    return false;
+}
+
+bool Input::isPushKeyDown(BYTE keys)
+{
+    if (key[keys]&&!preKey[keys])
+    {
+        //キーが押されている状態で、前回のキー状態も押されている場合
+        //つまり、キーが離された状態ではない
+        return true;
+
+    }
+
+    return false;
+}
+
+bool Input::isPushKeyUp(BYTE keys)
+{
+    //キーボードのキーを離した瞬間かどうかを確認
+    if (!key[keys]&&preKey[keys])
+    {
+        //キーが押されている状態で、前回のキー状態も押されている場合
+        //つまり、キーが離された状態ではない
+        return true;
+
+    }
+    return false;
 }

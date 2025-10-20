@@ -506,52 +506,7 @@ struct D3DResourceLeakChecker{
     }
 };
 
-bool isPushedKeyDown(int8_t keys,int8_t preKeys) {
 
-    if (keys&&preKeys)
-    {
-        return true;    
-
-    }
-    return false;
-}
-bool isPushedKeyUp(int8_t keys,int8_t preKeys) {
-    //キーボードのキーが離した状態かどうかを確認
-    //GetAsyncKeyState関数を使用してキーの状態を取得
-    if (!keys&&!preKeys)
-    {
-        //キーが押されている状態で、前回のキー状態も押されている場合
-        //つまり、キーが離された状態ではない
-        return true;
-
-    }
-
-    //キーが離されているかどうかを確認
-    //低位ビットが1であればキーが離されている
-    return false;
-}
-bool isPushKeyDown(int8_t keys,int8_t preKeys){
-    if (keys&&!preKeys)
-    {
-        //キーが押されている状態で、前回のキー状態も押されている場合
-        //つまり、キーが離された状態ではない
-        return true;
-
-    }
-
-    return false;
-}
-bool isPushKeyUp(int8_t keys,int8_t preKeys) {
-    //キーボードのキーを離した瞬間かどうかを確認
-    if (!keys&&preKeys)
-    {
-        //キーが押されている状態で、前回のキー状態も押されている場合
-        //つまり、キーが離された状態ではない
-        return true;
-
-    }
-    return false;
-}
 
 
 
@@ -1345,7 +1300,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
        
         
             // キー入力判定
-            if (key[DIK_D]) {
+            if (input->PushedKeyDown(DIK_D)) {
                 OutputDebugStringA("DIK_D\n");
                 transform.rotate.y += 0.1f; // 右に移動
             }
@@ -1357,7 +1312,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
            // 
           
-            if (isPushKeyDown(key[DIK_A],preKey[DIK_A]))
+            if (input->PushedKeyDown(DIK_A))
             {
                 OutputDebugStringA("DIK_A\n");
                 transform.rotate.y -= 0.1f; // 左に移動
