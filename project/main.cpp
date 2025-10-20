@@ -16,6 +16,7 @@
 #include<dxgidebug.h>
 #pragma comment(lib,"dxguid.lib")
 #include<dxcapi.h>
+#include "WinApp.h"
 #pragma comment(lib,"dxcompiler.lib")
 #include"engine/math/MassFunction.h"
 #include"externals/imgui/imgui.h"
@@ -27,7 +28,8 @@
 #include<numbers>
 #include<sstream>
 #include"engine/audio/Audio.h"
-#include <memory>
+
+
 
 #include "engine/input/Input.h"
 //#define DIRECTINPUT_VERSION 0x0800
@@ -543,51 +545,54 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     //ファイルへの書き込み
     std::ofstream logStream(logFilePath);
 
+    WinApp* winApp =nullptr;
 
+    winApp= new WinApp();
+    winApp-> Initialize();
     
-    WNDCLASS wc={};
-    //ウィンドウプロシージャ
-    wc.lpfnWndProc = WindowProc;
-    //ウィンドウクラスの名前
-    wc.lpszClassName=L"CG2WindowClass";
-    //インスタンスハンドル
-    wc.hInstance = GetModuleHandle(nullptr);
-    //カーソル
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    //ウィンドウクラスの登録
-    RegisterClass(&wc);
-	// Output
-   // Log("Hello,DirectX!\n");
-    Log(logStream,ConvertString( std::format( L"WSTRING{}\n",wstr)));
+ //   WNDCLASS wc={};
+ //   //ウィンドウプロシージャ
+ //   wc.lpfnWndProc = WindowProc;
+ //   //ウィンドウクラスの名前
+ //   wc.lpszClassName=L"CG2WindowClass";
+ //   //インスタンスハンドル
+ //   wc.hInstance = GetModuleHandle(nullptr);
+ //   //カーソル
+ //   wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+ //   //ウィンドウクラスの登録
+ //   RegisterClass(&wc);
+	//// Output
+ //  // Log("Hello,DirectX!\n");
+   Log(logStream,ConvertString( std::format( L"WSTRING{}\n",wstr)));
 
-	//OutputDebugStringA("Hello,DirectX!\n");
-    // //ウィンドウのサイズ
-    const int32_t kClientWidth = 1280;
-    const int32_t kClientHeight = 720;
+	////OutputDebugStringA("Hello,DirectX!\n");
+ //   // //ウィンドウのサイズ
+ //   const int32_t kClientWidth = 1280;
+ //   const int32_t kClientHeight = 720;
 
-    RECT wrc = { 0, 0, kClientWidth, kClientHeight };
+ //   RECT wrc = { 0, 0, kClientWidth, kClientHeight };
 
-    //  
-    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
-    //ウィンドウの作成
-      HWND hwnd = CreateWindow(
-            wc.lpszClassName,//クラス名
-            L"CG2",
-         WS_OVERLAPPEDWINDOW,
-         CW_USEDEFAULT,
-         CW_USEDEFAULT,
-         wrc.right - wrc.left,
-         wrc.bottom - wrc.top,
-         nullptr,
-         nullptr,
-         wc.hInstance,
-         nullptr
-     );
+ //   //  
+ //   AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
+    ////ウィンドウの作成
+    //  HWND hwnd = CreateWindow(
+    //        wc.lpszClassName,//クラス名
+    //        L"CG2",
+    //     WS_OVERLAPPEDWINDOW,
+    //     CW_USEDEFAULT,
+    //     CW_USEDEFAULT,
+    //     wrc.right - wrc.left,
+    //     wrc.bottom - wrc.top,
+    //     nullptr,
+    //     nullptr,
+    //     wc.hInstance,
+    //     nullptr
+    // );
 
 
-                  //ウィンドウを表示
-            ShowWindow(hwnd, SW_SHOW);
-            //
+    //              //ウィンドウを表示
+    //        ShowWindow(hwnd, SW_SHOW);
+    //        //
 
             //描画初期化処理
             // DXGIファクトリーの作成
@@ -1296,7 +1301,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::NewFrame();
  
         input->Update();
-        // keyboard->SetDataFormat(&c_dfDIKeyboard);
+     
        
         
             // キー入力判定
@@ -1304,7 +1309,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 OutputDebugStringA("DIK_D\n");
                 transform.rotate.y += 0.1f; // 右に移動
             }
-        
+          if (input->TriggerKeyDown(DIK_A))
+            {
+                OutputDebugStringA("DIK_A\n");
+                transform.rotate.y -= 0.1f; // 左に移動
+
+            }
 
             ///////
             ///Update
@@ -1312,12 +1322,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
            // 
           
-            if (input->TriggerKeyDown(DIK_A))
-            {
-                OutputDebugStringA("DIK_A\n");
-                transform.rotate.y -= 0.1f; // 左に移動
-
-            }
+          
             
 
             
@@ -1510,6 +1515,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
  
     delete audio;
     delete input;
+    delete winApp;
 
 
 
