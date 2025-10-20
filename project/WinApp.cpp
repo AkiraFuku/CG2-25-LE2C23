@@ -1,6 +1,6 @@
 #include "WinApp.h"
 #include "assert.h"
-#include<cstdint>
+
 #include"externals/imgui/imgui.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -25,7 +25,7 @@ LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 void WinApp::Initialize(){
 HRESULT hr=   CoInitializeEx(0, COINIT_MULTITHREADED);
 
- WNDCLASS wc={};
+ 
     //ウィンドウプロシージャ
     wc.lpfnWndProc = WindowProc;
     //ウィンドウクラスの名前
@@ -40,9 +40,7 @@ HRESULT hr=   CoInitializeEx(0, COINIT_MULTITHREADED);
  
 
 	//OutputDebugStringA("Hello,DirectX!\n");
-    // //ウィンドウのサイズ
-    const int32_t kClientWidth = 1280;
-    const int32_t kClientHeight = 720;
+
 
     RECT wrc = { 0, 0, kClientWidth, kClientHeight };
 
@@ -50,7 +48,7 @@ HRESULT hr=   CoInitializeEx(0, COINIT_MULTITHREADED);
     AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
 
      //ウィンドウの作成
-      HWND hwnd = CreateWindow(
+       hwnd = CreateWindow(
             wc.lpszClassName,//クラス名
             L"CG2",
          WS_OVERLAPPEDWINDOW,

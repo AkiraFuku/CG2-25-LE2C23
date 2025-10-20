@@ -663,7 +663,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //ここから書く　外部入力
            Input* input=nullptr;
            input=new Input();
-           input->Initialize(wc.hInstance,hwnd);
+           input->Initialize(winApp->GetInstance(),winApp->GetHwnd());
             
             
 
@@ -726,8 +726,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain=nullptr;
            // IDXGISwapChain4* swapChain = nullptr;
             DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-            swapChainDesc.Width = kClientWidth;//画像の幅
-            swapChainDesc.Height = kClientHeight;//画像の高さ
+            swapChainDesc.Width = WinApp::kClientWidth;//画像の幅
+            swapChainDesc.Height =WinApp::kClientHeight;//画像の高さ
             swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
             swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
             swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//レンダリングターゲットとして使用
@@ -949,7 +949,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(pixelShaderBlob.Get() != nullptr);
             ////
-              Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+              Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth,WinApp::kClientHeight);
            
               Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
             //深度ステンシルビューの設定
@@ -1024,8 +1024,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //ビューポート
             D3D12_VIEWPORT viewport{};
             //
-            viewport.Width = static_cast<float>(kClientWidth);
-            viewport.Height = static_cast<float>(kClientHeight);
+            viewport.Width = static_cast<float>(WinApp::kClientWidth);
+            viewport.Height = static_cast<float>(WinApp::kClientHeight);
             viewport.TopLeftX = 0.0f;
             viewport.TopLeftY = 0.0f;
             viewport.MinDepth = 0.0f;
@@ -1034,9 +1034,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //シザー矩形
             D3D12_RECT scissorRect{};
             scissorRect.left = 0;
-            scissorRect.right = kClientWidth;
+            scissorRect.right = WinApp::kClientWidth;
             scissorRect.top = 0;
-            scissorRect.bottom = kClientHeight;
+            scissorRect.bottom = WinApp::kClientHeight;
             ///
 
             ///マテリアルリソース
@@ -1080,7 +1080,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             //透視投影行列の作成
             Matrix4x4 projectionMatirx= MakePerspectiveFovMatrix(
-                0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 100.0f
+                0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f
             );
             //ワールド行列とビュー行列とプロジェクション行列を掛け算
             Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
@@ -1235,7 +1235,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //スプライトの行列の初期化
             Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
             Matrix4x4 viewMatrixSprite = Makeidetity4x4();
-            Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
+            Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight),0.0f,100.0f);
             //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
             Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
             transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
@@ -1356,7 +1356,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             wvpData->World=worldMatrix;
             Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
             Matrix4x4 viewMatrixSprite = Makeidetity4x4();
-            Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(kClientWidth),static_cast<float>(kClientHeight),0.0f,100.0f);
+            Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight),0.0f,100.0f);
             transformationMatrixDataSprite->WVP =  Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
             transformationMatrixDataSprite->World=worldMatrixSprite;
              directionalLightData->direction= Normalize(directionalLightData->direction);

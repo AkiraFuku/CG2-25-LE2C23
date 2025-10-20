@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include<cstdint>
 class WinApp
 {
 
@@ -12,5 +13,15 @@ public:
     //更新
     void Update();
 
+        // //ウィンドウのサイズ
+   static const int32_t kClientWidth = 1280;
+   static const int32_t kClientHeight = 720;
+
+   HWND GetHwnd()const{return hwnd;}
+   HINSTANCE GetInstance()const{return wc.hInstance;}
+
+private:
+       HWND hwnd=nullptr;
+       WNDCLASS wc{};
 };
 
