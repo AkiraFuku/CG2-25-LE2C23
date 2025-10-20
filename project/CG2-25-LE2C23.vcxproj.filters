@@ -78,6 +78,9 @@
     <ClCompile Include="engine\math\MassFunction.cpp">
       <Filter>engine\math</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -120,6 +123,9 @@
     </ClInclude>
     <ClInclude Include="engine\2d\Vector4.h">
       <Filter>engine\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

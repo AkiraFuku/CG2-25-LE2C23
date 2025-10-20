@@ -17,7 +17,6 @@
 #pragma comment(lib,"dxguid.lib")
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
-//#include"Vector4.h"
 #include"engine/math/MassFunction.h"
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
@@ -30,6 +29,7 @@
 #include"engine/audio/Audio.h"
 #include <memory>
 
+#include "Input.h"
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #pragma comment(lib,"dinput8.lib")
@@ -701,37 +701,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
             //ここから書く　外部入力
-            // DirectInputの初期化
-            Microsoft::WRL::ComPtr<IDirectInput8> directInput = nullptr;
-             hr = DirectInput8Create(
-                wc.hInstance,
-                DIRECTINPUT_VERSION,
-                IID_IDirectInput8,
-                (void**)&directInput,
-                nullptr
-            );
-            assert(SUCCEEDED(hr));
-            // キーボードデバイスの作成
-            Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard = nullptr;
-            hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-            assert(SUCCEEDED(hr));
-            // キーボードの設定
-            hr= keyboard->SetCooperativeLevel(
-                hwnd,
-                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
-            );
-            assert(SUCCEEDED(hr));
-            hr = keyboard->SetDataFormat(&c_dfDIKeyboard);
-            assert(SUCCEEDED(hr));
-            Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse = nullptr;
-            // マウスデバイスの作成
-            hr = directInput->CreateDevice(GUID_SysMouse, &mouse, NULL);
-            assert(SUCCEEDED(hr));
-            hr = mouse->SetCooperativeLevel(
-                hwnd,
-                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
-            );
-            assert(SUCCEEDED(hr));
+           Input* input=nullptr;
+           input=new Input();
+           input->Initialize(wc.hInstance,hwnd);
             
             
 
@@ -1587,6 +1559,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     CloseHandle(fenceEvent);
  
     delete audio;
+    delete input;
 
 
 
