@@ -84,6 +84,9 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="WinApp.cpp">
+      <Filter>engine\base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -129,6 +132,9 @@
     </ClInclude>
     <ClInclude Include="engine\input\Input.h">
       <Filter>engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WinApp.h">
+      <Filter>engine\base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
