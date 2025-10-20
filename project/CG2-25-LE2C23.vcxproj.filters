@@ -46,11 +46,11 @@
     <Filter Include="engine\io">
       <UniqueIdentifier>{7cf8d20a-921e-4b99-b150-b77089f72e52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="engine\Input">
+      <UniqueIdentifier>{be9e726b-6980-498d-9b0c-24447d76b299}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -78,8 +78,11 @@
     <ClCompile Include="engine\math\MassFunction.cpp">
       <Filter>engine\math</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\input\Input.cpp">
+      <Filter>engine\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +127,7 @@
     <ClInclude Include="engine\2d\Vector4.h">
       <Filter>engine\2d</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
+    <ClInclude Include="engine\input\Input.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

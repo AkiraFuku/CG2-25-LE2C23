@@ -29,11 +29,11 @@
 #include"engine/audio/Audio.h"
 #include <memory>
 
-#include "Input.h"
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#pragma comment(lib,"dinput8.lib")
-#pragma comment(lib,"dxguid.lib")
+#include "engine/input/Input.h"
+//#define DIRECTINPUT_VERSION 0x0800
+//#include <dinput.h>
+//#pragma comment(lib,"dinput8.lib")
+//#pragma comment(lib,"dxguid.lib")
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
