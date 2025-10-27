@@ -736,7 +736,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             // コマンドキュー,ウィンドウハンドル、設定して生成
             hr = dxgiFactory->CreateSwapChainForHwnd(
                 commandQueue.Get(),
-                hwnd,
+                winApp->GetHwnd(),
                 &swapChainDesc,
                 nullptr,
                 nullptr,
@@ -1095,7 +1095,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             ImGui::CreateContext();
             ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
             ImGui::StyleColorsDark();
-            ImGui_ImplWin32_Init(hwnd);
+            ImGui_ImplWin32_Init(winApp->GetHwnd());
             ImGui_ImplDX12_Init(
                 device.Get(),
                 swapChainDesc.BufferCount,
@@ -1530,7 +1530,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 CoUninitialize();
     //デバッグレイヤーの解放
 
-    CloseWindow(hwnd);
+    CloseWindow(winApp->GetHwnd());
 
     ///デバッグレイヤーのライブオブジェクトのレポート
 
