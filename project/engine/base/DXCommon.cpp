@@ -10,8 +10,13 @@
 
 
 
-void DXCommon::Initialize()
+void DXCommon::Initialize( WinApp* winApp)
 {
+    winApp_ = winApp;
+    CreateDevice();
+    CreateCommand();
+    CreateSwapChain();
+
 
 
 
@@ -137,6 +142,32 @@ void DXCommon::CreateCommand()
                 D3D12_COMMAND_LIST_TYPE_DIRECT,
                 commandAllocator_.Get(), nullptr,
                 IID_PPV_ARGS(&commandList_)
+            );
+            assert(SUCCEEDED(hr));
+}
+
+void DXCommon::CreateSwapChain()
+{
+        HRESULT hr;
+        //スワップチェーンの作成
+      swapChain_=nullptr;
+           // IDXGISwapChain4* swapChain = nullptr;
+            DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+            swapChainDesc.Width = WinApp::kClientWidth;//画像の幅
+            swapChainDesc.Height =WinApp::kClientHeight;//画像の高さ
+            swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
+            swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
+            swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//レンダリングターゲットとして使用
+            swapChainDesc.BufferCount = 2;//バッファの数
+            swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//写したら破棄
+            // コマンドキュー,ウィンドウハンドル、設定して生成
+            hr = dxgiFactory_->CreateSwapChainForHwnd(
+                commandQueue_.Get(),
+                winApp_->GetHwnd(),
+                &swapChainDesc,
+                nullptr,
+                nullptr,
+                reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf())
             );
             assert(SUCCEEDED(hr));
 }

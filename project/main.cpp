@@ -679,26 +679,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            // );
            // assert(SUCCEEDED(hr));
             //スワップチェーンの作成
-            Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain=nullptr;
-           // IDXGISwapChain4* swapChain = nullptr;
-            DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-            swapChainDesc.Width = WinApp::kClientWidth;//画像の幅
-            swapChainDesc.Height =WinApp::kClientHeight;//画像の高さ
-            swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
-            swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
-            swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//レンダリングターゲットとして使用
-            swapChainDesc.BufferCount = 2;//バッファの数
-            swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//写したら破棄
-            // コマンドキュー,ウィンドウハンドル、設定して生成
-            hr = dxgiFactory->CreateSwapChainForHwnd(
-                commandQueue.Get(),
-                winApp->GetHwnd(),
-                &swapChainDesc,
-                nullptr,
-                nullptr,
-                reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf())
-            );
-            assert(SUCCEEDED(hr));
+           // Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain=nullptr;
+           //// IDXGISwapChain4* swapChain = nullptr;
+           // DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+           // swapChainDesc.Width = WinApp::kClientWidth;//画像の幅
+           // swapChainDesc.Height =WinApp::kClientHeight;//画像の高さ
+           // swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
+           // swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
+           // swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//レンダリングターゲットとして使用
+           // swapChainDesc.BufferCount = 2;//バッファの数
+           // swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//写したら破棄
+           // // コマンドキュー,ウィンドウハンドル、設定して生成
+           // hr = dxgiFactory->CreateSwapChainForHwnd(
+           //     commandQueue.Get(),
+           //     winApp->GetHwnd(),
+           //     &swapChainDesc,
+           //     nullptr,
+           //     nullptr,
+           //     reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf())
+           // );
+           // assert(SUCCEEDED(hr));
 
             //ディスクプリプターヒープの作成
             Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap =  CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);;

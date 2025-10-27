@@ -3,10 +3,11 @@
 #include <d3d12.h>
 #include<dxgi1_6.h>
 #include <wrl.h>
+#include "WinApp.h"
 class DXCommon
 {
 public:
-    void Initialize();
+    void Initialize( WinApp* winApp);
 
 private:
     void CreateDevice();
@@ -22,5 +23,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
     //コマンドリスト  
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+    //スワップチェーン
+    void CreateSwapChain();
+    Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
+
+    WinApp* winApp_ = nullptr;
+
 };
 
