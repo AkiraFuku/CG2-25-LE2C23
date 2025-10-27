@@ -12,6 +12,8 @@ public:
     void Initialize();
     //更新
     void Update();
+    //終了
+    void Finalize();
 
         // //ウィンドウのサイズ
    static const int32_t kClientWidth = 1280;

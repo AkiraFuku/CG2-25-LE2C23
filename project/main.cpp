@@ -663,7 +663,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //ここから書く　外部入力
            Input* input=nullptr;
            input=new Input();
-           input->Initialize(winApp->GetInstance(),winApp->GetHwnd());
+           input->Initialize(winApp);
             
             
 
@@ -1515,7 +1515,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
  
     delete audio;
     delete input;
-    delete winApp;
+ 
 
 
 
@@ -1527,14 +1527,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
     
-CoUninitialize();
-    //デバッグレイヤーの解放
-
-    CloseWindow(winApp->GetHwnd());
-
-    ///デバッグレイヤーのライブオブジェクトのレポート
-
-  
+    winApp->Finalize();
+     delete winApp;
+    winApp = nullptr;
 
     
 	return 0;

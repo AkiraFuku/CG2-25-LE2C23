@@ -70,4 +70,15 @@ HRESULT hr=   CoInitializeEx(0, COINIT_MULTITHREADED);
 
 
 };
-void WinApp::Update(){};
+void WinApp::Update(){}
+void WinApp::Finalize()
+{
+    CoUninitialize();
+    //デバッグレイヤーの解放
+
+    CloseWindow(hwnd);
+
+    ///デバッグレイヤーのライブオブジェクトのレポート
+
+}
+;

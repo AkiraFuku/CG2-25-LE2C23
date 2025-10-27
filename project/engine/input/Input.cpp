@@ -6,12 +6,13 @@
 
 
 
-void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
+void Input::Initialize(WinApp* winapp){
+    winApp_ = winapp;
      // DirectInputの初期化
        HRESULT hr;
             Microsoft::WRL::ComPtr<IDirectInput8> directInput = nullptr;
              hr = DirectInput8Create(
-                hInstance,
+                winApp_->GetInstance(),
                 DIRECTINPUT_VERSION,
                 IID_IDirectInput8,
                 (void**)&directInput,
@@ -26,7 +27,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
             assert(SUCCEEDED(hr));
             // キーボードの設定
             hr= keyboard->SetCooperativeLevel(
-                hwnd,
+                winApp_->GetHwnd(),
                 DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
             );
             assert(SUCCEEDED(hr));
@@ -37,7 +38,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd){
             hr=mouse->SetDataFormat(&c_dfDIMouse);
             assert(SUCCEEDED(hr));
             hr = mouse->SetCooperativeLevel(
-                hwnd,
+                 winApp_->GetHwnd(),
                 DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
             );
             assert(SUCCEEDED(hr));
