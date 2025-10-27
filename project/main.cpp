@@ -5,18 +5,14 @@
 #include<filesystem>
 #include<fstream>
 #include<chrono>
-#include<d3d12.h>
-#include<dxgi1_6.h>
 #include<strsafe.h>
-#include<cassert>
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
 #include<dbghelp.h>
 #pragma comment(lib,"Dbghelp.lib")
 #include<dxgidebug.h>
 #pragma comment(lib,"dxguid.lib")
 #include<dxcapi.h>
-#include "WinApp.h"
+#include "engine/base/WinApp.h"
+#include "engine/base/DXCommon.h"
 #pragma comment(lib,"dxcompiler.lib")
 #include"engine/math/MassFunction.h"
 #include"externals/imgui/imgui.h"
@@ -27,15 +23,9 @@
 #include<vector>
 #include<numbers>
 #include<sstream>
+
 #include"engine/audio/Audio.h"
-
-
-
 #include "engine/input/Input.h"
-//#define DIRECTINPUT_VERSION 0x0800
-//#include <dinput.h>
-//#pragma comment(lib,"dinput8.lib")
-//#pragma comment(lib,"dxguid.lib")
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -549,116 +539,82 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
     winApp= new WinApp();
     winApp-> Initialize();
+
+    DXCommon* dxCommon = nullptr;
+    dxCommon = new DXCommon();
+    dxCommon->Initialize();
     
- //   WNDCLASS wc={};
- //   //ウィンドウプロシージャ
- //   wc.lpfnWndProc = WindowProc;
- //   //ウィンドウクラスの名前
- //   wc.lpszClassName=L"CG2WindowClass";
- //   //インスタンスハンドル
- //   wc.hInstance = GetModuleHandle(nullptr);
- //   //カーソル
- //   wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
- //   //ウィンドウクラスの登録
- //   RegisterClass(&wc);
-	//// Output
- //  // Log("Hello,DirectX!\n");
+
    Log(logStream,ConvertString( std::format( L"WSTRING{}\n",wstr)));
-
-	////OutputDebugStringA("Hello,DirectX!\n");
- //   // //ウィンドウのサイズ
- //   const int32_t kClientWidth = 1280;
- //   const int32_t kClientHeight = 720;
-
- //   RECT wrc = { 0, 0, kClientWidth, kClientHeight };
-
- //   //  
- //   AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, FALSE);
-    ////ウィンドウの作成
-    //  HWND hwnd = CreateWindow(
-    //        wc.lpszClassName,//クラス名
-    //        L"CG2",
-    //     WS_OVERLAPPEDWINDOW,
-    //     CW_USEDEFAULT,
-    //     CW_USEDEFAULT,
-    //     wrc.right - wrc.left,
-    //     wrc.bottom - wrc.top,
-    //     nullptr,
-    //     nullptr,
-    //     wc.hInstance,
-    //     nullptr
-    // );
+    HRESULT hr ;
 
 
-    //              //ウィンドウを表示
-    //        ShowWindow(hwnd, SW_SHOW);
-    //        //
-
-            //描画初期化処理
-            // DXGIファクトリーの作成
-            Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory=nullptr;
-           // IDXGIFactory7* dxgiFactory = nullptr;
-            // 
-            HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
-            //
-            assert(SUCCEEDED(hr));
-
-#ifdef _DEBUG
-
-            //デバッグレイヤーの有効
-            Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
-            if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))){
-                debugController->EnableDebugLayer();
-                //デバッグレイヤーの詳細な情報を取得
-                debugController->SetEnableGPUBasedValidation(TRUE);
-
-            }
-          
-#endif // _DEBUG
-
-
-            //アダプターの作成
-            Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
-            //IDXGIAdapter4* useAdapter = nullptr;
-            //良い順番のアダプターを探す
-            for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
-                IID_PPV_ARGS(&useAdapter))!=DXGI_ERROR_NOT_FOUND ; ++i){
-                ///アダプターの情報を取得
-                DXGI_ADAPTER_DESC3 adapterDesc{};
-                hr = useAdapter.Get()->GetDesc3(&adapterDesc);
-                assert(SUCCEEDED(hr));
-                if (!(adapterDesc.Flags&DXGI_ADAPTER_FLAG3_SOFTWARE)){
-                    Log(logStream,ConvertString(std::format(L"Use Adapter:{}\n",adapterDesc.Description)));
-                    break;
-                }
-                useAdapter=nullptr;
-            }
-            assert(useAdapter != nullptr);
-
-            Microsoft::WRL::ComPtr<ID3D12Device>  device= nullptr;
-           
-
-            D3D_FEATURE_LEVEL featureLevels[] ={
-                D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0,
-            };
-            const char* featureLevelStrings[] = {"12_2", "12_1", "12_0"};
-            for (size_t i = 0; i < _countof(featureLevels); i++){
-                hr = D3D12CreateDevice(
-                    useAdapter.Get(),
-                    featureLevels[i],
-                    IID_PPV_ARGS(&device));
-
-                 if (SUCCEEDED(hr)){
-                    Log(logStream, (std::format("Use FeatureLevel : {}\n", featureLevelStrings[i])));
-                    break;
-
-                 }
-            }
-            assert(device!=nullptr);
-            Log(logStream, "Complete create D3D12Device!!!\n" );
-            const uint32_t descriptorSizeSRV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-            const uint32_t descriptorSizeRTV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-            const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+//            //描画初期化処理
+//            // DXGIファクトリーの作成
+//            Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory=nullptr;
+//         
+//            HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+//            //
+//            assert(SUCCEEDED(hr));
+//
+//#ifdef _DEBUG
+//
+//            //デバッグレイヤーの有効
+//            Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
+//            if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))){
+//                debugController->EnableDebugLayer();
+//                //デバッグレイヤーの詳細な情報を取得
+//                debugController->SetEnableGPUBasedValidation(TRUE);
+//
+//            }
+//          
+//#endif // _DEBUG
+//
+//
+//            //アダプターの作成
+//            Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
+//            //IDXGIAdapter4* useAdapter = nullptr;
+//            //良い順番のアダプターを探す
+//            for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i,DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
+//                IID_PPV_ARGS(&useAdapter))!=DXGI_ERROR_NOT_FOUND ; ++i){
+//                ///アダプターの情報を取得
+//                DXGI_ADAPTER_DESC3 adapterDesc{};
+//                hr = useAdapter.Get()->GetDesc3(&adapterDesc);
+//                assert(SUCCEEDED(hr));
+//                if (!(adapterDesc.Flags&DXGI_ADAPTER_FLAG3_SOFTWARE)){
+//                    Log(logStream,ConvertString(std::format(L"Use Adapter:{}\n",adapterDesc.Description)));
+//                    break;
+//                }
+//                useAdapter=nullptr;
+//            }
+//            assert(useAdapter != nullptr);
+//            //D3D12デバイスの作成
+//            Microsoft::WRL::ComPtr<ID3D12Device>  device= nullptr;
+//           
+//            //対応するFeatureLevelでデバイスを作成
+//            D3D_FEATURE_LEVEL featureLevels[] ={
+//                D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0,
+//            };
+//            //
+//            const char* featureLevelStrings[] = {"12_2", "12_1", "12_0"};
+//            for (size_t i = 0; i < _countof(featureLevels); i++){
+//                hr = D3D12CreateDevice(
+//                    useAdapter.Get(),
+//                    featureLevels[i],
+//                    IID_PPV_ARGS(&device));
+//
+//                 if (SUCCEEDED(hr)){
+//                    Log(logStream, (std::format("Use FeatureLevel : {}\n", featureLevelStrings[i])));
+//                    break;
+//
+//                 }
+//            }
+//            //
+//            assert(device!=nullptr);
+//            Log(logStream, "Complete create D3D12Device!!!\n" );
+//            const uint32_t descriptorSizeSRV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+//            const uint32_t descriptorSizeRTV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+//            const uint32_t descriptorSizeDSV=device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
             //ここから書く　外部入力
            Input* input=nullptr;
@@ -667,61 +623,61 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             
             
 
-#ifdef _DEBUG
-            Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
-            if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
-            {
-                ///深刻なエラーを出力・停止
-                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
-                ///エラーを出力・停止
-                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
-                ///警告を出力/停止
-                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
-                //メッセージID
-                D3D12_MESSAGE_ID denyIds[]={
-                    D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
+//#ifdef _DEBUG
+//            Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
+//            if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+//            {
+//                ///深刻なエラーを出力・停止
+//                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+//                ///エラーを出力・停止
+//                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
+//                ///警告を出力/停止
+//                infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
+//                //メッセージID
+//                D3D12_MESSAGE_ID denyIds[]={
+//                    D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
+//
+//                };
+//                //
+//                D3D12_MESSAGE_SEVERITY severities[]={D3D12_MESSAGE_SEVERITY_INFO};
+//                D3D12_INFO_QUEUE_FILTER filter{};
+//                filter.DenyList.NumIDs = _countof(denyIds);
+//                filter.DenyList.pIDList = denyIds;
+//                filter.DenyList.NumSeverities = _countof(severities);
+//                filter.DenyList.pSeverityList = severities;
+//                //
+//                infoQueue->PushStorageFilter(&filter);
+//
+//            }
+//           
+//
+//#endif // _DEBUG
 
-                };
-                //
-                D3D12_MESSAGE_SEVERITY severities[]={D3D12_MESSAGE_SEVERITY_INFO};
-                D3D12_INFO_QUEUE_FILTER filter{};
-                filter.DenyList.NumIDs = _countof(denyIds);
-                filter.DenyList.pIDList = denyIds;
-                filter.DenyList.NumSeverities = _countof(severities);
-                filter.DenyList.pSeverityList = severities;
-                //
-                infoQueue->PushStorageFilter(&filter);
-
-            }
-           
-
-#endif // _DEBUG
-
-            //コマンドキューの作成
-              Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue=nullptr;
-           // ID3D12CommandQueue* commandQueue = nullptr;
-            D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-            hr = device->CreateCommandQueue(
-                &commandQueueDesc,
-                IID_PPV_ARGS(&commandQueue));
-            assert(SUCCEEDED(hr));
-            //コマンドアロケーターの作成
-            Microsoft::WRL::ComPtr<ID3D12CommandAllocator>commandAllocator=nullptr;
-            //ID3D12CommandAllocator* commandAllocator = nullptr;
-            hr = device->CreateCommandAllocator(
-                D3D12_COMMAND_LIST_TYPE_DIRECT,
-                IID_PPV_ARGS(&commandAllocator));
-            assert(SUCCEEDED(hr));
-            //コマンドリストの作成
-            Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
-            //ID3D12GraphicsCommandList* commandList = nullptr;
-            hr =device->CreateCommandList(
-                0,
-                D3D12_COMMAND_LIST_TYPE_DIRECT,
-                commandAllocator.Get(), nullptr,
-                IID_PPV_ARGS(&commandList)
-            );
-            assert(SUCCEEDED(hr));
+           // //コマンドキューの作成
+           //   Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue=nullptr;
+           //// ID3D12CommandQueue* commandQueue = nullptr;
+           // D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+           // hr = device->CreateCommandQueue(
+           //     &commandQueueDesc,
+           //     IID_PPV_ARGS(&commandQueue));
+           // assert(SUCCEEDED(hr));
+           // //コマンドアロケーターの作成
+           // Microsoft::WRL::ComPtr<ID3D12CommandAllocator>commandAllocator=nullptr;
+           // //ID3D12CommandAllocator* commandAllocator = nullptr;
+           // hr = device->CreateCommandAllocator(
+           //     D3D12_COMMAND_LIST_TYPE_DIRECT,
+           //     IID_PPV_ARGS(&commandAllocator));
+           // assert(SUCCEEDED(hr));
+           // //コマンドリストの作成
+           // Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
+           // //ID3D12GraphicsCommandList* commandList = nullptr;
+           // hr =device->CreateCommandList(
+           //     0,
+           //     D3D12_COMMAND_LIST_TYPE_DIRECT,
+           //     commandAllocator.Get(), nullptr,
+           //     IID_PPV_ARGS(&commandList)
+           // );
+           // assert(SUCCEEDED(hr));
             //スワップチェーンの作成
             Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain=nullptr;
            // IDXGISwapChain4* swapChain = nullptr;
@@ -1492,11 +1448,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             hr = commandList->Reset(commandAllocator.Get(), nullptr);
             assert(SUCCEEDED(hr));
             /////
-           
-              
-           
-        
-       
     }
 
     
@@ -1513,6 +1464,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
  
     delete audio;
     delete input;
+
+    delete dxCommon;
+    dxCommon = nullptr;
  
 
 
