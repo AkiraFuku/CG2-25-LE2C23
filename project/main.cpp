@@ -1284,17 +1284,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
             //メインループ
-    MSG msg{};
-    while (msg.message != WM_QUIT) {
+    
+    while (true) {
            
 
         //メッセージがある限りGetMessageを呼び出す
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-
+        if (winApp->ProcessMessage()){
+            break;
  
-        } else{
+        } 
            
             ImGui_ImplDX12_NewFrame();
             ImGui_ImplWin32_NewFrame();
@@ -1497,7 +1495,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            
               
            
-        }
+        
        
     }
 

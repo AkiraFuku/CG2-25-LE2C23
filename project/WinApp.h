@@ -21,9 +21,11 @@ public:
 
    HWND GetHwnd()const{return hwnd;}
    HINSTANCE GetInstance()const{return wc.hInstance;}
-
+   bool ProcessMessage();
 private:
        HWND hwnd=nullptr;
        WNDCLASS wc{};
+       //メッセージ
+      
 };
 
