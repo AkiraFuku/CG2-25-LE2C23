@@ -28,6 +28,10 @@ private:
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
 
     WinApp* winApp_ = nullptr;
+    //深度バッファ
+    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
+    void CreateDepthStencilTextureResource( );
+
 
 };
 

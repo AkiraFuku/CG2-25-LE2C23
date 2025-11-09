@@ -905,8 +905,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(pixelShaderBlob.Get() != nullptr);
             ////
+            //深度ステンシルバッファの生成
               Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth,WinApp::kClientHeight);
-           
+           //
               Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
             //深度ステンシルビューの設定
             D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
