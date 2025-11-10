@@ -910,14 +910,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            //
               //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
             //深度ステンシルビューの設定
-            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルのフォーマット
-            dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-            device->CreateDepthStencilView(
-                depthStencilResource.Get(),
-                &dsvDesc,
-                dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
-            );
+            //D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+            //dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルのフォーマット
+            //dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            //device->CreateDepthStencilView(
+            //    depthStencilResource.Get(),
+            //    &dsvDesc,
+            //    dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+            //);
 
             //DSSの設定
             D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};

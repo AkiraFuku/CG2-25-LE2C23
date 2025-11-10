@@ -4,10 +4,12 @@
 #include<dxgi1_6.h>
 #include <wrl.h>
 #include "WinApp.h"
+#include <array> // ← 追加
+
 class DXCommon
 {
 public:
-    void Initialize( WinApp* winApp);
+    void Initialize(WinApp* winApp);
 
     /// <summary>
     /// SRVのCPUディスクリプタハンドルを取得
@@ -23,7 +25,7 @@ public:
     D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
 private:
-      HRESULT hr_;
+    HRESULT hr_;
 
     void CreateDevice();
     //D3D12デバイス
@@ -45,7 +47,7 @@ private:
     WinApp* winApp_ = nullptr;
     //深度バッファ
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
-    void CreateDepthStencilTextureResource( );
+    void CreateDepthStencilTextureResource();
 
     //各種ディスクプリプターヒープ
     void CreateDescriptorHeaps();
@@ -53,16 +55,20 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
-     uint32_t descriptorSizeSRV_;
-     uint32_t descriptorSizeRTV_;
-     uint32_t descriptorSizeDSV_;
-     //レンダーターゲットビュー
-     void CreateRenderTargetView();
-     Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
-     //ディスクリプタ２つ用意
-     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
-     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index);
-     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index);
-
+    uint32_t descriptorSizeSRV_;
+    uint32_t descriptorSizeRTV_;
+    uint32_t descriptorSizeDSV_;
+    //レンダーターゲットビュー
+    void CreateRenderTargetView();
+    std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
+    //ディスクリプタ２つ用意
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+    D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+    //深度ステンシルビュー
+    void CreateDepthStencilView();
+    //フェンス
+    void CreateFence();
+    Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 };
 
