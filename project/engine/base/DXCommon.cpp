@@ -26,7 +26,7 @@ void DXCommon::Initialize(WinApp* winApp)
 
 void DXCommon::CreateDevice()
 {
-    HRESULT hr;
+   
 #ifdef _DEBUG
 
     //デバッグレイヤーの有効
@@ -42,9 +42,9 @@ void DXCommon::CreateDevice()
     // 
     dxgiFactory_ = nullptr;
 
-    hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
+    hr_ = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
     //
-    assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr_));
     //アダプターの作成
     Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
     //IDXGIAdapter4* useAdapter = nullptr;
@@ -53,8 +53,8 @@ void DXCommon::CreateDevice()
         IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i) {
         ///アダプターの情報を取得
         DXGI_ADAPTER_DESC3 adapterDesc{};
-        hr = useAdapter.Get()->GetDesc3(&adapterDesc);
-        assert(SUCCEEDED(hr));
+        hr_ = useAdapter.Get()->GetDesc3(&adapterDesc);
+        assert(SUCCEEDED(hr_));
         if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
             Logger::Log(StringUtility::ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
             break;
@@ -72,12 +72,12 @@ void DXCommon::CreateDevice()
     //
     const char* featureLevelStrings[] = { "12_2", "12_1", "12_0" };
     for (size_t i = 0; i < _countof(featureLevels); i++) {
-        hr = D3D12CreateDevice(
+        hr_ = D3D12CreateDevice(
             useAdapter.Get(),
             featureLevels[i],
             IID_PPV_ARGS(&device_));
 
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr_)) {
             Logger::Log((std::format("Use FeatureLevel : {}\n", featureLevelStrings[i])));
             break;
 
@@ -120,37 +120,37 @@ void DXCommon::CreateDevice()
 
 void DXCommon::CreateCommand()
 {
-    HRESULT hr;
+    
     //コマンドキューの作成
     commandQueue_ = nullptr;
     // ID3D12CommandQueue* commandQueue = nullptr;
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-    hr = device_->CreateCommandQueue(
+    hr_ = device_->CreateCommandQueue(
         &commandQueueDesc,
         IID_PPV_ARGS(&commandQueue_));
-    assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr_));
     //コマンドアロケーターの作成
     commandAllocator_ = nullptr;
     //ID3D12CommandAllocator* commandAllocator = nullptr;
-    hr = device_->CreateCommandAllocator(
+    hr_ = device_->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         IID_PPV_ARGS(&commandAllocator_));
-    assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr_));
     //コマンドリストの作成
     commandList_ = nullptr;
     //ID3D12GraphicsCommandList* commandList = nullptr;
-    hr = device_->CreateCommandList(
+    hr_ = device_->CreateCommandList(
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         commandAllocator_.Get(), nullptr,
         IID_PPV_ARGS(&commandList_)
     );
-    assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr_));
 }
 
 void DXCommon::CreateSwapChain()
 {
-    HRESULT hr;
+  
     //スワップチェーンの作成
     swapChain_ = nullptr;
     // IDXGISwapChain4* swapChain = nullptr;
@@ -163,7 +163,7 @@ void DXCommon::CreateSwapChain()
     swapChainDesc.BufferCount = 2;//バッファの数
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//写したら破棄
     // コマンドキュー,ウィンドウハンドル、設定して生成
-    hr = dxgiFactory_->CreateSwapChainForHwnd(
+    hr_ = dxgiFactory_->CreateSwapChainForHwnd(
         commandQueue_.Get(),
         winApp_->GetHwnd(),
         &swapChainDesc,
@@ -171,7 +171,7 @@ void DXCommon::CreateSwapChain()
         nullptr,
         reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf())
     );
-    assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr_));
 }
 
 
@@ -235,6 +235,45 @@ Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> DXCommon::CreateDescriptorHeap(con
     HRESULT hr = device.Get()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
     assert(SUCCEEDED(hr));
     return descriptorHeap;
+}
+
+void DXCommon::CreateRenderTargetView()
+{
+       //スワップチェーンからリソースをひっぱる
+            hr_ = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
+            assert(SUCCEEDED(hr_));
+            hr_ = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
+            assert(SUCCEEDED(hr_));
+            // RTVの作成
+            D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+            rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換・書き込み
+            rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+
+            //ディスクリプタヒープのハンドルを取得
+            for (uint32_t i = 0; i < 2; i++)
+            {
+
+                rtvHandles_[i] = GetCPUDescriptorHandle(rtvHeap_,descriptorSizeRTV_,i);
+                //レンダーターゲットビューの生成
+                device_->CreateRenderTargetView(
+                    swapChainResources_[i].Get(),
+                    &rtvDesc,
+                    rtvHandles_[i]
+                );
+            }
+}
+D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetCPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr+=(descriptorSize*index);
+    return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetGPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
+{
+    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU=descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr+=(descriptorSize*index);
+    return handleGPU;
 }
 
 

@@ -704,39 +704,39 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap =  CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);;
             ////ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
             //スワップチェーンからリソースをひっぱる
-            Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr };
-            //ID3D12Resource* swapChainResources[2] = {nullptr};
-            hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
-            assert(SUCCEEDED(hr));
-            hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
-            assert(SUCCEEDED(hr));
-            // RTVの作成
-            D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-            rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換・書き込み
-            rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+            //Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr };
+            ////ID3D12Resource* swapChainResources[2] = {nullptr};
+            //hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
+            //assert(SUCCEEDED(hr));
+            //hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
+            //assert(SUCCEEDED(hr));
+            //// RTVの作成
+            //D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+            //rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換・書き込み
+            //rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャ
             //ディスクリプタの先頭を取得
            // D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
  
-            //ディスクリプタ２つ用意
-            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-            //rtv一つ目 先頭を入れる
-            //rtvHandles[0] = rtvStartHandle;
-            rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,0);
-            device->CreateRenderTargetView(
-                swapChainResources[0].Get(),
-                &rtvDesc,
-                rtvHandles[0]
-            );
-            //rtv二つ目 ハンドルを得る
-           // rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-            rtvHandles[1]= GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,1);
-            //2つ目のRTVを作成
-            device->CreateRenderTargetView(
-                swapChainResources[1].Get(),
-                &rtvDesc,
-                rtvHandles[1]
-            );
+           // //ディスクリプタ２つ用意
+           // D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+           // //rtv一つ目 先頭を入れる
+           // //rtvHandles[0] = rtvStartHandle;
+           // rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,0);
+           // device->CreateRenderTargetView(
+           //     swapChainResources[0].Get(),
+           //     &rtvDesc,
+           //     rtvHandles[0]
+           // );
+           // //rtv二つ目 ハンドルを得る
+           //// rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+           // rtvHandles[1]= GetCPUDescriptorHandle(rtvDescriptorHeap,descriptorSizeRTV,1);
+           // //2つ目のRTVを作成
+           // device->CreateRenderTargetView(
+           //     swapChainResources[1].Get(),
+           //     &rtvDesc,
+           //     rtvHandles[1]
+           // );
       //fenceのさくせい
             Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
             //ID3D12Fence* fence = nullptr;

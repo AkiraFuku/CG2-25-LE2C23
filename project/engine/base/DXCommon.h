@@ -10,6 +10,8 @@ public:
     void Initialize( WinApp* winApp);
 
 private:
+      HRESULT hr_;
+
     void CreateDevice();
     //D3D12デバイス
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
@@ -41,7 +43,13 @@ private:
      uint32_t descriptorSizeSRV_;
      uint32_t descriptorSizeRTV_;
      uint32_t descriptorSizeDSV_;
-
+     //レンダーターゲットビュー
+     void CreateRenderTargetView();
+     Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
+     //ディスクリプタ２つ用意
+     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index);
+     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index);
 
 };
 
