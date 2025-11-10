@@ -6,6 +6,8 @@
 #include "WinApp.h"
 #include <array> // 
 #include<dxcapi.h>
+#include"externals/DirectXTex/DirectXTex.h"
+#include"externals/DirectXTex/d3dx12.h"
 
 
 class DXCommon
@@ -30,8 +32,20 @@ public:
     /// <returns></returns>
     D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
     //getter
-    Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const{return device_.Get();}
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {return commandList_.Get();}
+    Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const {
+        return device_.Get();
+    }
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {
+        return commandList_.Get();
+    }
+    //コンパイルシェーダー
+    Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath,const wchar_t* profile);
+    //クリエイトバッファ
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource( size_t sizeInBytes);
+    //クリエイトテクスチャ
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse( const DirectX::TexMetadata& metadata);
+
+
 private:
     HRESULT hr_;
 

@@ -124,6 +124,118 @@ D3D12_GPU_DESCRIPTOR_HANDLE DXCommon::GetSRVGPUDescriptorHandle(uint32_t index)
     return GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
 }
 
+Microsoft::WRL::ComPtr<IDxcBlob> DXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
+{
+    //hlslファイルの読み込み
+    Logger::Log(StringUtility::ConvertString(std::format(L"Bigin CompileShader, path:{},profiale:{}\n", filePath, profile)));
+    IDxcBlobEncoding* shaderSource = nullptr;
+    hr_ = dxcUtils->LoadFile(
+        filePath.c_str(),
+        nullptr,
+        &shaderSource
+    );
+    assert(SUCCEEDED(hr_));
+    DxcBuffer shaderSoursBuffer{};
+    shaderSoursBuffer.Ptr = shaderSource->GetBufferPointer();
+    shaderSoursBuffer.Size = shaderSource->GetBufferSize();
+    shaderSoursBuffer.Encoding = DXC_CP_ACP;
+    //compileする
+    LPCWSTR arguments[] = {
+        filePath.c_str(),
+        L"-E",L"main",
+        L"-T",profile,
+        L"-Zi",L"-Qembed_debug",
+        L"-Od",
+        L"-Zpr",
+
+    };
+
+    Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
+    hr_ = dxcCompiler->Compile(
+        &shaderSoursBuffer,
+        arguments,
+        _countof(arguments),
+        includeHandler.Get(),
+        IID_PPV_ARGS(&shaderResult)
+    );
+    assert(SUCCEEDED(hr_));
+
+    //警告・エラー確認
+    Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+    shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+    if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+        //エラーがあった場合
+        Logger::Log(shaderError->GetStringPointer());
+        assert(false);
+    }
+    //compile結果をうけとってわたす
+    Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
+    hr_ = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+    assert(SUCCEEDED(hr_));
+    Logger::Log(StringUtility::ConvertString(std::format(L"Compile Succeeded, path:{},profiale:{}\n", filePath, profile)));
+    //解放
+    return shaderBlob;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(size_t sizeInBytes)
+{
+    //リソース用ヒープ
+    D3D12_HEAP_PROPERTIES uploadHeapProperties{};
+    uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//アップロードヒープ
+    //リソース
+    D3D12_RESOURCE_DESC resourceDesc{};
+    //バッファリソース
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resourceDesc.Width = sizeInBytes;//リソースのサイズ
+    // バッファのサイズ
+    resourceDesc.Height = 1;
+    resourceDesc.DepthOrArraySize = 1;
+    resourceDesc.MipLevels = 1;
+    resourceDesc.SampleDesc.Count = 1;
+    //
+    resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    //リソースを作る
+    Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+     hr_ = device_.Get()->CreateCommittedResource(
+        &uploadHeapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&resource)
+    );
+    assert(SUCCEEDED(hr_));
+    return resource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateTextureResourse(const DirectX::TexMetadata& metadata)
+{
+      ///metadataを基にリソースを作成
+    D3D12_RESOURCE_DESC resourceDesc = {};
+    resourceDesc.Width = UINT(metadata.width);//幅
+    resourceDesc.Height = UINT(metadata.height);//高さ
+    resourceDesc.MipLevels = UINT16(metadata.mipLevels);//ミップマップの数    
+    resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);//配列の数
+    resourceDesc.Format = metadata.format;//フォーマット
+    resourceDesc.SampleDesc.Count = 1;//サンプル数
+    resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);//リソースの次元
+    //利用するheapの設定
+    D3D12_HEAP_PROPERTIES heapProperties = {};
+    heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//デフォルトヒープ
+    //リソースの生成
+    Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+    HRESULT hr = device_.Get()->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_COPY_DEST,
+        nullptr,
+        IID_PPV_ARGS(&resource)
+    );
+    assert(SUCCEEDED(hr));
+    return resource;
+}
+
 void DXCommon::CreateDevice()
 {
 
