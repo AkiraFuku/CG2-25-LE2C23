@@ -368,19 +368,19 @@ Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData( const  Microsoft::WRL:
 //}
 
 
-D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
-{
-    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr+=(descriptorSize*index);
-    return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
-{
-    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU=descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr+=(descriptorSize*index);
-    return handleGPU;
-}
+//D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
+//{
+//    D3D12_CPU_DESCRIPTOR_HANDLE handleCPU=descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+//    handleCPU.ptr+=(descriptorSize*index);
+//    return handleCPU;
+//}
+//
+//D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle( const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,uint32_t descriptorSize,uint32_t index)
+//{
+//    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU=descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+//    handleGPU.ptr+=(descriptorSize*index);
+//    return handleGPU;
+//}
 MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
   
     //1. 変数の宣言
@@ -1048,7 +1048,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
              //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
-            IMGUI_CHECKVERSION();
+        /*    IMGUI_CHECKVERSION();
             ImGui::CreateContext();
             ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
             ImGui::StyleColorsDark();
@@ -1060,7 +1060,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                 srvDescriptorHeap.Get(),
                 srvDescriptorHeap.Get()->GetCPUDescriptorHandleForHeapStart(),
                 srvDescriptorHeap.Get()->GetGPUDescriptorHandleForHeapStart()
-            );
+            );*/
 
             ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
 

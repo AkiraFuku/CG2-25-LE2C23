@@ -16,6 +16,8 @@
 
 void DXCommon::Initialize(WinApp* winApp)
 {
+
+    assert(winApp);
     winApp_ = winApp;
     CreateDevice();
     CreateCommand();
@@ -24,12 +26,11 @@ void DXCommon::Initialize(WinApp* winApp)
     CreateDescriptorHeaps();
     CreateRenderTargetView();
     CreateDepthStencilView();
-
-
-
-
-
-
+    CreateFence();
+    CreateViewport();
+    CreateScissorRect();
+    CreateDXCompiler();
+    InitializeImGui();
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
