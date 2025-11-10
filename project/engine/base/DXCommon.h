@@ -32,6 +32,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
     void CreateDepthStencilTextureResource( );
 
+    //各種ディスクプリプターヒープ
+    void CreateDescriptorHeaps();
+    Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(const  Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible);
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
+
 
 };
 
