@@ -38,6 +38,9 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
+     uint32_t descriptorSizeSRV_;
+     uint32_t descriptorSizeRTV_;
+     uint32_t descriptorSizeDSV_;
 
 
 };

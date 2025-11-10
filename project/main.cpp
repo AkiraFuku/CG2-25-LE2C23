@@ -222,18 +222,18 @@ Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource( const  Microsoft::W
 
 
 };
-Microsoft::WRL::ComPtr <ID3D12DescriptorHeap>CreateDescriptorHeap(const  Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible)
-{
-    //ディスクリプタヒープの設定
-    D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
-    heapDesc.NumDescriptors = numDescriptors;
-    heapDesc.Type = heepType;
-    heapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
-    HRESULT hr = device.Get()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
-    assert(SUCCEEDED(hr));
-    return descriptorHeap;
-}
+//Microsoft::WRL::ComPtr <ID3D12DescriptorHeap>CreateDescriptorHeap(const  Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible)
+//{
+//    //ディスクリプタヒープの設定
+//    D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
+//    heapDesc.NumDescriptors = numDescriptors;
+//    heapDesc.Type = heepType;
+//    heapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+//    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+//    HRESULT hr = device.Get()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&descriptorHeap));
+//    assert(SUCCEEDED(hr));
+//    return descriptorHeap;
+//}
 
 DirectX::ScratchImage LoadTexture(const std::string& filePath)
 {
@@ -700,9 +700,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            // );
            // assert(SUCCEEDED(hr));
 
-            //ディスクプリプターヒープの作成
-            Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap =  CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);;
-            //ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+            ////ディスクプリプターヒープの作成
+            //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap =  CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);;
+            ////ID3D12DescriptorHeap* rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
             //スワップチェーンからリソースをひっぱる
             Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr };
             //ID3D12Resource* swapChainResources[2] = {nullptr};
@@ -908,7 +908,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //深度ステンシルバッファの生成
             //  Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth,WinApp::kClientHeight);
            //
-              Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+              //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
             //深度ステンシルビューの設定
             D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
             dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルのフォーマット
@@ -1046,7 +1046,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
             //srvの設定
 
-             Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+             //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
