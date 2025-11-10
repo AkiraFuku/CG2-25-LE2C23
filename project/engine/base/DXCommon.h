@@ -45,6 +45,7 @@ private:
     //スワップチェーン
     void CreateSwapChain();
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
+    DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 
     WinApp* winApp_ = nullptr;
     //深度バッファ
@@ -63,6 +64,7 @@ private:
     //レンダーターゲットビュー
     void CreateRenderTargetView();
     std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
     //ディスクリプタ２つ用意
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
@@ -78,10 +80,12 @@ private:
     //シザー矩形
     D3D12_RECT scissorRect_{};
     void CreateScissorRect();
-    //DXコンパイラ
+    //DXCコンパイラ
     void CreateDXCompiler();
     Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
     Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
     Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
+    //IMGUI初期化
+    void InitializeImGui();
 };
 
