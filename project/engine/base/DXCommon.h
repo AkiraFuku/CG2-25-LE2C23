@@ -29,7 +29,9 @@ public:
     /// <param name="index"></param>
     /// <returns></returns>
     D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
-
+    //getter
+    Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const{return device_.Get();}
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {return commandList_.Get();}
 private:
     HRESULT hr_;
 
