@@ -33,6 +33,87 @@ void DXCommon::Initialize(WinApp* winApp)
     InitializeImGui();
 }
 
+void DXCommon::PreDraw()
+{
+    //バックバッファのインデックス取得
+    UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+    //リソースバリアで書き込み可能に変更
+    barrier_ = {};
+    //Transitionバリアー
+    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    //noneにする
+    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    //バリアを得るリソース。バックアップｂufferのインデックスを取得
+    barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+    //遷移前（現在）のリソース状態
+    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+    //遷移後のリソース状態
+    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    //transitionバリアーを張る
+    commandList_->ResourceBarrier(1, &barrier_);
+    //描画先のRTVとDSVの設定
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvHeap_, descriptorSizeDSV_, 0);
+    commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], FALSE, &dsvHandle);
+    //画面クリア
+      //クリアカラー
+    float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };
+    //
+    commandList_->ClearRenderTargetView(
+        rtvHandles_[backBufferIndex],
+        clearColor,
+        0,
+        nullptr
+    );
+    //画面深度クリア
+    commandList_->ClearDepthStencilView(
+        dsvHandle,
+        D3D12_CLEAR_FLAG_DEPTH,
+        1.0f, 0, 0, nullptr
+    );
+    //SRVヒープの設定
+    ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap_.Get() };
+    commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+    //ビューポート・シザー矩形の設定
+    commandList_->RSSetViewports(1, &viewport_);//ビューポートの設定
+    commandList_->RSSetScissorRects(1, &scissorRect_);//シザー矩形の設定
+}
+
+void DXCommon::PostDraw()
+{
+    //バックバッファのインデックス取得
+    UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+    //リソースバリアでプレゼント可能に変更
+    commandList_->ResourceBarrier(1, &barrier_);
+    //コマンドリストのクローズ
+    hr_ = commandList_->Close();
+    assert(SUCCEEDED(hr_));
+    //コマンドリストの実行
+    ID3D12CommandList* commandLists[] = { commandList_.Get() };
+    commandQueue_->ExecuteCommandLists(1, commandLists);
+    //画面に表示する
+    hr_ = swapChain_->Present(1, 0);
+    assert(SUCCEEDED(hr_));
+    //次のフレームへ
+    fenceValue_++;
+    commandQueue_->Signal(fence_.Get(), fenceValue_);
+    //待機
+    //現在のフェンス値がゴール値に到達しているか確認
+    if (fence_.Get()->GetCompletedValue() < fenceValue_)
+    {
+
+        fence_.Get()->SetEventOnCompletion(fenceValue_, fenceEvent_);
+        WaitForSingleObject(fenceEvent_, INFINITE);
+    }
+    //コマンドアロケーターのリセット
+    hr_ = commandAllocator_->Reset();
+    assert(SUCCEEDED(hr_));
+    //コマンドリストのリセット
+    hr_ = commandList_->Reset(commandAllocator_.Get(), nullptr);
+    assert(SUCCEEDED(hr_));
+
+}
+
+
 D3D12_CPU_DESCRIPTOR_HANDLE DXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
 {
     return GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
@@ -173,7 +254,7 @@ void DXCommon::CreateSwapChain()
     //スワップチェーンの作成
     swapChain_ = nullptr;
     // IDXGISwapChain4* swapChain = nullptr;
-  
+
     swapChainDesc_.Width = WinApp::kClientWidth;//画像の幅
     swapChainDesc_.Height = WinApp::kClientHeight;//画像の高さ
     swapChainDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
@@ -264,7 +345,7 @@ void DXCommon::CreateRenderTargetView()
     hr_ = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
     assert(SUCCEEDED(hr_));
     // RTVの作成
-  
+
     rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換・書き込み
     rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 
@@ -318,8 +399,8 @@ void DXCommon::CreateFence()
         IID_PPV_ARGS(&fence_)
     );
     assert(SUCCEEDED(hr_));
-    HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    assert(fenceEvent != nullptr);
+    fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+    assert(fenceEvent_ != nullptr);
 }
 
 void DXCommon::CreateViewport()
@@ -359,19 +440,19 @@ void DXCommon::CreateDXCompiler()
 
 void DXCommon::InitializeImGui()
 {
-      IMGUI_CHECKVERSION();
-            ImGui::CreateContext();
-            ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
-            ImGui::StyleColorsDark();
-            ImGui_ImplWin32_Init(winApp_->GetHwnd());
-            ImGui_ImplDX12_Init(
-                device_.Get(),
-                swapChainDesc_.BufferCount,
-                rtvDesc_.Format,
-                srvHeap_.Get(),
-                srvHeap_.Get()->GetCPUDescriptorHandleForHeapStart(),
-                srvHeap_.Get()->GetGPUDescriptorHandleForHeapStart()
-            );
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
+    ImGui::StyleColorsDark();
+    ImGui_ImplWin32_Init(winApp_->GetHwnd());
+    ImGui_ImplDX12_Init(
+        device_.Get(),
+        swapChainDesc_.BufferCount,
+        rtvDesc_.Format,
+        srvHeap_.Get(),
+        srvHeap_.Get()->GetCPUDescriptorHandleForHeapStart(),
+        srvHeap_.Get()->GetGPUDescriptorHandleForHeapStart()
+    );
 }
 
 

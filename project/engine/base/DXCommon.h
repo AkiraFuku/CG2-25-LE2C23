@@ -13,6 +13,10 @@ class DXCommon
 public:
     void Initialize(WinApp* winApp);
 
+    void PreDraw();
+    void PostDraw();
+
+
     /// <summary>
     /// SRVのCPUディスクリプタハンドルを取得
     /// </summary>
@@ -61,6 +65,7 @@ private:
     uint32_t descriptorSizeSRV_;
     uint32_t descriptorSizeRTV_;
     uint32_t descriptorSizeDSV_;
+
     //レンダーターゲットビュー
     void CreateRenderTargetView();
     std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
@@ -74,6 +79,7 @@ private:
     //フェンス
     void CreateFence();
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
+    HANDLE fenceEvent_ = nullptr;
     //ビューポート矩形
     void CreateViewport();
     D3D12_VIEWPORT viewport_{};
@@ -87,5 +93,9 @@ private:
     Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
     //IMGUI初期化
     void InitializeImGui();
+    //バリア
+    D3D12_RESOURCE_BARRIER barrier_{};
+    //フェンス値
+    uint64_t fenceValue_ = 0;
 };
 
