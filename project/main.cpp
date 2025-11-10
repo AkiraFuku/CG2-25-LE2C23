@@ -753,27 +753,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(fenceEvent != nullptr);*/
             ///
 
-            //DXCCompileの初期化
-            Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
-           // IDxcUtils* dxcUtils = nullptr;
-            Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-           // IDxcCompiler3* dxcCompiler = nullptr;
-            hr = DxcCreateInstance(
-                CLSID_DxcUtils,
-                IID_PPV_ARGS(&dxcUtils)
-            );
-            assert(SUCCEEDED(hr));
-            hr = DxcCreateInstance(
-                CLSID_DxcCompiler,
-                IID_PPV_ARGS(&dxcCompiler)
-            );
-            assert(SUCCEEDED(hr));
+           //// //DXCCompileの初期化
+           //Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+           ////// IDxcUtils* dxcUtils = nullptr;
+           //Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+           ////// IDxcCompiler3* dxcCompiler = nullptr;
+           // hr = DxcCreateInstance(
+           //     CLSID_DxcUtils,
+           //     IID_PPV_ARGS(&dxcUtils)
+           // );
+           // assert(SUCCEEDED(hr));
+           // hr = DxcCreateInstance(
+           //     CLSID_DxcCompiler,
+           //     IID_PPV_ARGS(&dxcCompiler)
+           // );
+           // assert(SUCCEEDED(hr));
 
-            //includeに対応する為の設定
-             Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
-           // IDxcIncludeHandler* includeHandler = nullptr;
-            hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-            assert(SUCCEEDED(hr));
+           // //includeに対応する為の設定
+           //  Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
+           //// IDxcIncludeHandler* includeHandler = nullptr;
+           // hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+           // assert(SUCCEEDED(hr));
             ///
             ///ディスクプリプターレンジの作成
             D3D12_DESCRIPTOR_RANGE descriptorRange[1]{};

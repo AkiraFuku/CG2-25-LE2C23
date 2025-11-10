@@ -4,7 +4,9 @@
 #include<dxgi1_6.h>
 #include <wrl.h>
 #include "WinApp.h"
-#include <array> // ← 追加
+#include <array> // 
+#include<dxcapi.h>
+
 
 class DXCommon
 {
@@ -76,5 +78,10 @@ private:
     //シザー矩形
     D3D12_RECT scissorRect_{};
     void CreateScissorRect();
+    //DXコンパイラ
+    void CreateDXCompiler();
+    Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+    Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+    Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
 };
 

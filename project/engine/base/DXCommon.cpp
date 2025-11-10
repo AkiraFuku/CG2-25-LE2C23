@@ -10,6 +10,7 @@
 
 
 
+
 void DXCommon::Initialize(WinApp* winApp)
 {
     winApp_ = winApp;
@@ -333,6 +334,23 @@ void DXCommon::CreateScissorRect()
     scissorRect_.right = WinApp::kClientWidth;
     scissorRect_.top = 0;
     scissorRect_.bottom = WinApp::kClientHeight;
+}
+
+void DXCommon::CreateDXCompiler()
+{
+    hr_ = DxcCreateInstance(
+        CLSID_DxcUtils,
+        IID_PPV_ARGS(&dxcUtils)
+    );
+    assert(SUCCEEDED(hr_));
+    hr_ = DxcCreateInstance(
+        CLSID_DxcCompiler,
+        IID_PPV_ARGS(&dxcCompiler)
+    );
+    assert(SUCCEEDED(hr_));
+    hr_ = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+    assert(SUCCEEDED(hr_));
+
 }
 
 
