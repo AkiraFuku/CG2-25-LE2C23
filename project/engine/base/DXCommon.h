@@ -9,6 +9,19 @@ class DXCommon
 public:
     void Initialize( WinApp* winApp);
 
+    /// <summary>
+    /// SRVのCPUディスクリプタハンドルを取得
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
+    /// <summary>
+    /// SRVのGPUディスクリプタハンドルを取得
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+
 private:
       HRESULT hr_;
 
