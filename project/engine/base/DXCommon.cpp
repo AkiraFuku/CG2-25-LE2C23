@@ -304,15 +304,35 @@ void DXCommon::CreateDepthStencilView()
 
 void DXCommon::CreateFence()
 {
-     
-            //ID3D12Fence* fence = nullptr;
-            uint64_t fenceValue = 0;
-            hr_ = device_->CreateFence(
-                fenceValue,
-                D3D12_FENCE_FLAG_NONE,
-                IID_PPV_ARGS(&fence_)
-            );
-            assert(SUCCEEDED(hr_));
+
+    //ID3D12Fence* fence = nullptr;
+    uint64_t fenceValue = 0;
+    hr_ = device_->CreateFence(
+        fenceValue,
+        D3D12_FENCE_FLAG_NONE,
+        IID_PPV_ARGS(&fence_)
+    );
+    assert(SUCCEEDED(hr_));
+    HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    assert(fenceEvent != nullptr);
+}
+
+void DXCommon::CreateViewport()
+{
+    viewport_.Width = static_cast<float>(WinApp::kClientWidth);
+    viewport_.Height = static_cast<float>(WinApp::kClientHeight);
+    viewport_.TopLeftX = 0.0f;
+    viewport_.TopLeftY = 0.0f;
+    viewport_.MinDepth = 0.0f;
+    viewport_.MaxDepth = 1.0f;
+}
+
+void DXCommon::CreateScissorRect()
+{
+    scissorRect_.left = 0;
+    scissorRect_.right = WinApp::kClientWidth;
+    scissorRect_.top = 0;
+    scissorRect_.bottom = WinApp::kClientHeight;
 }
 
 

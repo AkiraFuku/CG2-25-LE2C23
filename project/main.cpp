@@ -738,19 +738,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            //     rtvHandles[1]
            // );
       //fenceのさくせい
-            Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
-            //ID3D12Fence* fence = nullptr;
-            uint64_t fenceValue = 0;
-            hr = device->CreateFence(
-                fenceValue,
-                D3D12_FENCE_FLAG_NONE,
-                IID_PPV_ARGS(&fence)
-            );
-            assert(SUCCEEDED(hr));
+            //Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+            ////ID3D12Fence* fence = nullptr;
+            //uint64_t fenceValue = 0;
+            //hr = device->CreateFence(
+            //    fenceValue,
+            //    D3D12_FENCE_FLAG_NONE,
+            //    IID_PPV_ARGS(&fence)
+            //);
+            //assert(SUCCEEDED(hr));
             //スワップチェーンのフリップを待つためのイベント
             //イベントオブジェクトの作成
-            HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-            assert(fenceEvent != nullptr);
+          /*  HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            assert(fenceEvent != nullptr);*/
             ///
 
             //DXCCompileの初期化
@@ -978,22 +978,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
 
 
 
-            //ビューポート
-            D3D12_VIEWPORT viewport{};
-            //
-            viewport.Width = static_cast<float>(WinApp::kClientWidth);
-            viewport.Height = static_cast<float>(WinApp::kClientHeight);
-            viewport.TopLeftX = 0.0f;
-            viewport.TopLeftY = 0.0f;
-            viewport.MinDepth = 0.0f;
-            viewport.MaxDepth = 1.0f;
+            ////ビューポート
+            //D3D12_VIEWPORT viewport{};
+            ////
+            //viewport.Width = static_cast<float>(WinApp::kClientWidth);
+            //viewport.Height = static_cast<float>(WinApp::kClientHeight);
+            //viewport.TopLeftX = 0.0f;
+            //viewport.TopLeftY = 0.0f;
+            //viewport.MinDepth = 0.0f;
+            //viewport.MaxDepth = 1.0f;
 
             //シザー矩形
-            D3D12_RECT scissorRect{};
+         /*   D3D12_RECT scissorRect{};
             scissorRect.left = 0;
             scissorRect.right = WinApp::kClientWidth;
             scissorRect.top = 0;
-            scissorRect.bottom = WinApp::kClientHeight;
+            scissorRect.bottom = WinApp::kClientHeight;*/
             ///
 
             ///マテリアルリソース

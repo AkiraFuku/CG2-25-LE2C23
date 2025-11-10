@@ -70,5 +70,11 @@ private:
     //フェンス
     void CreateFence();
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
+    //ビューポート矩形
+    void CreateViewport();
+    D3D12_VIEWPORT viewport_{};
+    //シザー矩形
+    D3D12_RECT scissorRect_{};
+    void CreateScissorRect();
 };
 
