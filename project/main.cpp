@@ -26,44 +26,45 @@
 
 #include"engine/audio/Audio.h"
 #include "engine/input/Input.h"
+#include"engine/base/D3DResourceLeakChecker.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 
-void Log(std::ofstream& os, const std::string& message) {
-    os << message << std::endl;
-    OutputDebugStringA(message.c_str());
-
-}
-std::wstring ConvertString(const std::string& str) {
-    if (str.empty()) {
-        return std::wstring();
-    }
-
-    auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-    if (sizeNeeded == 0) {
-        return std::wstring();
-    }
-    std::wstring result(sizeNeeded, 0);
-    MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-    return result;
-}
-
-std::string ConvertString(const std::wstring& str) {
-    if (str.empty()) {
-        return std::string();
-    }
-
-    auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-    if (sizeNeeded == 0) {
-        return std::string();
-    }
-    std::string result(sizeNeeded, 0);
-    WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-    return result;
-}
+//void Log(std::ofstream& os, const std::string& message) {
+//    os << message << std::endl;
+//    OutputDebugStringA(message.c_str());
+//
+//}
+//std::wstring ConvertString(const std::string& str) {
+//    if (str.empty()) {
+//        return std::wstring();
+//    }
+//
+//    auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
+//    if (sizeNeeded == 0) {
+//        return std::wstring();
+//    }
+//    std::wstring result(sizeNeeded, 0);
+//    MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
+//    return result;
+//}
+//
+//std::string ConvertString(const std::wstring& str) {
+//    if (str.empty()) {
+//        return std::string();
+//    }
+//
+//    auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
+//    if (sizeNeeded == 0) {
+//        return std::string();
+//    }
+//    std::string result(sizeNeeded, 0);
+//    WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
+//    return result;
+//}
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
@@ -484,19 +485,19 @@ ModelData LoadObjFile(const std::string& directryPath, const std::string& filena
    
 }
 
-struct D3DResourceLeakChecker{
-    ~D3DResourceLeakChecker(){
-        // D3D12デバッグレイヤーを有効にしている場合、リソースのリークをチェック
-        Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-        if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-        debug->ReportLiveObjects(DXGI_DEBUG_ALL,DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_APP,DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_D3D12,DXGI_DEBUG_RLO_ALL);
-
-       
-        }
-    }
-};
+//struct D3DResourceLeakChecker{
+//    ~D3DResourceLeakChecker(){
+//        // D3D12デバッグレイヤーを有効にしている場合、リソースのリークをチェック
+//        Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+//        if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+//        debug->ReportLiveObjects(DXGI_DEBUG_ALL,DXGI_DEBUG_RLO_ALL);
+//        debug->ReportLiveObjects(DXGI_DEBUG_APP,DXGI_DEBUG_RLO_ALL);
+//        debug->ReportLiveObjects(DXGI_DEBUG_D3D12,DXGI_DEBUG_RLO_ALL);
+//
+//       
+//        }
+//    }
+//};
 
 
 
@@ -545,7 +546,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
     dxCommon->Initialize(winApp);
     
 
-   Log(logStream,ConvertString( std::format( L"WSTRING{}\n",wstr)));
+   //Log(logStream,ConvertString( std::format( L"WSTRING{}\n",wstr)));
     HRESULT hr ;
 
 
