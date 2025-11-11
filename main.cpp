@@ -1461,6 +1461,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         instancingSrvHandleCPU
     );
 
+    Transform transforms[kNumInstances];
+    for (uint32_t i = 0; i < kNumInstances; ++i)
+    {
+        transforms[i].scale = { 1.0f,1.0f,1.0f };
+        transforms[i].rotate = { 0.0f,0.0f,0.0f };
+        transforms[i].traslate={i*2.0f,i*2.0f,i*2.0f};
+
+    }
 
 
 
@@ -1569,6 +1577,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
             uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
             materialDataSprite->uvTransform = uvTransformMatrix;
+
+            for (uint32_t i = 0; i < kNumInstances; i++)
+            {
+
+                Matrix4x4 worldMatrixInstance = MakeAfineMatrix(transforms[i].scale, transforms[i].rotate, transforms[i].traslate);
+                instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
+                instancingData[i].World = worldMatrixInstance;  
+
+            }
 
             //// ImGui::End(); の直前や、描画前の適切な場所で
             BlendMode newBlendMode = static_cast<BlendMode>(blendModeIndex);
