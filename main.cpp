@@ -1431,8 +1431,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              audio->PlayAudio(soundData1);
 
             
+             const uint32_t kNumInstances = 10;
 
+             Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = CreateBufferResource(device, sizeof(TransformationMatrix) * kNumInstances);
 
+             //インスタンシング用データの設定
+             TransformationMatrix* instancingData = nullptr;
+             instancingResource.Get()->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
+
+             for (uint32_t i = 0; i < kNumInstances; ++i)
+             {
+                 instancingData[i].WVP = Makeidetity4x4();
+                 instancingData[i].World = Makeidetity4x4();
+             }
          
            
                  
