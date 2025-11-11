@@ -235,37 +235,37 @@ static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception){
 //    return descriptorHeap;
 //}
 
-DirectX::ScratchImage LoadTexture(const std::string& filePath)
-{
-    //テクスチャの読み込み
-    DirectX::ScratchImage image{};
-    std::wstring filePathW= ConvertString(filePath);
-    HRESULT hr = DirectX::LoadFromWICFile(
-        filePathW.c_str(),
-        DirectX::WIC_FLAGS_FORCE_SRGB,
-        nullptr,
-        image
-
-    );
-    assert(SUCCEEDED(hr));
-    //ミップマップの生成
-    DirectX::ScratchImage mipImages{};
-    hr = DirectX::GenerateMipMaps(
-        image.GetImages(),
-        image.GetImageCount(),
-        image.GetMetadata(),
-        DirectX::TEX_FILTER_SRGB,
-        0,
-        mipImages
-    );
-    assert(SUCCEEDED(hr));
-
-
-
-    return mipImages;
-
-
-}
+//DirectX::ScratchImage LoadTexture(const std::string& filePath)
+//{
+//    //テクスチャの読み込み
+//    DirectX::ScratchImage image{};
+//    std::wstring filePathW= ConvertString(filePath);
+//    HRESULT hr = DirectX::LoadFromWICFile(
+//        filePathW.c_str(),
+//        DirectX::WIC_FLAGS_FORCE_SRGB,
+//        nullptr,
+//        image
+//
+//    );
+//    assert(SUCCEEDED(hr));
+//    //ミップマップの生成
+//    DirectX::ScratchImage mipImages{};
+//    hr = DirectX::GenerateMipMaps(
+//        image.GetImages(),
+//        image.GetImageCount(),
+//        image.GetMetadata(),
+//        DirectX::TEX_FILTER_SRGB,
+//        0,
+//        mipImages
+//    );
+//    assert(SUCCEEDED(hr));
+//
+//
+//
+//    return mipImages;
+//
+//
+//}
 
 //Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse( const  Microsoft::WRL::ComPtr<ID3D12Device> device , const DirectX::TexMetadata& metadata)
 //{
@@ -296,45 +296,45 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath)
 //
 //
 //}
-[[nodiscard]] //戻り値を無視しないようにするアトリビュート
-Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, const  Microsoft::WRL::ComPtr<ID3D12Device> device,
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>  commandlist)
-{
-    std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-    DirectX::PrepareUpload(
-        device.Get(),
-        mipImages.GetImages(),
-        mipImages.GetImageCount(),
-        mipImages.GetMetadata(),
-        subresources
-    );
-    uint64_t intermediateSize = GetRequiredIntermediateSize(
-        textur.Get(),
-        0,//最初のサブリソース
-        UINT(subresources.size())//全てのサブリソース
-    );
-   Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource = CreateBufferResource(device,intermediateSize);
-    UpdateSubresources(
-        commandlist.Get(),
-        textur.Get(),//転送先のテクスチャ
-        intermediateResource.Get(),//転送元のリソース
-        0,//転送元のオフセット
-        0,//転送先のオフセット
-        UINT(subresources.size()),//サブリソースの数
-        subresources.data()//サブリソースデータ
-    );
-    //
-    D3D12_RESOURCE_BARRIER barrier{};
-    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;//リソースの遷移
-    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;//フラグなし
-    barrier.Transition.pResource = textur.Get();//遷移するリソース
-    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;//全てのサブリソース
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;//コピー先の状態
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;//読み取り可能な状態
-    commandlist.Get()->ResourceBarrier(1, &barrier);//バリアを設定
-    return intermediateResource;
-    
-}
+//[[nodiscard]] //戻り値を無視しないようにするアトリビュート
+//Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages, const  Microsoft::WRL::ComPtr<ID3D12Device> device,
+//    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>  commandlist)
+//{
+//    std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+//    DirectX::PrepareUpload(
+//        device.Get(),
+//        mipImages.GetImages(),
+//        mipImages.GetImageCount(),
+//        mipImages.GetMetadata(),
+//        subresources
+//    );
+//    uint64_t intermediateSize = GetRequiredIntermediateSize(
+//        textur.Get(),
+//        0,//最初のサブリソース
+//        UINT(subresources.size())//全てのサブリソース
+//    );
+//   Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource = CreateBufferResource(device,intermediateSize);
+//    UpdateSubresources(
+//        commandlist.Get(),
+//        textur.Get(),//転送先のテクスチャ
+//        intermediateResource.Get(),//転送元のリソース
+//        0,//転送元のオフセット
+//        0,//転送先のオフセット
+//        UINT(subresources.size()),//サブリソースの数
+//        subresources.data()//サブリソースデータ
+//    );
+//    //
+//    D3D12_RESOURCE_BARRIER barrier{};
+//    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;//リソースの遷移
+//    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;//フラグなし
+//    barrier.Transition.pResource = textur.Get();//遷移するリソース
+//    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;//全てのサブリソース
+//    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;//コピー先の状態
+//    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;//読み取り可能な状態
+//    commandlist.Get()->ResourceBarrier(1, &barrier);//バリアを設定
+//    return intermediateResource;
+//    
+//}
 
 //Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource( const  Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width,int32_t height){
 //    D3D12_RESOURCE_DESC resourceDesc{};
