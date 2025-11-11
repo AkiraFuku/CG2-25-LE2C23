@@ -44,6 +44,8 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource( size_t sizeInBytes);
     //クリエイトテクスチャ
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse( const DirectX::TexMetadata& metadata);
+    //アップロードテクスチャ
+    Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages);
 
 
 private:
