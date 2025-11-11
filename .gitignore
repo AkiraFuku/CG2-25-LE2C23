@@ -319,7 +319,8 @@ DirectXGame/imgui.ini
 **/DirectXTex/Shaders/Compiled/
 /Dumps
 
+
 project/logs/
 project/Dumps/
-project/externals/imgui/my_imgui_settings.ini
+project/externals/imgui/my_imgui_settings.ini/
 
