@@ -67,6 +67,8 @@ HRESULT hr=   CoInitializeEx(0, COINIT_MULTITHREADED);
             ShowWindow(hwnd, SW_SHOW);
             //
 
+            timeBeginPeriod(1);
+
 
 
 };

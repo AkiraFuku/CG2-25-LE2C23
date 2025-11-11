@@ -9,6 +9,8 @@
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
+#include <thread>
+
 
 
 
@@ -19,6 +21,8 @@ void DXCommon::Initialize(WinApp* winApp)
 
     assert(winApp);
     winApp_ = winApp;
+
+    InitializeFixFPS();
     CreateDevice();
     CreateCommand();
     CreateSwapChain();
@@ -40,7 +44,7 @@ void DXCommon::Finalize()
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
     //フェンスイベントのクローズ
-    CloseHandle(fenceEvent_);
+ //   CloseHandle(fenceEvent_);
 }
 
 void DXCommon::PreDraw()
@@ -92,12 +96,12 @@ void DXCommon::PostDraw()
 {
     //バックバッファのインデックス取得
     UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-      
+
     barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
     barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
     barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier_.Transition.StateAfter  = D3D12_RESOURCE_STATE_PRESENT;
+    barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
     //リソースバリアでプレゼント可能に変更
     commandList_->ResourceBarrier(1, &barrier_);
     //コマンドリストのクローズ
@@ -116,9 +120,11 @@ void DXCommon::PostDraw()
     //現在のフェンス値がゴール値に到達しているか確認
     if (fence_.Get()->GetCompletedValue() < fenceValue_)
     {
-
+        HANDLE fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+        assert(fenceEvent_ != nullptr);
         fence_.Get()->SetEventOnCompletion(fenceValue_, fenceEvent_);
         WaitForSingleObject(fenceEvent_, INFINITE);
+        CloseHandle(fenceEvent_);
     }
     //コマンドアロケーターのリセット
     hr_ = commandAllocator_->Reset();
@@ -212,7 +218,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(size_t siz
     resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
     //リソースを作る
     Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-     hr_ = device_.Get()->CreateCommittedResource(
+    hr_ = device_.Get()->CreateCommittedResource(
         &uploadHeapProperties,
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,
@@ -226,7 +232,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateBufferResource(size_t siz
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateTextureResourse(const DirectX::TexMetadata& metadata)
 {
-      ///metadataを基にリソースを作成
+    ///metadataを基にリソースを作成
     D3D12_RESOURCE_DESC resourceDesc = {};
     resourceDesc.Width = UINT(metadata.width);//幅
     resourceDesc.Height = UINT(metadata.height);//高さ
@@ -268,7 +274,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::UploadTextureData(const Microso
         0,//最初のサブリソース
         UINT(subresources.size())//全てのサブリソース
     );
-   Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource = CreateBufferResource(intermediateSize);
+    Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource = CreateBufferResource(intermediateSize);
     UpdateSubresources(
         commandList_.Get(),
         textur.Get(),//転送先のテクスチャ
@@ -288,14 +294,14 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::UploadTextureData(const Microso
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;//読み取り可能な状態
     commandList_.Get()->ResourceBarrier(1, &barrier);//バリアを設定
     return intermediateResource;
-    
+
 }
 
 DirectX::ScratchImage DXCommon::LoadTexture(const std::string& filePath)
 {
-//テクスチャの読み込み
+    //テクスチャの読み込み
     DirectX::ScratchImage image{};
-    std::wstring filePathW= StringUtility::ConvertString(filePath);
+    std::wstring filePathW = StringUtility::ConvertString(filePath);
     HRESULT hr = DirectX::LoadFromWICFile(
         filePathW.c_str(),
         DirectX::WIC_FLAGS_FORCE_SRGB,
@@ -318,7 +324,31 @@ DirectX::ScratchImage DXCommon::LoadTexture(const std::string& filePath)
 
 
 
-    return mipImages;}
+    return mipImages;
+}
+
+void DXCommon::InitializeFixFPS()
+{
+    reference_ = std::chrono::steady_clock::now();
+}
+
+void DXCommon::UpdateFixFPS()
+{
+    const std::chrono::microseconds kMinTime(uint64_t(1000000.0f/60.0f));
+    const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f/65.0f));
+
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+    if (elapsed<kMinCheckTime){
+        while (std::chrono::steady_clock::now()-reference_<kMinTime)
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
+
+        }
+
+    }
+      reference_ = std::chrono::steady_clock::now();
+}
 
 void DXCommon::CreateDevice()
 {
@@ -587,7 +617,7 @@ void DXCommon::CreateDepthStencilView()
 void DXCommon::CreateFence()
 {
 
-   
+
     uint64_t fenceValue = 0;
     hr_ = device_->CreateFence(
         fenceValue,
@@ -595,8 +625,8 @@ void DXCommon::CreateFence()
         IID_PPV_ARGS(&fence_)
     );
     assert(SUCCEEDED(hr_));
-    fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
-    assert(fenceEvent_ != nullptr);
+    /* fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+     assert(fenceEvent_ != nullptr);*/
 }
 
 void DXCommon::CreateViewport()

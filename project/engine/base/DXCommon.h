@@ -8,6 +8,7 @@
 #include<dxcapi.h>
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
+#include <chrono>
 
 
 class DXCommon
@@ -54,6 +55,14 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const  Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages);
     //テクスチャロード
     DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+private:
+    //FPS固定
+    void InitializeFixFPS();
+    //FPS更新
+    void UpdateFixFPS();
+    //記録用時間
+    std::chrono::steady_clock::time_point reference_;
 
 
 private:
@@ -105,7 +114,7 @@ private:
     //フェンス
     void CreateFence();
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
-    HANDLE fenceEvent_ = nullptr;
+    //HANDLE fenceEvent_ = nullptr;
     //ビューポート矩形
     void CreateViewport();
     D3D12_VIEWPORT viewport_{};
