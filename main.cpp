@@ -967,6 +967,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             assert(SUCCEEDED(hr));
             ///
             ///ディスクプリプターレンジの作成
+            D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1]{};
+            descriptorRangeForInstancing[0].BaseShaderRegister = 0;//シェーダーのレジスタ番号0
+            descriptorRangeForInstancing[0].NumDescriptors = 1;//ディスクリプタの数1つ
+            descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+            descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
+            ///
+            ///ディスクプリプターレンジの作成
             D3D12_DESCRIPTOR_RANGE descriptorRange[1]{};
             descriptorRange[0].BaseShaderRegister = 0;//シェーダーのレジスタ番号0
             descriptorRange[0].NumDescriptors = 1;//ディスクリプタの数1つ
@@ -989,9 +996,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
             rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
-            rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+            rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//CBVを使う
             rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
             rootParameters[1].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+            rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;//ディスクリプタレンジの設定
+            rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);//ディスクリプタレンジの数
             rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//ディスクリプタテーブルを使う
             rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
             rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
