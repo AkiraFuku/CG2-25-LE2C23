@@ -33,6 +33,16 @@ void DXCommon::Initialize(WinApp* winApp)
     InitializeImGui();
 }
 
+void DXCommon::Finalize()
+{
+    //ImGui終了処理
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+    //フェンスイベントのクローズ
+    CloseHandle(fenceEvent_);
+}
+
 void DXCommon::PreDraw()
 {
     //バックバッファのインデックス取得
@@ -82,6 +92,12 @@ void DXCommon::PostDraw()
 {
     //バックバッファのインデックス取得
     UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+      
+    barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+    barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier_.Transition.StateAfter  = D3D12_RESOURCE_STATE_PRESENT;
     //リソースバリアでプレゼント可能に変更
     commandList_->ResourceBarrier(1, &barrier_);
     //コマンドリストのクローズ
@@ -571,7 +587,7 @@ void DXCommon::CreateDepthStencilView()
 void DXCommon::CreateFence()
 {
 
-    //ID3D12Fence* fence = nullptr;
+   
     uint64_t fenceValue = 0;
     hr_ = device_->CreateFence(
         fenceValue,

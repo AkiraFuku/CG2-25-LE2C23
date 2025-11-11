@@ -14,8 +14,11 @@ class DXCommon
 {
 public:
     void Initialize(WinApp* winApp);
+    void Finalize();
 
+    //描画開始前処理
     void PreDraw();
+    //描画終了後処理
     void PostDraw();
 
 
@@ -38,16 +41,20 @@ public:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {
         return commandList_.Get();
     }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() const {
+        return srvHeap_.Get();
+    }
     //コンパイルシェーダー
-    Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath,const wchar_t* profile);
+    Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
     //クリエイトバッファ
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource( size_t sizeInBytes);
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
     //クリエイトテクスチャ
-    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse( const DirectX::TexMetadata& metadata);
+    Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse(const DirectX::TexMetadata& metadata);
     //アップロードテクスチャ
-    Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData( const  Microsoft::WRL::ComPtr<ID3D12Resource> textur,const DirectX::ScratchImage& mipImages);
+    Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const  Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages);
     //テクスチャロード
     DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
 
 private:
     HRESULT hr_;
