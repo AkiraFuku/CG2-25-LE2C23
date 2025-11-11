@@ -1675,14 +1675,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             //WVP行列リソースの設定
             commandList->SetGraphicsRootConstantBufferView(1, wvpResource.Get()->GetGPUVirtualAddress());
             ///
-            commandList->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+            commandList->SetGraphicsRootDescriptorTable(1,instancingSrvHandleGPU);
+            //commandList->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
             // 追加: 平行光源CBVをバインド
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
             //
             //描画コマンド
 
          //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+            commandList->DrawInstanced(UINT(modelData.vertices.size()), kNumInstances, 0, 0);
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
