@@ -970,79 +970,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-    ///ディスクプリプターレンジの作成
-    D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1]{};
-    descriptorRangeForInstancing[0].BaseShaderRegister = 0;//シェーダーのレジスタ番号0
-    descriptorRangeForInstancing[0].NumDescriptors = 1;//ディスクリプタの数1つ
-    descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-    descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
-    ///
-
-
-
-
-
-
-    // RootSignatureの作成
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignaturForInstancing{};
-    descriptionRootSignaturForInstancing.Flags =
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-    /////ルートパラメータの設定
-    D3D12_ROOT_PARAMETER rootParametersForInstancing[4]{};
-    rootParametersForInstancing[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-    rootParametersForInstancing[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
-    rootParametersForInstancing[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
-    rootParametersForInstancing[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//CBVを使う
-    rootParametersForInstancing[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
-    rootParametersForInstancing[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;//ディスクリプタレンジの設定
-    rootParametersForInstancing[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);//ディスクリプタレンジの数
-    rootParametersForInstancing[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//ディスクリプタテーブルを使う
-    rootParametersForInstancing[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
-    rootParametersForInstancing[2].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;//ディスクリプタレンジの設定
-    rootParametersForInstancing[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);//ディスクリプタレンジの数
-    rootParametersForInstancing[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-    rootParametersForInstancing[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
-    rootParametersForInstancing[3].Descriptor.ShaderRegister = 1;
-
-    descriptionRootSignaturForInstancing.pParameters = rootParametersForInstancing;//ルートパラメータの設定
-    descriptionRootSignaturForInstancing.NumParameters = _countof(rootParametersForInstancing);//ルートパラメータの数
-
-    D3D12_STATIC_SAMPLER_DESC staticSamplersForInstanceing[1]{};
-    staticSamplersForInstanceing[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//線形フィルタリング
-    staticSamplersForInstanceing[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
-    staticSamplersForInstanceing[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
-    staticSamplersForInstanceing[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
-    staticSamplersForInstanceing[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//比較関数は使用しない
-    staticSamplersForInstanceing[0].MaxLOD = D3D12_FLOAT32_MAX;//最大LODは最大値
-    staticSamplersForInstanceing[0].ShaderRegister = 0;//シェーダーのレジスタ番号0
-    staticSamplersForInstanceing[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使用する
-    descriptionRootSignaturForInstancing.pStaticSamplers = staticSamplersForInstanceing;//スタティックサンプラーの設定
-    descriptionRootSignaturForInstancing.NumStaticSamplers = _countof(staticSamplersForInstanceing);//スタティックサンプラーの数
-
-    ////シリアライズしてバイナリにする;
-    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-    Microsoft::WRL::ComPtr< ID3DBlob> errorBlob = nullptr;
-   hr = D3D12SerializeRootSignature(
-      &descriptionRootSignaturForInstancing,
-      D3D_ROOT_SIGNATURE_VERSION_1,
-       &signatureBlob,
-       &errorBlob
-   );
-   if (FAILED(hr)) {
-       Log(logStream, reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-       assert(false);
-   }
-   //バイナリを元にルートシグネチャー生成
-   Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignatureForInstancing = nullptr;
   
-   hr = device->CreateRootSignature(
-       0,
-       signatureBlob.Get()->GetBufferPointer(),
-       signatureBlob.Get()->GetBufferSize(),
-       IID_PPV_ARGS(&rootSignatureForInstancing)
-   );
-   assert(SUCCEEDED(hr));
+
+
+
+
+
 
 
 
@@ -1065,6 +998,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
     ///
 
+  ///ディスクプリプターレンジの作成
+    D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1]{};
+    descriptorRangeForInstancing[0].BaseShaderRegister = 0;//シェーダーのレジスタ番号0
+    descriptorRangeForInstancing[0].NumDescriptors = 1;//ディスクリプタの数1つ
+    descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+    descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
+    ///
 
 
 
@@ -1080,7 +1020,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//CBVを使う
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
     rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;//ディスクリプタレンジの設定
     rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);//ディスクリプタレンジの数
@@ -1108,9 +1048,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     descriptionRootSignatur.pStaticSamplers = staticSamplers;//スタティックサンプラーの設定
     descriptionRootSignatur.NumStaticSamplers = _countof(staticSamplers);//スタティックサンプラーの数
 
+
+
+
     //シリアライズしてバイナリにする;
-    signatureBlob = nullptr;
-    errorBlob = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob>errorBlob = nullptr;
     hr = D3D12SerializeRootSignature(
         &descriptionRootSignatur,
         D3D_ROOT_SIGNATURE_VERSION_1,
