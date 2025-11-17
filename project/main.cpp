@@ -20,15 +20,15 @@
 #include"externals/imgui/imgui_impl_win32.h"
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
-#include<vector>
-#include<numbers>
-#include<sstream>
 
 #include"engine/audio/Audio.h"
 #include "engine/input/Input.h"
 #include"engine/base/D3DResourceLeakChecker.h"
 #include"StringUtility.h"
 #include"Logger.h"
+
+#include "engine/2d/Sprite.h"
+#include "engine/2d/SpriteCommon.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -252,6 +252,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     input->Initialize(winApp);
 
 
+    SpriteCommon* spritecommon;
+    spritecommon->Initialize();
+
+
+    
+
 
 
     ///ディスクプリプターレンジの作成
@@ -378,20 +384,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     );
     assert(pixelShaderBlob.Get() != nullptr);
-    ////
-    //深度ステンシルバッファの生成
-    //  Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth,WinApp::kClientHeight);
-   //
-      //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
-    //深度ステンシルビューの設定
-    //D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-    //dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルのフォーマット
-    //dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-    //device->CreateDepthStencilView(
-    //    depthStencilResource.Get(),
-    //    &dsvDesc,
-    //    dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
-    //);
+   
 
     //DSSの設定
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
@@ -452,23 +445,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-    ////ビューポート
-    //D3D12_VIEWPORT viewport{};
-    ////
-    //viewport.Width = static_cast<float>(WinApp::kClientWidth);
-    //viewport.Height = static_cast<float>(WinApp::kClientHeight);
-    //viewport.TopLeftX = 0.0f;
-    //viewport.TopLeftY = 0.0f;
-    //viewport.MinDepth = 0.0f;
-    //viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
- /*   D3D12_RECT scissorRect{};
-    scissorRect.left = 0;
-    scissorRect.right = WinApp::kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = WinApp::kClientHeight;*/
-    ///
+   
 
     ///マテリアルリソース
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = dxCommon->CreateBufferResource(sizeof(Material));
@@ -518,26 +495,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //行列をGPUに転送
     *transformatiomationMatrixDate = worldViewProjectionMatrix;
 
-    //srvの設定
-
-     //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
-
-/*    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
-    ImGui::StyleColorsDark();
-    ImGui_ImplWin32_Init(winApp->GetHwnd());
-    ImGui_ImplDX12_Init(
-        device.Get(),
-        swapChainDesc.BufferCount,
-        rtvDesc.Format,
-        srvDescriptorHeap.Get(),
-        srvDescriptorHeap.Get()->GetCPUDescriptorHandleForHeapStart(),
-        srvDescriptorHeap.Get()->GetGPUDescriptorHandleForHeapStart()
-    );*/
-
-    //ID3D12DescriptorHeap* descriptorHeaps[] = {dxCommon->srvDescriptorHeap.Get() };
-
+    
     DirectX::ScratchImage mipImages2 = dxCommon->LoadTexture(modelData.material.textureFilePath);
     const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
     Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = dxCommon->CreateTextureResourse(metadata2);
@@ -704,7 +662,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-
+    Sprite* sprite = new Sprite();
+    sprite->Initialize();
 
 
 
@@ -806,44 +765,44 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ImGui::Render();
         dxCommon->PreDraw();
       
-          // RootSignatureの設定
-        dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-        //PSOの設定
-        dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
-        //VBVの設定
-        dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+      //    // RootSignatureの設定
+      //  dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+      //  //PSOの設定
+      //  dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
+      //  //VBVの設定
+      //  dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
 
-        //形状の設定
-        dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+      //  //形状の設定
+      //  dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        ///モデルの描画
-        //マテリアルリソースの設定
-        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource.Get()->GetGPUVirtualAddress());
-        //WVP行列リソースの設定
-        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource.Get()->GetGPUVirtualAddress());
-        ///
-        dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-        // 追加: 平行光源CBVをバインド
-        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
-        //
-        //描画コマンド
+      //  ///モデルの描画
+      //  //マテリアルリソースの設定
+      //  dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource.Get()->GetGPUVirtualAddress());
+      //  //WVP行列リソースの設定
+      //  dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource.Get()->GetGPUVirtualAddress());
+      //  ///
+      //  dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+      //  // 追加: 平行光源CBVをバインド
+      //  dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
+      //  //
+      //  //描画コマンド
 
-      //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-        dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+      ////   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
+      //  dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
         ///
      //   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
      //   barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 
 
-        ///スプライトの描画
-      //  commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite.Get()->GetGPUVirtualAddress());
-     //   commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-     //   commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-     //   commandList->IASetIndexBuffer(&indexBufferViewSprite);
-     //   commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-     //   //commandList->DrawInstanced(6, 1, 0, 0);
-     //   commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+        /////スプライトの描画
+        //dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0,materialResourceSprite.Get()->GetGPUVirtualAddress());
+        //dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+        //dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+        //dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
+        //dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
+        ////commandList->DrawInstanced(6, 1, 0, 0);
+        //dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 
 
@@ -863,6 +822,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete audio;
     delete input;
 
+    delete sprite;
+    delete spritecommon;
     delete dxCommon;
     dxCommon = nullptr;
 

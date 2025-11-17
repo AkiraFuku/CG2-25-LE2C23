@@ -33,6 +33,8 @@
     </ClCompile>
     <ClCompile Include="engine\math\MassFunction.cpp" />
     <ClCompile Include="engine\base\WinApp.cpp" />
+    <ClCompile Include="engine\2d\SpriteCommon.cpp" />
+    <ClCompile Include="engine\2d\Sprite.cpp" />
     <ClCompile Include="StringUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +72,8 @@
     <ClInclude Include="engine\input\Input.h" />
     <ClInclude Include="engine\base\WinApp.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="engine\2d\SpriteCommon.h" />
+    <ClInclude Include="engine\2d\Sprite.h" />
     <ClInclude Include="StringUtility.h" />
   </ItemGroup>
   <ItemGroup>
