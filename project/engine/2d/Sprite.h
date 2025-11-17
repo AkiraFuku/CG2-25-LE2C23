@@ -33,6 +33,8 @@ public:
     void Initialize(SpriteCommon* spriteCommon);
 
     void Update();
+
+    void Draw();
 private:
     SpriteCommon* spriteCommon_ = nullptr;
 

@@ -15,6 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="engine\2d\Sprite.cpp" />
     <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="engine\base\DXCommon.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
@@ -34,7 +35,6 @@
     <ClCompile Include="engine\math\MassFunction.cpp" />
     <ClCompile Include="engine\base\WinApp.cpp" />
     <ClCompile Include="engine\2d\SpriteCommon.cpp" />
-    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="StringUtility.cpp" />
   </ItemGroup>
   <ItemGroup>

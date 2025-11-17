@@ -242,7 +242,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
-    HRESULT hr;
+    
 
 
 
@@ -523,12 +523,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //);
 
     ////
-    //DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resources/uvChecker.png");
-    //const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-    //Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = dxCommon->CreateTextureResourse(metadata);
-    ////ID3D12Resource* textureResource = CreateTextureResourse(device, metadata);
-    ////テクスチャのアップロード
-    //Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource = dxCommon->UploadTextureData(textureResource, mipImages);
+    DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resources/uvChecker.png");
+    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = dxCommon->CreateTextureResourse(metadata);
+    //テクスチャのアップロード
+    Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource = dxCommon->UploadTextureData(textureResource, mipImages);
 
 
     ////metaDataを基にSRVの設定
@@ -717,7 +716,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        
 
 
-       ImGui::Begin("MaterialData");
+       //ImGui::Begin("MaterialData");
        //ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
        //ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
        //ImGui::ColorEdit4("Color", &(materialData->color).x); 
@@ -736,7 +735,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        // ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x,0.01f,-10.0f,10.0f);
        // ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
        // ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
-       ImGui::End();
+       //ImGui::End();
        // Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
        // Matrix4x4 viewMatrix = Inverse(cameraMatrix);
        // Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
@@ -755,6 +754,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        //  materialDataSprite->uvTransform = uvTransformMatrix;
 
 
+        sprite->Update();
         ///////
         ///Update
         ///////
@@ -799,7 +799,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         /////スプライトの描画
 
         spritecommon->SpriteCommonDraw();
-        
+        sprite->Draw();
         //dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
        // dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
         //dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
