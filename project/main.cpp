@@ -754,45 +754,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-       
 
 
-       ImGui::Begin("MaterialData");
-       ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
-       ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
-       ImGui::ColorEdit4("Color", &(materialData->color).x); 
-       bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
-       ImGui::Checkbox("enable", &enableLighting);
-       materialData->enableLighting = enableLighting; // Update the original value after modification
-       ImGui::DragFloat3("rotate",&(transform.rotate.x));
-       ImGui::DragFloat3("traslate", &(transform.traslate.x));
-       ImGui::Checkbox("useMonsterBall",&useMonstorBall);
-       ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x); 
-       ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
-       ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
-       ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
-       ImGui::InputFloat("intensity",&(directionalLightData->intensity));
 
-        ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x,0.01f,-10.0f,10.0f);
-        ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
+        ImGui::Begin("MaterialData");
+        ImGui::DragFloat3("Camera Transrate", &(cameraTransform.traslate.x));
+        ImGui::DragFloat3("Camera rotateate", &(cameraTransform.rotate.x));
+        ImGui::ColorEdit4("Color", &(materialData->color).x);
+        bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
+        ImGui::Checkbox("enable", &enableLighting);
+        materialData->enableLighting = enableLighting; // Update the original value after modification
+        ImGui::DragFloat3("rotate", &(transform.rotate.x));
+        ImGui::DragFloat3("traslate", &(transform.traslate.x));
+        ImGui::Checkbox("useMonsterBall", &useMonstorBall);
+        ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x);
+        ImGui::DragFloat3("traslateSprite", &(transformSprite.traslate.x));
+        ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x);
+        ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
+        ImGui::InputFloat("intensity", &(directionalLightData->intensity));
+
+        ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x, 0.01f, -10.0f, 10.0f);
+        ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
         ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
         ImGui::End();
         Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
         Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-        Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-        wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
-        wvpData->World=worldMatrix;
+        Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
+        wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
+        wvpData->World = worldMatrix;
         Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
         Matrix4x4 viewMatrixSprite = Makeidetity4x4();
-        Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight),0.0f,100.0f);
-        transformationMatrixDataSprite->WVP =  Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
-        transformationMatrixDataSprite->World=worldMatrixSprite;
-         directionalLightData->direction= Normalize(directionalLightData->direction);
+        Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight), 0.0f, 100.0f);
+        transformationMatrixDataSprite->WVP = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
+        transformationMatrixDataSprite->World = worldMatrixSprite;
+        directionalLightData->direction = Normalize(directionalLightData->direction);
 
-         Matrix4x4 uvTransformMatrix=MakeScaleMatrix(uvTransformSprite.scale);
-         uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
-         uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
-         materialDataSprite->uvTransform = uvTransformMatrix;
+        Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+        uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+        uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
+        materialDataSprite->uvTransform = uvTransformMatrix;
 
 
         ///////
@@ -805,8 +805,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ///
         ImGui::Render();
         dxCommon->PreDraw();
-      
-          // RootSignatureの設定
+
+        // RootSignatureの設定
         dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
         //PSOの設定
         dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
@@ -832,18 +832,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
       //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
         dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
         ///
-     //   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-     //   barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+     
 
 
         ///スプライトの描画
-      //  commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite.Get()->GetGPUVirtualAddress());
-     //   commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-     //   commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-     //   commandList->IASetIndexBuffer(&indexBufferViewSprite);
-     //   commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-     //   //commandList->DrawInstanced(6, 1, 0, 0);
-     //   commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite.Get()->GetGPUVirtualAddress());
+        dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+        dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+        dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
+        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
+       
+        dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 
 
@@ -853,7 +852,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
 
         dxCommon->PostDraw();
-       
+
     }
 
 
