@@ -252,7 +252,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     input->Initialize(winApp);
 
 
-    SpriteCommon* spritecommon;
+    SpriteCommon* spritecommon=nullptr;
+    spritecommon= new SpriteCommon;
     spritecommon->Initialize();
 
 
@@ -796,10 +797,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
         /////スプライトの描画
-        //dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0,materialResourceSprite.Get()->GetGPUVirtualAddress());
-        //dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+
+        spritecommon->SpriteCommonDraw()
+        
         //dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-        //dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
+       // dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
         //dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
         ////commandList->DrawInstanced(6, 1, 0, 0);
         //dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
