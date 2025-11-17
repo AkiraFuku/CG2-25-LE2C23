@@ -254,7 +254,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     SpriteCommon* spritecommon=nullptr;
     spritecommon= new SpriteCommon;
-    spritecommon->Initialize();
+    spritecommon->Initialize(dxCommon);
 
 
     
@@ -798,7 +798,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         /////スプライトの描画
 
-        spritecommon->SpriteCommonDraw()
+        spritecommon->SpriteCommonDraw();
         
         //dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
        // dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
