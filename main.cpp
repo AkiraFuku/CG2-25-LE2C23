@@ -1170,7 +1170,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             );
             assert(SUCCEEDED(hr));
             ///
-            ModelData modelData = LoadObjFile("resources", "fence.obj");
+            ModelData modelData = LoadObjFile("resources", "plane.obj");
             
             //頂点リソース
               Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource =CreateBufferResource(device, sizeof(VertexData)*modelData.vertices.size());
@@ -1463,7 +1463,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
               D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU=GetCPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,3);
               D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU=GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,3);
               device->CreateShaderResourceView(instancingResource.Get(),&instancingSrvDesc,instancingSrvHandleCPU);
-           
+                
+              Transform transforms[kNumInstance];
+              for (uint32_t i = 0; i < kNumInstance; ++i)
+              {
+                  transforms[i].scale={1.0f,1.0f,1.0f};
+                  transforms[i].rotate={0.0f,0.0f,0.0f};
+                  transforms[i].traslate={i*0.1f,i*0.1f,i*0.1f};
+
+              }
                  
            
           
@@ -1499,7 +1507,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
            keyboard->Acquire();
            BYTE key[256] = {};
          keyboard->GetDeviceState(sizeof(key), key);
-        // keyboard->SetDataFormat(&c_dfDIKeyboard);
        
         
             // キー入力判定
@@ -1573,6 +1580,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
              uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
              materialDataSprite->uvTransform = uvTransformMatrix;
+
+
+             for (uint32_t i = 0; i < kNumInstance; ++i)
+             {
+                 Matrix4x4 worldMatrixInstance =MakeAfineMatrix(transforms[i].scale,transforms[i].rotate,transforms[i].traslate);
+                 instancingData[i].WVP=Multiply(worldMatrixInstance,Multiply(viewMatrixSprite, projectionMatrixSprite));
+                 instancingData[i].World=worldMatrixInstance;
+             }
 
              //// ImGui::End(); の直前や、描画前の適切な場所で
                 BlendMode newBlendMode = static_cast<BlendMode>(blendModeIndex);
