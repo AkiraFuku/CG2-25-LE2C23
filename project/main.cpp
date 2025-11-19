@@ -612,16 +612,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     transformationMatrixDataSprite->WVP = Makeidetity4x4();
     transformationMatrixDataSprite->World = Makeidetity4x4();
 
-    ///マテリアルリソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = dxCommon->CreateBufferResource(sizeof(Material));
-    //マテリアルデータの設定
-    Material* materialDataSprite = nullptr;
-    //書き込む為のアドレス
-    materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
-    //データの設定
-    materialDataSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-    materialDataSprite->enableLighting = false;
-    materialDataSprite->uvTransform = Makeidetity4x4();
+    /////マテリアルリソース
+    //Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = dxCommon->CreateBufferResource(sizeof(Material));
+    ////マテリアルデータの設定
+    //Material* materialDataSprite = nullptr;
+    ////書き込む為のアドレス
+    //materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
+    ////データの設定
+    //materialDataSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+    //materialDataSprite->enableLighting = false;
+    //materialDataSprite->uvTransform = Makeidetity4x4();
     Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     //スプライトの行列の初期化
     Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);

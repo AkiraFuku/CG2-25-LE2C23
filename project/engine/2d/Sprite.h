@@ -12,16 +12,27 @@ public:
         Vector2 texcoord; // 2D texture coordinate vector
         Vector3 normal;
     };
+    struct Material
+    {
+        Vector4 color;
+        int32_t enableLighting;
+        float padding[3]; // パディングを追加してサイズを揃える
+        Matrix4x4 uvTransform; // UV変換行列
+
+    };
 
     void Initialize(SpriteCommon* spriteCom);
 private:
     SpriteCommon* spriteCom_ = nullptr;
     //buffer
-     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
     Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-    VertexData* vertexData_=nullptr;
-    uint32_t* indexData_=nullptr;
+    VertexData* vertexData_ = nullptr;
+    uint32_t* indexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
     D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+    //マテリアル
+    Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+    Material* materialData_ = nullptr;
 };
 
