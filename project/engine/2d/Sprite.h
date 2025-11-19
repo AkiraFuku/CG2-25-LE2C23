@@ -20,6 +20,12 @@ public:
         Matrix4x4 uvTransform; // UV変換行列
 
     };
+    struct TransformationMatrix
+    {
+        Matrix4x4 WVP;
+        Matrix4x4 World;
+
+    };
 
     void Initialize(SpriteCommon* spriteCom);
 private:
@@ -34,5 +40,8 @@ private:
     //マテリアル
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
     Material* materialData_ = nullptr;
+    //座標変換
+    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
+    TransformationMatrix* transformationMatrixData_ = nullptr;
 };
 

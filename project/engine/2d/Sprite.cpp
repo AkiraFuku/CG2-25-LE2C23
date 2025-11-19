@@ -30,9 +30,16 @@ void Sprite::Initialize(SpriteCommon* spriteCom) {
         CreateBufferResource(sizeof(Material));
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-       //データの設定
+    //データの設定
     materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     materialData_->enableLighting = false;
     materialData_->uvTransform = Makeidetity4x4();
-
+    //座標変換
+    transformationMatrixResourse_ =
+        spriteCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(TransformationMatrix));
+    transformationMatrixResourse_.Get()->
+        Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+    transformationMatrixData_->WVP = Makeidetity4x4();
+    transformationMatrixData_->World = Makeidetity4x4();
 }

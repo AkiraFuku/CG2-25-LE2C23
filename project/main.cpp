@@ -602,15 +602,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     indexDataSprite[5] = 3;
 
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourseSprite = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
+    //Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourseSprite = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
     //スプライトの行列データの設定
-    TransformationMatrix* transformationMatrixDataSprite = nullptr;
+    //TransformationMatrix* transformationMatrixDataSprite = nullptr;
     //書き込む為のアドレス
-    transformationMatrixResourseSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+    //transformationMatrixResourseSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
 
     //行列の初期化
-    transformationMatrixDataSprite->WVP = Makeidetity4x4();
-    transformationMatrixDataSprite->World = Makeidetity4x4();
+   /* transformationMatrixDataSprite->WVP = Makeidetity4x4();
+    transformationMatrixDataSprite->World = Makeidetity4x4();*/
 
     /////マテリアルリソース
     //Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = dxCommon->CreateBufferResource(sizeof(Material));
