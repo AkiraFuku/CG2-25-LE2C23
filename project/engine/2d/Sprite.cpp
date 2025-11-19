@@ -81,3 +81,15 @@ void Sprite::Update() {
     transformationMatrixData_->World = worldMatrix;
 
 }
+
+void Sprite::Draw()
+{
+    spriteCom_->GetDxCommon()->
+        GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    spriteCom_->GetDxCommon()->
+        GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+    spriteCom_->GetDxCommon()->
+        GetCommandList()->
+        SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_->GetGPUVirtualAddress());
+    spriteCom_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
