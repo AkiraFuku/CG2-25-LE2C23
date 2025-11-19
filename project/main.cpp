@@ -551,18 +551,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
     //スプライトリソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourseSprite = dxCommon->CreateBufferResource(sizeof(VertexData) * 4);
+   // Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourseSprite = dxCommon->CreateBufferResource(sizeof(VertexData) * 4);
     //スプライトの頂点バッファビューの設定
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+    //D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
     //リソース先頭アドレス
-    vertexBufferViewSprite.BufferLocation = vertexResourseSprite.Get()->GetGPUVirtualAddress();
+    //vertexBufferViewSprite.BufferLocation = vertexResourseSprite.Get()->GetGPUVirtualAddress();
     //リソースのサイズ
-    vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
-    vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+   /* vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
+    vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);*/
 
-    VertexData* vertexDataSprite = nullptr;
+    //VertexData* vertexDataSprite = nullptr;
     //書き込む為のアドレス
-    vertexResourseSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+    //vertexResourseSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
     // 左下
     vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
     vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
@@ -581,18 +581,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
 
     ///インデックスリソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
+   // Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
     //インデックスバッファビューの設定
-    D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+    //D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
     //リソース先頭アドレス
-    indexBufferViewSprite.BufferLocation = indexResourceSprite.Get()->GetGPUVirtualAddress();
+    //indexBufferViewSprite.BufferLocation = indexResourceSprite.Get()->GetGPUVirtualAddress();
     //リソースのサイズ
-    indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
-    indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;//32ビット整数
+    //indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+    //indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;//32ビット整数
 
-    uint32_t* indexDataSprite = nullptr;
+    //uint32_t* indexDataSprite = nullptr;
     //書き込む為のアドレス
-    indexResourceSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+    //indexResourceSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
     //インデックスの設定
     indexDataSprite[0] = 0;
     indexDataSprite[1] = 1;
@@ -665,7 +665,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
     Sprite* sprite = new Sprite();
-    sprite->Initialize();
+    sprite->Initialize(spritecommon);
 
 
 
