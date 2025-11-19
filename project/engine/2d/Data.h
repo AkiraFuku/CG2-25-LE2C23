@@ -1,10 +1,6 @@
 #pragma once
 #include <Vector4.h>
-struct Transform{
-    Vector3 scale;
-    Vector3 rotate;
-    Vector3 traslate;
-};
+
 struct VertexData{
     Vector4 position; // 4D position vector
     Vector2 texcoord; // 2D texture coordinate vector

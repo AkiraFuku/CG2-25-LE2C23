@@ -28,6 +28,7 @@ public:
     };
 
     void Initialize(SpriteCommon* spriteCom);
+    void Update();
 private:
     SpriteCommon* spriteCom_ = nullptr;
     //buffer

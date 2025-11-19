@@ -563,22 +563,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //VertexData* vertexDataSprite = nullptr;
     //書き込む為のアドレス
     //vertexResourseSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-    // 左下
-    vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
-    vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
-    vertexDataSprite[0].normal = { 0.0f,0.0f, -1.0f };
-    // 左上
-    vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-    vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
-    vertexDataSprite[1].normal = { 0.0f,0.0f, -1.0f };
-    // 右下
-    vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
-    vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
-    vertexDataSprite[2].normal = { 0.0f,0.0f, -1.0f };
-    // 右上
-    vertexDataSprite[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };
-    vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
-    vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
+    //// 左下
+    //vertexDataSprite[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
+    //vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
+    //vertexDataSprite[0].normal = { 0.0f,0.0f, -1.0f };
+    //// 左上
+    //vertexDataSprite[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+    //vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
+    //vertexDataSprite[1].normal = { 0.0f,0.0f, -1.0f };
+    //// 右下
+    //vertexDataSprite[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
+    //vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
+    //vertexDataSprite[2].normal = { 0.0f,0.0f, -1.0f };
+    //// 右上
+    //vertexDataSprite[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };
+    //vertexDataSprite[3].texcoord = { 1.0f, 0.0f };
+    //vertexDataSprite[3].normal = { 0.0f,0.0f, -1.0f };
 
     ///インデックスリソース
    // Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
@@ -594,12 +594,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //書き込む為のアドレス
     //indexResourceSprite.Get()->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
     //インデックスの設定
-    indexDataSprite[0] = 0;
+    /*indexDataSprite[0] = 0;
     indexDataSprite[1] = 1;
     indexDataSprite[2] = 2;
     indexDataSprite[3] = 2;
     indexDataSprite[4] = 1;
-    indexDataSprite[5] = 3;
+    indexDataSprite[5] = 3;*/
 
 
     //Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourseSprite = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
@@ -622,7 +622,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //materialDataSprite->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     //materialDataSprite->enableLighting = false;
     //materialDataSprite->uvTransform = Makeidetity4x4();
-    Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    //Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     //スプライトの行列の初期化
     Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
     Matrix4x4 viewMatrixSprite = Makeidetity4x4();
@@ -767,31 +767,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ImGui::Render();
         dxCommon->PreDraw();
       
-      //    // RootSignatureの設定
-      //  dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-      //  //PSOの設定
-      //  dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
-      //  //VBVの設定
-      //  dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+          // RootSignatureの設定
+        dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+        //PSOの設定
+        dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
+        //VBVの設定
+        dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
 
-      //  //形状の設定
-      //  dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        //形状の設定
+        dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-      //  ///モデルの描画
-      //  //マテリアルリソースの設定
-      //  dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource.Get()->GetGPUVirtualAddress());
-      //  //WVP行列リソースの設定
-      //  dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource.Get()->GetGPUVirtualAddress());
-      //  ///
-      //  dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-      //  // 追加: 平行光源CBVをバインド
-      //  dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
-      //  //
-      //  //描画コマンド
+        ///モデルの描画
+        //マテリアルリソースの設定
+        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource.Get()->GetGPUVirtualAddress());
+        //WVP行列リソースの設定
+        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource.Get()->GetGPUVirtualAddress());
+        ///
+        dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+        // 追加: 平行光源CBVをバインド
+        dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
+        //
+        //描画コマンド
 
-      ////   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-      //  dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+        dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
         ///
      //   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
      //   barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

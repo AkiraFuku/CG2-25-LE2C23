@@ -23,4 +23,8 @@ struct Vector3{
     float y;
     float z;
 };
-
+struct Transform{
+    Vector3 scale;
+    Vector3 rotate;
+    Vector3 traslate;
+};
