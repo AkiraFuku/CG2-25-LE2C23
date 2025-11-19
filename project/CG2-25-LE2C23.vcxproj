@@ -56,6 +56,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\2d\Data.h" />
     <ClInclude Include="engine\base\D3DResourceLeakChecker.h" />
     <ClInclude Include="engine\base\DXCommon.h" />
     <ClInclude Include="engine\audio\Audio.h" />

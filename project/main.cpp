@@ -29,6 +29,7 @@
 
 #include "engine/2d/Sprite.h"
 #include "engine/2d/SpriteCommon.h"
+#include "Data.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

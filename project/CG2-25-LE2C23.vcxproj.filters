@@ -172,6 +172,9 @@
     <ClInclude Include="engine\2d\Sprite.h">
       <Filter>engine\2d</Filter>
     </ClInclude>
+    <ClInclude Include="engine\2d\Data.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
