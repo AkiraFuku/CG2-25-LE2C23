@@ -70,7 +70,7 @@ void Sprite::Update() {
 
 
 
-    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{postion_.x,postion_.y,0.0f} };
 
      Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
     Matrix4x4 viewMatrix = Makeidetity4x4();

@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector4.h"
+#include "Vector2.h"
 #include <wrl.h>
 #include <d3d12.h>
 
@@ -30,8 +31,14 @@ public:
     void Initialize(SpriteCommon* spriteCom);
     void Update();
     void Draw();
+
+    const Vector2& GetPosition() const{return postion_;} 
+    void SetPosition(const Vector2& position){postion_=position;}
 private:
     SpriteCommon* spriteCom_ = nullptr;
+
+    Vector2 postion_={0.0f,0.0f};
+
     //buffer
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
     Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

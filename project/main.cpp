@@ -441,13 +441,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     vertexResource.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
     std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 
-
-
-
-
-
-   
-
     ///マテリアルリソース
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = dxCommon->CreateBufferResource(sizeof(Material));
     //マテリアルデータの設定
@@ -628,8 +621,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
        // 
 
-
-
+        Vector2 pos=sprite->GetPosition();
+        pos+=Vector2{0.1f,0.1f};
+        sprite->SetPosition(pos);
 
 
        
@@ -660,12 +654,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
         wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
         wvpData->World=worldMatrix;
-       /* Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
-        Matrix4x4 viewMatrixSprite = Makeidetity4x4();
-        Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f,0.0f,static_cast<float>(WinApp::kClientWidth),static_cast<float>(WinApp::kClientHeight),0.0f,100.0f);
-        transformationMatrixDataSprite->WVP =  Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
-        transformationMatrixDataSprite->World=worldMatrixSprite;*/
-         directionalLightData->direction= Normalize(directionalLightData->direction);
+           directionalLightData->direction= Normalize(directionalLightData->direction);
 
         /* Matrix4x4 uvTransformMatrix=MakeScaleMatrix(uvTransformSprite.scale);
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
@@ -709,19 +698,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
         ///
-     //   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-     //   barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+     
 
 
         /////スプライトの描画
 
         spritecommon->SpriteCommonDraw();
         sprite->Draw();
-        //dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-       // dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
-        //dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
-        ////commandList->DrawInstanced(6, 1, 0, 0);
-        //dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+       
 
 
 
