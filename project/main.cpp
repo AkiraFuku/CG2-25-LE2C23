@@ -644,12 +644,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        ImGui::Checkbox("useMonsterBall",&useMonstorBall);
 
        color=sprite->GetColor();
-       //ImGui::ColorEdit4("ColorSprite", &(color).x);
-       color.x+=0.01f;
-       if (color.x>1.0f)
-       {
-           color.x-=1.0f;
-       }
+       
+       ImGui::ColorEdit4("ColorSprite", &(color).x);
+      
        sprite->SetColor(color);
        //ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
        ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
