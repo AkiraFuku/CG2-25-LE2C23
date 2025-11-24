@@ -577,6 +577,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     Sprite* sprite = new Sprite();
     sprite->Initialize(spritecommon);
     Vector4 color= sprite->GetColor();
+    //Vector2 size={};
 
 
 
@@ -622,9 +623,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
        // 
 
-       Vector2 pos=sprite->GetPosition();
+      /* Vector2 pos=sprite->GetPosition();
         pos+=Vector2{0.1f,0.1f};
-        sprite->SetPosition(pos);
+        sprite->SetPosition(pos);*/
 
        /* float rotat=sprite->GetRotation();
         rotat+=0.1f;
@@ -644,10 +645,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        ImGui::Checkbox("useMonsterBall",&useMonstorBall);
 
        color=sprite->GetColor();
-       
        ImGui::ColorEdit4("ColorSprite", &(color).x);
-      
        sprite->SetColor(color);
+
+       Vector2 size=sprite->GetSize();
+        size.x+=0.1f;
+        size.y+=0.1f;
+       sprite->SetSize(size);
+
        //ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
        ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
        ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));

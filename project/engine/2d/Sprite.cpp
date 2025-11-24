@@ -45,7 +45,7 @@ void Sprite::Initialize(SpriteCommon* spriteCom) {
 }
 void Sprite::Update() {
     // 左下
-    vertexData_[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
+    vertexData_[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
     vertexData_[0].texcoord = { 0.0f, 1.0f };
     vertexData_[0].normal = { 0.0f,0.0f, -1.0f };
     // 左上
@@ -53,11 +53,11 @@ void Sprite::Update() {
     vertexData_[1].texcoord = { 0.0f, 0.0f };
     vertexData_[1].normal = { 0.0f,0.0f, -1.0f };
     // 右下
-    vertexData_[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
+    vertexData_[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
     vertexData_[2].texcoord = { 1.0f, 1.0f };
     vertexData_[2].normal = { 0.0f,0.0f, -1.0f };
     // 右上
-    vertexData_[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };
+    vertexData_[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
     vertexData_[3].texcoord = { 1.0f, 0.0f };
     vertexData_[3].normal = { 0.0f,0.0f, -1.0f };
 
@@ -70,7 +70,7 @@ void Sprite::Update() {
 
 
 
-    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,rotation_},{postion_.x,postion_.y,0.0f} };
+    Transform transform{ {size_.x,size_.y,1.0f},{0.0f,0.0f,rotation_},{postion_.x,postion_.y,0.0f} };
 
      Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
     Matrix4x4 viewMatrix = Makeidetity4x4();

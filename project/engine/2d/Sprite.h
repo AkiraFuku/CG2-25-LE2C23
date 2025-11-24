@@ -43,11 +43,17 @@ public:
 
     Matrix4x4& GetUV()const{return materialData_->uvTransform;}
     void SetUV (Matrix4x4& uvTransfom){materialData_->uvTransform=uvTransfom;}
+
+    const Vector2& GetSize()const{return size_;}
+    void SetSize(const Vector2& Size){this->size_=Size;}
+
 private:
     SpriteCommon* spriteCom_ = nullptr;
 
     Vector2 postion_={0.0f,0.0f};
     float rotation_=0.0f;
+
+    Vector2 size_={640.0f,360.0f};
 
     //buffer
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
