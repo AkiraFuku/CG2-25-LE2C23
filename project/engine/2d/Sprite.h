@@ -38,6 +38,11 @@ public:
     float GetRotation() const{return rotation_;}
     void SetRotation(const float rotation){rotation_=rotation;}
     
+    Vector4& GetColor() const {return materialData_->color;}
+    void SetColor(const Vector4& color){materialData_->color=color;}
+
+    Matrix4x4& GetUV()const{return materialData_->uvTransform;}
+    void SetUV (Matrix4x4& uvTransfom){materialData_->uvTransform=uvTransfom;}
 private:
     SpriteCommon* spriteCom_ = nullptr;
 

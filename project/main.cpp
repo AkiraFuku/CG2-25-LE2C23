@@ -576,6 +576,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     Sprite* sprite = new Sprite();
     sprite->Initialize(spritecommon);
+    Vector4 color= sprite->GetColor();
 
 
 
@@ -621,15 +622,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
        // 
 
-    /*    Vector2 pos=sprite->GetPosition();
+       Vector2 pos=sprite->GetPosition();
         pos+=Vector2{0.1f,0.1f};
         sprite->SetPosition(pos);
-*/
-        float rotat=sprite->GetRotation();
+
+       /* float rotat=sprite->GetRotation();
         rotat+=0.1f;
-        sprite->SetRotation(rotat);
+        sprite->SetRotation(rotat);*/
        
-        sprite->Update();
+       
 
        ImGui::Begin("MaterialData");
        ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
@@ -641,8 +642,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        ImGui::DragFloat3("rotate",&(transform.rotate.x));
        ImGui::DragFloat3("traslate", &(transform.traslate.x));
        ImGui::Checkbox("useMonsterBall",&useMonstorBall);
-      /* ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x); 
-       ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));*/
+
+       color=sprite->GetColor();
+       //ImGui::ColorEdit4("ColorSprite", &(color).x);
+       color.x+=0.01f;
+       if (color.x>1.0f)
+       {
+           color.x-=1.0f;
+       }
+       sprite->SetColor(color);
+       //ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
        ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
        ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
        ImGui::InputFloat("intensity",&(directionalLightData->intensity));
@@ -662,7 +671,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
          //materialDataSprite->uvTransform = uvTransformMatrix;
-
+sprite->Update();
 
         ///////
         ///Update

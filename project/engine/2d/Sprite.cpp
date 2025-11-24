@@ -88,6 +88,9 @@ void Sprite::Draw()
         GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
     spriteCom_->GetDxCommon()->
         GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+   spriteCom_->GetDxCommon()->
+        GetCommandList()->
+        SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
     spriteCom_->GetDxCommon()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_->GetGPUVirtualAddress());
