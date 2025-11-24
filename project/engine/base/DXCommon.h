@@ -132,5 +132,7 @@ private:
     D3D12_RESOURCE_BARRIER barrier_{};
     //フェンス値
     uint64_t fenceValue_ = 0;
+    //最大テクスチャ数
+    static const uint32_t kMaxSRVCount;
 };
 

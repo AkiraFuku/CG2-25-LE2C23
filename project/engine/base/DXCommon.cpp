@@ -13,7 +13,7 @@
 
 
 
-
+const uint32_t DXCommon::kMaxSRVCount=512;
 
 
 void DXCommon::Initialize(WinApp* winApp)
@@ -539,7 +539,7 @@ void DXCommon::CreateDescriptorHeaps()
     descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
     //SRVヒープの作成
-    srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+    srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
     //RTVヒープの作成
     rtvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
     //DSVヒープの作成

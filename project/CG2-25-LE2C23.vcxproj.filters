@@ -111,6 +111,9 @@
     <ClCompile Include="engine\2d\Vector2.cpp">
       <Filter>engine\2d</Filter>
     </ClCompile>
+    <ClCompile Include="engine\2d\TextureManager.cpp">
+      <Filter>engine\2d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -186,6 +189,9 @@
     </ClInclude>
     <ClInclude Include="engine\3d\Vector3.h">
       <Filter>engine\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\2d\TextureManager.h">
+      <Filter>engine\2d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
