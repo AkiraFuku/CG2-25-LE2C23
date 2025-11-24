@@ -6,6 +6,8 @@
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
 
+class DXCommon;
+
 class TextureManager
 {
 private:
@@ -22,14 +24,18 @@ private:
     };
 
     static TextureManager* instance;
-    TextureManager()=default;
-    ~TextureManager()=default;
-    TextureManager(TextureManager&)=delete;
-    TextureManager& operator=(TextureManager&)=delete;
+    TextureManager() = default;
+    ~TextureManager() = default;
+    TextureManager(TextureManager&) = delete;
+    TextureManager& operator=(TextureManager&) = delete;
     std::vector<TextureData> textureDatas;
+
+    DXCommon* dxCommon_;
 public:
-    void Initialize();
+    void Initialize( DXCommon* dxCommon);
     static TextureManager* GetInstance();
     void Finalize();
+    //テクスチャロード
+    void LoadTexture(const std::string& filePath);
 };
 
