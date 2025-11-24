@@ -82,6 +82,6 @@ void TextureManager::LoadTexture(const std::string& filePath){
         &srvDesc,
         textureData.srvHandleCPU
     );
-   Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource = dxCommon_->UploadTextureData(textureData.resource,mipImages);
+    textureData.intermediateResource = dxCommon_->UploadTextureData(textureData.resource,mipImages);
 
 };

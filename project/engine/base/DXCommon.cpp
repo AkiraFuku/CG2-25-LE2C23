@@ -257,7 +257,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateTextureResourse(const Dir
     assert(SUCCEEDED(hr));
     return resource;
 }
-
+[[nodiscard]]
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages)
 {
 

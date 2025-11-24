@@ -20,7 +20,7 @@ private:
         Microsoft::WRL::ComPtr<ID3D12Resource> resource;
         D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
-
+        Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource;
     };
 
     static TextureManager* instance;
@@ -30,7 +30,7 @@ private:
     TextureManager& operator=(TextureManager&) = delete;
     std::vector<TextureData> textureDatas;
 
-    DXCommon* dxCommon_;
+    DXCommon* dxCommon_=nullptr;
 public:
     void Initialize( DXCommon* dxCommon);
     static TextureManager* GetInstance();
