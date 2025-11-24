@@ -25,6 +25,17 @@ void TextureManager::Finalize(){
 }
 void TextureManager::LoadTexture(const std::string& filePath){
 
+    auto it =std::find_if(
+    textureDatas.begin(),
+        textureDatas.end(),
+        [&](TextureData& textureData){return textureData.filePath==filePath; }
+    );
+    if (it!=textureDatas.end()){
+        return;
+    }
+
+
+
      //テクスチャの読み込み
     DirectX::ScratchImage image{};
     std::wstring filePathW = StringUtility::ConvertString(filePath);
@@ -71,6 +82,6 @@ void TextureManager::LoadTexture(const std::string& filePath){
         &srvDesc,
         textureData.srvHandleCPU
     );
-
+   Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource = dxCommon_->UploadTextureData(textureData.resource,mipImages);
 
 };
