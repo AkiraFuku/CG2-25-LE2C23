@@ -28,6 +28,7 @@ private:
     TextureManager& operator=(TextureManager&)=delete;
     std::vector<TextureData> textureDatas;
 public:
+    void Initialize();
     static TextureManager* GetInstance();
     void Finalize();
 };

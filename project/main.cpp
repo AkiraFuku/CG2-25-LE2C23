@@ -29,6 +29,7 @@
 
 #include "engine/2d/Sprite.h"
 #include "engine/2d/SpriteCommon.h"
+#include "engine/2d/TextureManager.h"
 #include "Data.h"
 
 
@@ -240,7 +241,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     DXCommon* dxCommon = nullptr;
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
-
+    TextureManager::GetInstance()->Initialize();
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
     HRESULT hr;
@@ -773,7 +774,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete spritecommon;
     delete dxCommon;
     dxCommon = nullptr;
-
+    TextureManager::GetInstance()->Finalize();
 
     winApp->Finalize();
     delete winApp;

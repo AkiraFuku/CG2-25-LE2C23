@@ -56,6 +56,9 @@ public:
     //テクスチャロード
     DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
+     //最大テクスチャ数
+    static const uint32_t kMaxSRVCount;
+
 private:
     //FPS固定
     void InitializeFixFPS();
@@ -132,7 +135,6 @@ private:
     D3D12_RESOURCE_BARRIER barrier_{};
     //フェンス値
     uint64_t fenceValue_ = 0;
-    //最大テクスチャ数
-    static const uint32_t kMaxSRVCount;
+   
 };
 
