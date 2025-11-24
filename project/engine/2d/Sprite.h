@@ -34,10 +34,15 @@ public:
 
     const Vector2& GetPosition() const{return postion_;} 
     void SetPosition(const Vector2& position){postion_=position;}
+
+    float GetRotation() const{return rotation_;}
+    void SetRotation(const float rotation){rotation_=rotation;}
+    
 private:
     SpriteCommon* spriteCom_ = nullptr;
 
     Vector2 postion_={0.0f,0.0f};
+    float rotation_=0.0f;
 
     //buffer
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;

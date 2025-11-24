@@ -621,11 +621,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
        // 
 
-        Vector2 pos=sprite->GetPosition();
+    /*    Vector2 pos=sprite->GetPosition();
         pos+=Vector2{0.1f,0.1f};
         sprite->SetPosition(pos);
-
-
+*/
+        float rotat=sprite->GetRotation();
+        rotat+=0.1f;
+        sprite->SetRotation(rotat);
        
         sprite->Update();
 
