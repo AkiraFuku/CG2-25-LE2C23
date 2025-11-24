@@ -573,12 +573,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+    std::vector<Sprite*> sprites;
+    for (uint32_t i = 0; i < 5; i++)
+    {
 
-    Sprite* sprite = new Sprite();
-    sprite->Initialize(spritecommon);
-    Vector4 color= sprite->GetColor();
+        Sprite* sprite = new Sprite();
+        sprite->Initialize(spritecommon);
+
+        sprite->SetPosition(Vector2{i*25.0f,0.0f});
+        sprites.push_back(sprite);
+
+
+    }
+  
+   /* Vector4 color= sprite->GetColor();*/
     //Vector2 size={};
-
+    
+           
 
 
 
@@ -644,14 +655,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        ImGui::DragFloat3("traslate", &(transform.traslate.x));
        ImGui::Checkbox("useMonsterBall",&useMonstorBall);
 
-       color=sprite->GetColor();
+      /* color=sprite->GetColor();
        ImGui::ColorEdit4("ColorSprite", &(color).x);
-       sprite->SetColor(color);
+       sprite->SetColor(color);*/
 
-       Vector2 size=sprite->GetSize();
+      /* Vector2 size=sprite->GetSize();
         size.x+=0.1f;
         size.y+=0.1f;
-       sprite->SetSize(size);
+       sprite->SetSize(size);*/
 
        //ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
        ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x); 
@@ -673,7 +684,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
          //materialDataSprite->uvTransform = uvTransformMatrix;
-sprite->Update();
+
+
+
+
+
+           for( Sprite*sprite:sprites)
+           {
+
+               sprite->Update();
+
+           }
 
         ///////
         ///Update
@@ -716,10 +737,14 @@ sprite->Update();
 
         /////スプライトの描画
 
-        spritecommon->SpriteCommonDraw();
-        sprite->Draw();
+        
        
+        for (Sprite* sprite: sprites)
+        {
+            spritecommon->SpriteCommonDraw();
+            sprite->Draw();
 
+        }
 
 
 
@@ -738,7 +763,13 @@ sprite->Update();
     delete audio;
     delete input;
 
-    delete sprite;
+   
+      for (Sprite* sprite: sprites)
+        {
+          
+           delete sprite;
+
+        }
     delete spritecommon;
     delete dxCommon;
     dxCommon = nullptr;
