@@ -35,6 +35,7 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
+#include "particle.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -1451,13 +1452,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                  instancingData[i].World=Makeidetity4x4();
 
              }
-              Transform transforms[kNumInstance];
+              Particle particles[kNumInstance];
               for (uint32_t i = 0; i < kNumInstance; ++i)
               {
-                  transforms[i].scale={1.0f,1.0f,1.0f};
-                  transforms[i].rotate={0.0f,0.0f,0.0f};
-                  transforms[i].traslate={i*0.1f,i*0.1f,i*0.1f};
-                  Matrix4x4 worldMatrix = MakeAfineMatrix(transforms[i].scale,transforms[i].rotate,transforms[i].traslate);
+                  particles[i].transfom.scale={1.0f,1.0f,1.0f};
+                  particles[i].transfom.rotate={0.0f,0.0f,0.0f};
+                  particles[i].transfom.traslate={i*0.1f,i*0.1f,i*0.1f};
+                  Matrix4x4 worldMatrix = MakeAfineMatrix(particles[i].transfom.scale,particles[i].transfom.rotate,particles[i].transfom.traslate);
     
     // 3. GPUバッファに書き込む
     instancingData[i].World = worldMatrix;
@@ -1586,8 +1587,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              materialDataSprite->uvTransform = uvTransformMatrix;
 
              for (uint32_t i = 0; i < kNumInstance; ++i)
-             {//  transforms[i].rotate.y+=0.1f;
-                 Matrix4x4 worldMatrixInstance =MakeAfineMatrix(transforms[i].scale,transforms[i].rotate,transforms[i].traslate);
+             {
+                 Matrix4x4 worldMatrixInstance =MakeAfineMatrix(particles[i].transfom.scale,particles[i].transfom.rotate,particles[i].transfom.traslate);
                  instancingData[i].WVP=Multiply(worldMatrixInstance,Multiply(viewMatrix, projectionMatirx));
                  instancingData[i].World=worldMatrixInstance;
              }
