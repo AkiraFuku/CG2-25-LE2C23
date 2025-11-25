@@ -1451,7 +1451,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
                  instancingData[i].World=Makeidetity4x4();
 
              }
-             
+              Transform transforms[kNumInstance];
+              for (uint32_t i = 0; i < kNumInstance; ++i)
+              {
+                  transforms[i].scale={1.0f,1.0f,1.0f};
+                  transforms[i].rotate={0.0f,0.0f,0.0f};
+                  transforms[i].traslate={i*0.1f,i*0.1f,i*0.1f};
+                  Matrix4x4 worldMatrix = MakeAfineMatrix(transforms[i].scale,transforms[i].rotate,transforms[i].traslate);
+    
+    // 3. GPUバッファに書き込む
+    instancingData[i].World = worldMatrix;
+    instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
+              }
               D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
               instancingSrvDesc.Format=DXGI_FORMAT_UNKNOWN;
               instancingSrvDesc.Shader4ComponentMapping=D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -1464,14 +1475,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
               D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU=GetGPUDescriptorHandle(srvDescriptorHeap,descriptorSizeSRV,3);
               device->CreateShaderResourceView(instancingResource.Get(),&instancingSrvDesc,instancingSrvHandleCPU);
                 
-              Transform transforms[kNumInstance];
-              for (uint32_t i = 0; i < kNumInstance; ++i)
-              {
-                  transforms[i].scale={1.0f,1.0f,1.0f};
-                  transforms[i].rotate={0.0f,0.0f,0.0f};
-                  transforms[i].traslate={i*0.1f,i*0.1f,i*0.1f};
-
-              }
+             
                  
            
           
@@ -1581,11 +1585,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
              uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
              materialDataSprite->uvTransform = uvTransformMatrix;
 
-
              for (uint32_t i = 0; i < kNumInstance; ++i)
-             {
+             {//  transforms[i].rotate.y+=0.1f;
                  Matrix4x4 worldMatrixInstance =MakeAfineMatrix(transforms[i].scale,transforms[i].rotate,transforms[i].traslate);
-                 instancingData[i].WVP=Multiply(worldMatrixInstance,Multiply(viewMatrixSprite, projectionMatrixSprite));
+                 instancingData[i].WVP=Multiply(worldMatrixInstance,Multiply(viewMatrix, projectionMatirx));
                  instancingData[i].World=worldMatrixInstance;
              }
 
@@ -1675,7 +1678,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //マテリアルリソースの設定
             commandList->SetGraphicsRootConstantBufferView(0,materialResource.Get()->GetGPUVirtualAddress());
             //WVP行列リソースの設定
-            commandList->SetGraphicsRootConstantBufferView(1,wvpResource.Get()->GetGPUVirtualAddress());
+            //commandList->SetGraphicsRootConstantBufferView(1,wvpResource.Get()->GetGPUVirtualAddress());
+            commandList->SetGraphicsRootDescriptorTable(1,instancingSrvHandleGPU);
             ///
             commandList->SetGraphicsRootDescriptorTable(2,useMonstorBall?textureSrvHandleGPU2:textureSrvHandleGPU);
             // 追加: 平行光源CBVをバインド
@@ -1683,21 +1687,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int){
             //
             //描画コマンド
             
+
          //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+            commandList->DrawInstanced(UINT(modelData.vertices.size()), kNumInstance, 0, 0);
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
            
            
             ///スプライトの描画
-            commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite.Get()->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-            commandList->IASetIndexBuffer(&indexBufferViewSprite);
-            commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
+          //  commandList->SetGraphicsRootConstantBufferView(0,materialResourceSprite.Get()->GetGPUVirtualAddress());
+            //commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+            //commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+            //commandList->IASetIndexBuffer(&indexBufferViewSprite);
+            //commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourseSprite->GetGPUVirtualAddress());
             //commandList->DrawInstanced(6, 1, 0, 0);
-            commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+            //commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
             
 
             
