@@ -3,6 +3,8 @@
 #include "StringUtility.h"
 TextureManager* TextureManager::instance=nullptr;
 
+uint32_t TextureManager::kSRVIndexTop = 0;
+
 void TextureManager::Initialize( DXCommon* dxCommon){
 
     textureDatas.reserve(DXCommon::kMaxSRVCount);
@@ -65,7 +67,7 @@ void TextureManager::LoadTexture(const std::string& filePath){
     textureData.metadata=mipImages.GetMetadata();//メタデータ
     textureData.resource=dxCommon_->CreateTextureResourse(textureData.metadata);//テクスチャリソース
     //SRVインデックス
-    uint32_t srvIndex=static_cast<uint32_t>(textureDatas.size()-1);
+    uint32_t srvIndex=static_cast<uint32_t>(textureDatas.size()-1)+kSRVIndexTop;
 
     textureData.srvHandleCPU=dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
     textureData.srvHandleGPU=dxCommon_->GetSRVGPUDescriptorHandle(srvIndex);

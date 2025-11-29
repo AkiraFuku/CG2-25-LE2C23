@@ -31,6 +31,8 @@ private:
     std::vector<TextureData> textureDatas;
 
     DXCommon* dxCommon_=nullptr;
+
+    static uint32_t kSRVIndexTop;
 public:
     void Initialize( DXCommon* dxCommon);
     static TextureManager* GetInstance();
