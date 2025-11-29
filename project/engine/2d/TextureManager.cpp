@@ -26,7 +26,7 @@ void TextureManager::Finalize(){
     instance=nullptr;
 }
 void TextureManager::LoadTexture(const std::string& filePath){
-
+    //すでに読み込まれているか確認
     auto it =std::find_if(
     textureDatas.begin(),
         textureDatas.end(),
@@ -35,7 +35,7 @@ void TextureManager::LoadTexture(const std::string& filePath){
     if (it!=textureDatas.end()){
         return;
     }
-
+    assert(textureDatas.size()+kSRVIndexTop < DXCommon::kMaxSRVCount);
 
 
      //テクスチャの読み込み
@@ -95,4 +95,18 @@ void TextureManager::ReleaseIntermediateResources()
             textureData.intermediateResource.Reset();
         }
     }
+}
+
+uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
+{
+    auto it = std::find_if(
+        textureDatas.begin(),
+        textureDatas.end(),
+        [&](TextureData& textureData) { return textureData.filePath == filePath; }
+    );
+    if (it != textureDatas.end()) {
+        return static_cast<uint32_t>(std::distance(textureDatas.begin(), it)) ;
+    }
+    assert(0);
+    return 0;
 }

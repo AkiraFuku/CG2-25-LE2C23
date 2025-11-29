@@ -41,5 +41,7 @@ public:
     void LoadTexture(const std::string& filePath);
     //中間リソース解放
     void ReleaseIntermediateResources();
+    //SRVindex開始番号取得
+    uint32_t GetTextureIndexByFilePath(const std::string& filePath);
 };
 
