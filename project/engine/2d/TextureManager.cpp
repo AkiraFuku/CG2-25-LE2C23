@@ -110,3 +110,9 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
     assert(0);
     return 0;
 }
+
+D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHundleGPU(uint32_t textureindex)
+{
+    assert(textureindex < textureDatas.size());
+    return textureDatas[textureindex].srvHandleGPU;
+}

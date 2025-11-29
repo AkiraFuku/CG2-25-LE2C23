@@ -43,5 +43,7 @@ public:
     void ReleaseIntermediateResources();
     //SRVindex開始番号取得
     uint32_t GetTextureIndexByFilePath(const std::string& filePath);
+    //テクスチャ番号からGPUハンドル
+    D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHundleGPU(uint32_t textureindex);
 };
 
