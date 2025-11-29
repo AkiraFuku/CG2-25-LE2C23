@@ -102,13 +102,20 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
     auto it = std::find_if(
         textureDatas.begin(),
         textureDatas.end(),
-        [&](TextureData& textureData) { return textureData.filePath == filePath; }
+        [&](TextureData& textureData) { return textureData.filePath == filePath; }//テクスチャデータ検索
     );
     if (it != textureDatas.end()) {
-        return static_cast<uint32_t>(std::distance(textureDatas.begin(), it)) ;
+        uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
+        return textureIndex ;
     }
-    assert(0);
-    return 0;
+    /*assert(0);
+    return 0;*/
+
+    //見つからなかった場合、その場で読み込む
+    LoadTexture(filePath);
+
+    
+    return static_cast<uint32_t>(textureDatas.size() - 1);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHundleGPU(uint32_t textureindex)

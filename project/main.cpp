@@ -244,7 +244,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     TextureManager::GetInstance()->Initialize(dxCommon);
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
-    HRESULT hr;
+    /*HRESULT hr;*/
 
 
 
@@ -572,16 +572,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-
+    TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     std::vector<Sprite*> sprites;
     for (uint32_t i = 0; i < 5; i++)
     {
 
         Sprite* sprite = new Sprite();
-        sprite->Initialize(spritecommon);
+        sprite->Initialize(spritecommon,"resources/uvChecker.png");
 
         sprite->SetPosition(Vector2{i*25.0f,0.0f});
+        sprite->SetSize(Vector2{ 20.0f,20.0f });
         sprites.push_back(sprite);
 
 

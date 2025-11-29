@@ -28,7 +28,7 @@ public:
 
     };
 
-    void Initialize(SpriteCommon* spriteCom);
+    void Initialize(SpriteCommon* spriteCom,std::string textureFilePath);
     void Update();
     void Draw();
 
@@ -68,5 +68,6 @@ private:
     //座標変換
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
     TransformationMatrix* transformationMatrixData_ = nullptr;
+    uint32_t textureIndex_ = 0;
 };
 
