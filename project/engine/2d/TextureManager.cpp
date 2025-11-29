@@ -3,7 +3,7 @@
 #include "StringUtility.h"
 TextureManager* TextureManager::instance=nullptr;
 
-uint32_t TextureManager::kSRVIndexTop = 0;
+uint32_t TextureManager::kSRVIndexTop = 1;
 
 void TextureManager::Initialize( DXCommon* dxCommon){
 
