@@ -37,5 +37,7 @@ public:
     void Finalize();
     //テクスチャロード
     void LoadTexture(const std::string& filePath);
+    //中間リソース解放
+    void ReleaseIntermediateResources();
 };
 

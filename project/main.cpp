@@ -754,6 +754,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
 
         dxCommon->PostDraw();
+
+        TextureManager::GetInstance()->ReleaseIntermediateResources();
        
     }
 

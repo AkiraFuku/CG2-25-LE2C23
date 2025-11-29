@@ -84,4 +84,13 @@ void TextureManager::LoadTexture(const std::string& filePath){
     );
     textureData.intermediateResource = dxCommon_->UploadTextureData(textureData.resource,mipImages);
 
-};
+}
+void TextureManager::ReleaseIntermediateResources()
+{
+    for (TextureData& textureData : textureDatas) {
+        if (textureData.intermediateResource) {
+            // ComPtrのResetを呼び出してリソースを解放し、nullptrにする
+            textureData.intermediateResource.Reset();
+        }
+    }
+}
