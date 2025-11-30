@@ -62,6 +62,10 @@ public:
 
     //テクスチャ変更
     void SetTextureByFilePath(const std::string& textureFilePath) ;
+
+private:
+    void AdjustTextureSize();
+
 private:
     SpriteCommon* spriteCom_ = nullptr;
 

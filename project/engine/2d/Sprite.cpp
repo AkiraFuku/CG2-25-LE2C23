@@ -46,6 +46,8 @@ void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
 
     //テクスチャの読み込み
     textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+    
+    AdjustTextureSize();
 }
 void Sprite::Update() {
 
@@ -141,4 +143,14 @@ void Sprite::Draw()
 void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
 {
     textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+}
+
+void Sprite::AdjustTextureSize()
+{
+    //メタデータの取得
+    const DirectX::TexMetadata& metadata= TextureManager::GetInstance()->GetMetaData(textureIndex_);
+
+    textureSize.x = static_cast<float>(metadata.width);
+    textureSize.y = static_cast<float>(metadata.height);
+    size_ = textureSize;
 }

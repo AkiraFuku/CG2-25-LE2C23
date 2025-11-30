@@ -583,11 +583,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         sprite->Initialize(spritecommon,"resources/uvChecker.png");
 
         sprite->SetPosition(Vector2{i*25.0f+100.0f,100.0f});
-        sprite->SetSize(Vector2{ 100.0f,100.0f });
+       // sprite->SetSize(Vector2{ 100.0f,100.0f });
         sprites.push_back(sprite);
 
         sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
-
+        
     }
   
    /* Vector4 color= sprite->GetColor();*/
