@@ -54,6 +54,16 @@ void Sprite::Update() {
     float top = 0.0f - anchorPoint_.y;
     float bottom = 1.0f - anchorPoint_.y;
 
+    if (isFlipX_)
+    {
+        Left*=-1.0f;
+        right*=-1.0f;
+    }
+    if (isFlipY_)
+    {
+        top*=-1.0f;
+        bottom*=-1.0f;
+    }
 
     // 左下
     vertexData_[0].position = { Left, bottom, 0.0f, 1.0f };

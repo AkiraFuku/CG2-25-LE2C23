@@ -49,6 +49,13 @@ public:
 
     const Vector2& GetAnchorPoint()const {return anchorPoint_;}
     void SetAnchorPoint(const Vector2& anchorPoint){anchorPoint_=anchorPoint;}
+
+    bool GetIsFlipX()const {return isFlipX_;}
+    void SetIsFlipX(bool isFlipX){isFlipX_=isFlipX;}
+    bool GetIsFlipY()const {return isFlipY_;}
+    void SetIsFlipY(bool isFlipY){isFlipY_=isFlipY;}
+
+
 private:
     SpriteCommon* spriteCom_ = nullptr;
 
@@ -58,6 +65,9 @@ private:
     Vector2 size_={10.0f,10.0f};
 
     Vector2 anchorPoint_ = { 0.0f,0.0f };
+
+    bool isFlipX_ = false;
+    bool isFlipY_ = false;
 
     //buffer
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;

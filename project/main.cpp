@@ -579,13 +579,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     {
 
         Sprite* sprite = new Sprite();
-        sprite->Initialize(spritecommon,"resources/uvChecker.png");
+        sprite->Initialize(spritecommon,"resources/monsterBall.png");
 
-        sprite->SetPosition(Vector2{i*25.0f,0.0f});
+        sprite->SetPosition(Vector2{i*25.0f+100.0f,100.0f});
         sprite->SetSize(Vector2{ 20.0f,20.0f });
         sprites.push_back(sprite);
 
-       // sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
+        sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
 
     }
   
@@ -593,8 +593,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //Vector2 size={};
     
            
+     bool fripx=false;
+     bool fripY=false;
 
 
+    
 
 
 
@@ -675,7 +678,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        /* ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x,0.01f,-10.0f,10.0f);
         ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
         ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);*/
-        ImGui::End();
+       
        /* Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
         Matrix4x4 viewMatrix = Inverse(cameraMatrix);
         Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
@@ -688,19 +691,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
          //materialDataSprite->uvTransform = uvTransformMatrix;
 
-
-
+      
+               ImGui::Text("Sprite");
+               ImGui::Checkbox("fripX", &(fripx));
+               ImGui::Checkbox("fripy",&(fripY));
 
 
            for( Sprite*sprite:sprites)
            {
-
               
-               sprite->SetRotation(sprite->GetRotation() + 0.1f);
+               
+               sprite->SetIsFlipX(fripx);
+               sprite->SetIsFlipY(fripY);
+              
+               //sprite->SetRotation(sprite->GetRotation() + 0.1f);
                sprite->Update();
 
            }
-
+ ImGui::End();
         ///////
         ///Update
         ///////
