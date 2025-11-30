@@ -53,8 +53,11 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse(const DirectX::TexMetadata& metadata);
     //アップロードテクスチャ
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const  Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages);
-    //テクスチャロード
-    DirectX::ScratchImage LoadTexture(const std::string& filePath);
+   
+   
+
+     //最大テクスチャ数
+    static const uint32_t kMaxSRVCount;
 
 private:
     //FPS固定
@@ -132,5 +135,6 @@ private:
     D3D12_RESOURCE_BARRIER barrier_{};
     //フェンス値
     uint64_t fenceValue_ = 0;
+   
 };
 

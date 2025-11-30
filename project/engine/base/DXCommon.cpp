@@ -13,7 +13,7 @@
 
 
 
-
+const uint32_t DXCommon::kMaxSRVCount=512;
 
 
 void DXCommon::Initialize(WinApp* winApp)
@@ -257,7 +257,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::CreateTextureResourse(const Dir
     assert(SUCCEEDED(hr));
     return resource;
 }
-
+[[nodiscard]]
 Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages)
 {
 
@@ -297,35 +297,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DXCommon::UploadTextureData(const Microso
 
 }
 
-DirectX::ScratchImage DXCommon::LoadTexture(const std::string& filePath)
-{
-    //テクスチャの読み込み
-    DirectX::ScratchImage image{};
-    std::wstring filePathW = StringUtility::ConvertString(filePath);
-    HRESULT hr = DirectX::LoadFromWICFile(
-        filePathW.c_str(),
-        DirectX::WIC_FLAGS_FORCE_SRGB,
-        nullptr,
-        image
 
-    );
-    assert(SUCCEEDED(hr));
-    //ミップマップの生成
-    DirectX::ScratchImage mipImages{};
-    hr = DirectX::GenerateMipMaps(
-        image.GetImages(),
-        image.GetImageCount(),
-        image.GetMetadata(),
-        DirectX::TEX_FILTER_SRGB,
-        0,
-        mipImages
-    );
-    assert(SUCCEEDED(hr));
-
-
-
-    return mipImages;
-}
 
 void DXCommon::InitializeFixFPS()
 {
@@ -539,7 +511,7 @@ void DXCommon::CreateDescriptorHeaps()
     descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
     //SRVヒープの作成
-    srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+    srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
     //RTVヒープの作成
     rtvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
     //DSVヒープの作成
