@@ -2,7 +2,7 @@
 #include "SpriteCommon.h"
 #include "MassFunction.h"
 #include "TextureManager.h"
-void Sprite::Initialize(SpriteCommon* spriteCom,std::string textureFilePath) {
+void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
 
     spriteCom_ = spriteCom;
 
@@ -45,41 +45,49 @@ void Sprite::Initialize(SpriteCommon* spriteCom,std::string textureFilePath) {
     transformationMatrixData_->World = Makeidetity4x4();
 
     //テクスチャの読み込み
-      textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+    textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 }
 void Sprite::Update() {
 
-    float Left= 0.0f-anchorPoint_.x;
+    float Left = 0.0f - anchorPoint_.x;
     float right = 1.0f - anchorPoint_.x;
     float top = 0.0f - anchorPoint_.y;
     float bottom = 1.0f - anchorPoint_.y;
 
     if (isFlipX_)
     {
-        Left*=-1.0f;
-        right*=-1.0f;
+        Left *= -1.0f;
+        right *= -1.0f;
     }
     if (isFlipY_)
     {
-        top*=-1.0f;
-        bottom*=-1.0f;
+        top *= -1.0f;
+        bottom *= -1.0f;
     }
+
+    const DirectX::TexMetadata& metadata =
+        TextureManager::GetInstance()->GetMetaData(textureIndex_);
+
+    float tex_left = textureLeftTop.x / metadata.width;
+    float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
+    float tex_top = textureLeftTop.y / metadata.height;
+    float tex_bottom = (textureLeftTop.y + textureSize.y) / metadata.height;
 
     // 左下
     vertexData_[0].position = { Left, bottom, 0.0f, 1.0f };
-    vertexData_[0].texcoord = { 0.0f, 1.0f };
+    vertexData_[0].texcoord = { tex_left, tex_bottom };
     vertexData_[0].normal = { 0.0f,0.0f, -1.0f };
     // 左上
     vertexData_[1].position = { Left, top, 0.0f, 1.0f };
-    vertexData_[1].texcoord = { 0.0f, 0.0f };
+    vertexData_[1].texcoord = { tex_left, tex_top };
     vertexData_[1].normal = { 0.0f,0.0f, -1.0f };
     // 右下
     vertexData_[2].position = { right, bottom, 0.0f, 1.0f };
-    vertexData_[2].texcoord = { 1.0f, 1.0f };
+    vertexData_[2].texcoord = { tex_right, tex_bottom };
     vertexData_[2].normal = { 0.0f,0.0f, -1.0f };
     // 右上
     vertexData_[3].position = { right, top, 0.0f, 1.0f };
-    vertexData_[3].texcoord = { 1.0f, 0.0f };
+    vertexData_[3].texcoord = { tex_right, tex_top };
     vertexData_[3].normal = { 0.0f,0.0f, -1.0f };
 
     indexData_[0] = 0;
@@ -93,7 +101,7 @@ void Sprite::Update() {
 
     Transform transform{ {size_.x,size_.y,1.0f},{0.0f,0.0f,rotation_},{postion_.x,postion_.y,0.0f} };
 
-     Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
+    Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
     Matrix4x4 viewMatrix = Makeidetity4x4();
     Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight), 0.0f, 100.0f);
     //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
@@ -101,7 +109,7 @@ void Sprite::Update() {
     transformationMatrixData_->WVP = worldViewProjectionMatrix;
     transformationMatrixData_->World = worldMatrix;
 
-  
+
 }
 
 void Sprite::Draw()
@@ -126,6 +134,11 @@ void Sprite::Draw()
     spriteCom_->GetDxCommon()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_->GetGPUVirtualAddress());
-  
+
     spriteCom_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
+
+void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
+{
+    textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 }

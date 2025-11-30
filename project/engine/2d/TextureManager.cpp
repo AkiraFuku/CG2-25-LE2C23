@@ -123,3 +123,12 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHundleGPU(uint32_t textureinde
     assert(textureindex < textureDatas.size());
     return textureDatas[textureindex].srvHandleGPU;
 }
+
+const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureindex)
+{
+    // テクスチャ番号が正常範囲内であることをチェック
+    // textureindex は unsigned なので 0 未満のチェックは不要
+    assert(textureindex < textureDatas.size());
+
+    return textureDatas[textureindex].metadata;
+}

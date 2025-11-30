@@ -579,10 +579,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     {
 
         Sprite* sprite = new Sprite();
-        sprite->Initialize(spritecommon,"resources/monsterBall.png");
+       // sprite->Initialize(spritecommon,"resources/monsterBall.png");
+        sprite->Initialize(spritecommon,"resources/uvChecker.png");
 
         sprite->SetPosition(Vector2{i*25.0f+100.0f,100.0f});
-        sprite->SetSize(Vector2{ 20.0f,20.0f });
+        sprite->SetSize(Vector2{ 100.0f,100.0f });
         sprites.push_back(sprite);
 
         sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });

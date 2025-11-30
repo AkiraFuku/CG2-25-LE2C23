@@ -55,7 +55,13 @@ public:
     bool GetIsFlipY()const {return isFlipY_;}
     void SetIsFlipY(bool isFlipY){isFlipY_=isFlipY;}
 
+    Vector2 GetTextureLeftTop()const {return textureLeftTop;}
+    void SetTextureLeftTop(const Vector2& textureLeftTop){this->textureLeftTop=textureLeftTop;}
+    Vector2 GetTextureSize()const {return textureSize;}
+    void SetTextureSize(const Vector2& textureSize){this->textureSize=textureSize;}
 
+    //テクスチャ変更
+    void SetTextureByFilePath(const std::string& textureFilePath) ;
 private:
     SpriteCommon* spriteCom_ = nullptr;
 
@@ -68,6 +74,12 @@ private:
 
     bool isFlipX_ = false;
     bool isFlipY_ = false;
+
+    //テクスチャ左上
+    Vector2 textureLeftTop={0.0f,0.0f};
+    //テクスチャ切り出しサイズ
+    Vector2 textureSize{100.0f,100.0f};
+
 
     //buffer
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
