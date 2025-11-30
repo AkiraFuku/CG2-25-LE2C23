@@ -47,6 +47,8 @@ public:
     const Vector2& GetSize()const{return size_;}
     void SetSize(const Vector2& Size){this->size_=Size;}
 
+    const Vector2& GetAnchorPoint()const {return anchorPoint_;}
+    void SetAnchorPoint(const Vector2& anchorPoint){anchorPoint_=anchorPoint;}
 private:
     SpriteCommon* spriteCom_ = nullptr;
 
@@ -54,6 +56,8 @@ private:
     float rotation_=0.0f;
 
     Vector2 size_={10.0f,10.0f};
+
+    Vector2 anchorPoint_ = { 0.0f,0.0f };
 
     //buffer
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;

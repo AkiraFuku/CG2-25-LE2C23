@@ -48,20 +48,27 @@ void Sprite::Initialize(SpriteCommon* spriteCom,std::string textureFilePath) {
       textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 }
 void Sprite::Update() {
+
+    float Left= 0.0f-anchorPoint_.x;
+    float right = 1.0f - anchorPoint_.x;
+    float top = 0.0f - anchorPoint_.y;
+    float bottom = 1.0f - anchorPoint_.y;
+
+
     // 左下
-    vertexData_[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
+    vertexData_[0].position = { Left, bottom, 0.0f, 1.0f };
     vertexData_[0].texcoord = { 0.0f, 1.0f };
     vertexData_[0].normal = { 0.0f,0.0f, -1.0f };
     // 左上
-    vertexData_[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+    vertexData_[1].position = { Left, top, 0.0f, 1.0f };
     vertexData_[1].texcoord = { 0.0f, 0.0f };
     vertexData_[1].normal = { 0.0f,0.0f, -1.0f };
     // 右下
-    vertexData_[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexData_[2].position = { right, bottom, 0.0f, 1.0f };
     vertexData_[2].texcoord = { 1.0f, 1.0f };
     vertexData_[2].normal = { 0.0f,0.0f, -1.0f };
     // 右上
-    vertexData_[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
+    vertexData_[3].position = { right, top, 0.0f, 1.0f };
     vertexData_[3].texcoord = { 1.0f, 0.0f };
     vertexData_[3].normal = { 0.0f,0.0f, -1.0f };
 

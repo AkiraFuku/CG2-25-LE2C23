@@ -585,6 +585,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         sprite->SetSize(Vector2{ 20.0f,20.0f });
         sprites.push_back(sprite);
 
+       // sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
 
     }
   
@@ -694,6 +695,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
            for( Sprite*sprite:sprites)
            {
 
+              
+               sprite->SetRotation(sprite->GetRotation() + 0.1f);
                sprite->Update();
 
            }
