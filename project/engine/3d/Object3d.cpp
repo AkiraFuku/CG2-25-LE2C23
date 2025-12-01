@@ -10,7 +10,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
     object3dCom_ = object3dCommon;
 
-    modelData_ = LoadObjFile("resources", "plane.obj");
+    modelData_ = LoadObjFile("resources", "axis.obj");
     if (modelData_.material.textureFilePath.empty()) {
         modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
         TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
@@ -33,7 +33,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
         );
 
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
 }
 void Object3d::Update()
 {
