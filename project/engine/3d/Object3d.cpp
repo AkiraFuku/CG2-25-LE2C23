@@ -4,9 +4,23 @@
 #include <fstream> // 追加: ifstreamの完全な型を利用するため
 #include <sstream> // 追加: istringstreamのため
 
-void Object3d::Initialize( Object3dCommon* object3dCommon)
+void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
-    object3dCommon_ = object3dCommon;
+    object3dCom_ = object3dCommon;
+
+    modelData_ = LoadObjFile("resources", "axis.obj");
+
+    //頂点リソースの作成
+    vertexResourse_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(VertexData) * 4);
+    //頂点バッファビューの設定
+    vertexBufferView_.BufferLocation =
+        vertexResourse_.Get()->GetGPUVirtualAddress();
+    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+    vertexBufferView_.StrideInBytes = sizeof(VertexData);
+    vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
 }
 
 Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename)
@@ -37,7 +51,7 @@ Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& dir
 
 Object3d::ModelData Object3d::LoadObjFile(const std::string& directryPath, const std::string& filename)
 {
-       //1. 変数の宣言
+    //1. 変数の宣言
     ModelData modelData;
     std::vector<Vector4> positions;//頂点座標
     std::vector<Vector3> normals;//法線ベクトル
