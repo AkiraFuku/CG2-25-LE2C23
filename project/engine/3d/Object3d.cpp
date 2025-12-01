@@ -20,7 +20,12 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
     vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
     vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-
+    //マテリアルリソースの作成
+    materialResource_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(Material));
+    materialResource_->
+        Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 }
 
 Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename)

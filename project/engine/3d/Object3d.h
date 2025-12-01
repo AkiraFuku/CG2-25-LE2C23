@@ -32,6 +32,12 @@ public:
         std::vector<VertexData> vertices; // 頂点データの配列
         MaterialData material; // マテリアルデータ
     };
+    struct TransformationMatrix
+    {
+        Matrix4x4 WVP;
+        Matrix4x4 World;
+
+    };
 
     void Initialize(Object3dCommon* object3dCommon);
     //マテリアルの読み込み
@@ -49,6 +55,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
     VertexData* vertexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-
+    //マテリアルリソース
+    Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+    Material* materialData_ = nullptr;
 };
 
