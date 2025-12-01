@@ -45,6 +45,8 @@ public:
     };
 
     void Initialize(Object3dCommon* object3dCommon);
+    void Update();
+    void Draw();
     //マテリアルの読み込み
     static MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename);
     //OBJファイルの読み込み
@@ -67,7 +69,7 @@ private:
     void CreateMaterialResource();
     //WVP行列リソース
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
-    TransformationMatrix* transformationMatrixData_ = nullptr;
+    TransformationMatrix* wvpResource_ = nullptr;
     void CreateWVPResource();
     //平行光源
     Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourse_;

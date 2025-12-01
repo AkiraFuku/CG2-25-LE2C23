@@ -29,7 +29,44 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
         );
 
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
+    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+}
+void Object3d::Update()
+{
+    //  WVP行列の作成
+    Matrix4x4 worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.traslate);
+    Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.traslate);
+    Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+    //透視投影行列の作成
+    Matrix4x4 projectionMatirx = MakePerspectiveFovMatrix(
+        0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f
+    );
+    //ワールド行列とビュー行列とプロジェクション行列を掛け算
+    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
+    //行列をGPUに転送
+    wvpResource_->WVP = worldViewProjectionMatrix;
+    wvpResource_->World = worldMatrix;
+}
+
+void Object3d::Draw()
+{
+    //VBVの設定
+    object3dCom_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    //マテリアルリソースの設定
+    object3dCom_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
+    //WVP行列リソースの設定
+    object3dCom_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
+    //SRVのディスクリプタテーブルの設定
+    object3dCom_->GetDxCommon()->
+        GetCommandList()->
+        SetGraphicsRootDescriptorTable(2,
+            TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
+    object3dCom_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse_.Get()->GetGPUVirtualAddress());
+    //描画コマンド
+
+    object3dCom_->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+
+
 }
 
 Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename)
@@ -138,13 +175,16 @@ void Object3d::CreateVertexBuffer()
     //頂点リソースの作成
     vertexResourse_ =
         object3dCom_->GetDxCommon()->
-        CreateBufferResource(sizeof(VertexData) * 4);
+        CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+    vertexBufferView_.SizeInBytes =UINT(sizeof(VertexData) * modelData_.vertices.size());
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
     vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
+    //頂点データの転送
+    memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 
 }
 
@@ -157,6 +197,12 @@ void Object3d::CreateMaterialResource()
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 
+    materialData_->color = Vector4{ 1.0f,1.0f,1.0f,1.0f };
+    materialData_->enableLighting = false;
+    materialData_->uvTransform = Makeidetity4x4();
+
+
+
 }
 
 void Object3d::CreateWVPResource()
@@ -166,9 +212,9 @@ void Object3d::CreateWVPResource()
         object3dCom_->GetDxCommon()->
         CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResourse_.Get()->
-        Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-    transformationMatrixData_->WVP = Makeidetity4x4();
-    transformationMatrixData_->World = Makeidetity4x4();
+        Map(0, nullptr, reinterpret_cast<void**>(&wvpResource_));
+    wvpResource_->WVP = Makeidetity4x4();
+    wvpResource_->World = Makeidetity4x4();
 
 }
 

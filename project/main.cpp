@@ -382,6 +382,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //    L"vs_6_0"
 
 
+
+
+
     //);
     //assert(vertexShaderBlob.Get() != nullptr);
 
@@ -603,6 +606,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
      bool fripY=false;
 
 
+     Object3d* object3d = nullptr;
+     object3d = new Object3d();
+     object3d->Initialize(object3dCommon);
     
 
 
@@ -697,7 +703,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
          //materialDataSprite->uvTransform = uvTransformMatrix;
 
-      
+       object3d->Update();
                ImGui::Text("Sprite");
                ImGui::Checkbox("fripX", &(fripx));
                ImGui::Checkbox("fripy",&(fripY));
@@ -727,6 +733,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         dxCommon->PreDraw();
       
         object3dCommon->Object3dCommonDraw();
+        object3d->Draw();
         //  // RootSignatureの設定
         //dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
         ////PSOの設定
@@ -759,12 +766,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         
        
-        for (Sprite* sprite: sprites)
+       /* for (Sprite* sprite: sprites)
         {
             spritecommon->SpriteCommonDraw();
             sprite->Draw();
 
-        }
+        }*/
 
 
 
@@ -785,7 +792,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete audio;
     delete input;
     delete object3dCommon;
-   
+    delete object3d;
       for (Sprite* sprite: sprites)
         {
           
