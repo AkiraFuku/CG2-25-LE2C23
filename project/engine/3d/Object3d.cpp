@@ -10,7 +10,11 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
     object3dCom_ = object3dCommon;
 
-    modelData_ = LoadObjFile("resources", "axis.obj");
+    modelData_ = LoadObjFile("resources", "plane.obj");
+    if (modelData_.material.textureFilePath.empty()) {
+        modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
+        TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
+    }
 
     //頂点リソースの作成
     CreateVertexBuffer();
@@ -29,7 +33,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
         );
 
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 }
 void Object3d::Update()
 {
@@ -179,7 +183,7 @@ void Object3d::CreateVertexBuffer()
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes =UINT(sizeof(VertexData) * modelData_.vertices.size());
+    vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
     vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
