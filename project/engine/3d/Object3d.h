@@ -16,26 +16,31 @@ public:
         Vector2 texcoord; // 2D texture coordinate vector
         Vector3 normal;
     };
-    struct Material
-    {
+    struct Material   {
         Vector4 color;
         int32_t enableLighting;
         float padding[3]; // パディングを追加してサイズを揃える
         Matrix4x4 uvTransform; // UV変換行列
 
     };
-    struct MaterialData
-    {
+    struct MaterialData {
         std::string textureFilePath;
+        uint_fast16_t textureIndex=0;
     };
     struct ModelData {
         std::vector<VertexData> vertices; // 頂点データの配列
         MaterialData material; // マテリアルデータ
     };
-    struct TransformationMatrix
-    {
+    struct TransformationMatrix {
         Matrix4x4 WVP;
         Matrix4x4 World;
+
+    };
+    struct DirectionalLight {
+        Vector4 color;//ライトの色
+        Vector3 direction;//ライトの向き
+        float intensity;// 明るさ
+
 
     };
 
@@ -55,11 +60,18 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
     VertexData* vertexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+    void CreateVertexBufferView();
     //マテリアルリソース
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
     Material* materialData_ = nullptr;
+    void CreateMaterialResource();
     //WVP行列リソース
-      Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
     TransformationMatrix* transformationMatrixData_ = nullptr;
+    void CreateWVPResource();
+    //平行光源
+    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourse_;
+    DirectionalLight* directionalLightData_ = nullptr;
+    void CreateDirectionalLightResource();
 };
 

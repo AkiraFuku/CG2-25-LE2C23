@@ -11,30 +11,6 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 
     modelData_ = LoadObjFile("resources", "axis.obj");
 
-    //頂点リソースの作成
-    vertexResourse_ =
-        object3dCom_->GetDxCommon()->
-        CreateBufferResource(sizeof(VertexData) * 4);
-    //頂点バッファビューの設定
-    vertexBufferView_.BufferLocation =
-        vertexResourse_.Get()->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
-    vertexBufferView_.StrideInBytes = sizeof(VertexData);
-    vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-    //マテリアルリソースの作成
-    materialResource_ =
-        object3dCom_->GetDxCommon()->
-        CreateBufferResource(sizeof(Material));
-    materialResource_->
-        Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-    //座標変換
-    transformationMatrixResourse_ =
-        object3dCom_->GetDxCommon()->
-        CreateBufferResource(sizeof(TransformationMatrix));
-    transformationMatrixResourse_.Get()->
-        Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-    transformationMatrixData_->WVP = Makeidetity4x4();
-    transformationMatrixData_->World = Makeidetity4x4();
 
 }
 
@@ -137,4 +113,56 @@ Object3d::ModelData Object3d::LoadObjFile(const std::string& directryPath, const
     }
     //4. モデルデータを返す
     return modelData;
+}
+
+void Object3d::CreateVertexBufferView()
+{
+    //頂点リソースの作成
+    vertexResourse_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(VertexData) * 4);
+    //頂点バッファビューの設定
+    vertexBufferView_.BufferLocation =
+        vertexResourse_.Get()->GetGPUVirtualAddress();
+    vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+    vertexBufferView_.StrideInBytes = sizeof(VertexData);
+    vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
+}
+
+void Object3d::CreateMaterialResource()
+{
+    //マテリアルリソースの作成
+    materialResource_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(Material));
+    materialResource_->
+        Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+
+}
+
+void Object3d::CreateWVPResource()
+{
+    //座標変換
+    transformationMatrixResourse_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(TransformationMatrix));
+    transformationMatrixResourse_.Get()->
+        Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+    transformationMatrixData_->WVP = Makeidetity4x4();
+    transformationMatrixData_->World = Makeidetity4x4();
+
+}
+
+void Object3d::CreateDirectionalLightResource()
+{
+    directionalLightResourse_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(DirectionalLight));
+    directionalLightResourse_.Get()->
+        Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
+    directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
+    directionalLightData_->direction = { 0.0f,-1.0f,0.0f };
+    directionalLightData_->intensity = 1.0f;
+
 }
