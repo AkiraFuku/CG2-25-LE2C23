@@ -3,6 +3,7 @@
 #include <cassert>
 #include <fstream> // 追加: ifstreamの完全な型を利用するため
 #include <sstream> // 追加: istringstreamのため
+#include "MassFunction.h"
 
 void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
@@ -26,6 +27,15 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
         CreateBufferResource(sizeof(Material));
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+    //座標変換
+    transformationMatrixResourse_ =
+        object3dCom_->GetDxCommon()->
+        CreateBufferResource(sizeof(TransformationMatrix));
+    transformationMatrixResourse_.Get()->
+        Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+    transformationMatrixData_->WVP = Makeidetity4x4();
+    transformationMatrixData_->World = Makeidetity4x4();
+
 }
 
 Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename)

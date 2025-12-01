@@ -58,5 +58,8 @@ private:
     //マテリアルリソース
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
     Material* materialData_ = nullptr;
+    //WVP行列リソース
+      Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
+    TransformationMatrix* transformationMatrixData_ = nullptr;
 };
 
