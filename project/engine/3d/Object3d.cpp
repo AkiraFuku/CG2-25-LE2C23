@@ -28,7 +28,8 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
             modelData_.material.textureFilePath
         );
 
-
+    transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
 }
 
 Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename)
