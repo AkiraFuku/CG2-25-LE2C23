@@ -114,10 +114,10 @@
     <ClCompile Include="engine\2d\TextureManager.cpp">
       <Filter>engine\2d</Filter>
     </ClCompile>
-    <ClCompile Include="Object3d.cpp">
+    <ClCompile Include="engine\3d\Object3d.cpp">
       <Filter>engine\3d</Filter>
     </ClCompile>
-    <ClCompile Include="Object3dCommon.cpp">
+    <ClCompile Include="engine\3d\Object3dCommon.cpp">
       <Filter>engine\3d</Filter>
     </ClCompile>
   </ItemGroup>
@@ -199,10 +199,10 @@
     <ClInclude Include="engine\2d\TextureManager.h">
       <Filter>engine\2d</Filter>
     </ClInclude>
-    <ClInclude Include="Object3d.h">
+    <ClInclude Include="engine\3d\Object3d.h">
       <Filter>engine\3d</Filter>
     </ClInclude>
-    <ClInclude Include="Object3dCommon.h">
+    <ClInclude Include="engine\3d\Object3dCommon.h">
       <Filter>engine\3d</Filter>
     </ClInclude>
   </ItemGroup>

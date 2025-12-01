@@ -32,6 +32,9 @@
 #include "engine/2d/TextureManager.h"
 #include "Data.h"
 
+#include"engine/3d/Object3DCommon.h"
+#include"engine/3d/Object3D.h"
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -258,7 +261,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     spritecommon= new SpriteCommon;
     spritecommon->Initialize(dxCommon);
 
-
+    Object3dCommon* object3dCommon = nullptr;
+    object3dCommon = new Object3dCommon;
+    object3dCommon->Initialize(dxCommon);
     
 
 
@@ -721,6 +726,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ImGui::Render();
         dxCommon->PreDraw();
       
+        object3dCommon->Object3dCommonDraw();
         //  // RootSignatureの設定
         //dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
         ////PSOの設定
@@ -778,7 +784,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     delete audio;
     delete input;
-
+    delete object3dCommon;
    
       for (Sprite* sprite: sprites)
         {
