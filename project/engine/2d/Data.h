@@ -30,11 +30,3 @@ struct DirectionalLight{
 
 
 };
-struct MaterialData
-{
-    std::string textureFilePath;
-};
-struct ModelData{
-    std::vector<VertexData> vertices; // 頂点データの配列
-    MaterialData material; // マテリアルデータ
-};
