@@ -4,12 +4,29 @@
 #include <fstream> // 追加: ifstreamの完全な型を利用するため
 #include <sstream> // 追加: istringstreamのため
 #include "MassFunction.h"
+#include "TextureManager.h"
 
 void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
     object3dCom_ = object3dCommon;
 
     modelData_ = LoadObjFile("resources", "axis.obj");
+
+    //頂点リソースの作成
+    CreateVertexBuffer();
+    //マテリアルリソースの作成
+    CreateMaterialResource();
+    //WVP行列リソースの作成
+    CreateWVPResource();
+    //平行光源リソースの作成
+    CreateDirectionalLightResource();
+    //テクスチャの読み込み
+    TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
+    //テクスチャインデックスの取得
+    modelData_.material.textureIndex =
+        TextureManager::GetInstance()->GetTextureIndexByFilePath(
+            modelData_.material.textureFilePath
+        );
 
 
 }
@@ -115,7 +132,7 @@ Object3d::ModelData Object3d::LoadObjFile(const std::string& directryPath, const
     return modelData;
 }
 
-void Object3d::CreateVertexBufferView()
+void Object3d::CreateVertexBuffer()
 {
     //頂点リソースの作成
     vertexResourse_ =

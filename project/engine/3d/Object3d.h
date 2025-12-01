@@ -60,7 +60,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
     VertexData* vertexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-    void CreateVertexBufferView();
+    void CreateVertexBuffer();
     //マテリアルリソース
     Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
     Material* materialData_ = nullptr;
