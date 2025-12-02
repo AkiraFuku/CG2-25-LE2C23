@@ -35,6 +35,9 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
+
+#include<random>
+
 #include "particle.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -1452,19 +1455,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         instancingData[i].World = Makeidetity4x4();
 
     }
+    std::random_device seedGen;
+    std::mt19937 randomEngine(seedGen());
+
     Particle particles[kNumInstance];
+        std::uniform_real_distribution<float> distribution(-1.0f,1.0f);
     for (uint32_t i = 0; i < kNumInstance; ++i)
     {
-        particles[i].transfom.scale = { 1.0f,1.0f,1.0f };
+
+        particles[i].transfom.scale = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
         particles[i].transfom.rotate = { 0.0f,0.0f,0.0f };
-        particles[i].transfom.traslate = { i * 0.1f,i * 0.1f,i * 0.1f };
-        Matrix4x4 worldMatrix = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
+        particles[i].transfom.traslate = { distribution(randomEngine),distribution(randomEngine) ,distribution(randomEngine) };
 
         // 3. GPUバッファに書き込む
         instancingData[i].World = worldMatrix;
         instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
 
-        particles[i].veloxity = { 0.0f,1.0f,0.0f };
+        particles[i].veloxity = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
+        Matrix4x4 worldMatrix = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
 
     }
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
@@ -1490,7 +1498,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-    const float kDeltaTime=1.0f/60.0f;
+
+    const float kDeltaTime = 1.0f / 60.0f;
     BYTE preKey[256] = {};
     keyboard->GetDeviceState(sizeof(preKey), preKey);
 
@@ -1571,6 +1580,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x, 0.01f, -10.0f, 10.0f);
             ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
+
+             ImGui::End();
+             ImGui::Begin("ParticleData");
+            ImGui::Text("particle Veloxity");
+
+            for (uint32_t i = 0; i < kNumInstance; ++i)
+            {
+                std::string label = "Particle " + std::to_string(i);
+                ImGui::DragFloat3(label.c_str(), &(particles[i].veloxity.x), 0.01f, -10.0f, 10.0f);
+            }
+
             ImGui::End();
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -1591,7 +1611,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             for (uint32_t i = 0; i < kNumInstance; ++i)
             {
-                particles[i].transfom.traslate +=kDeltaTime*particles->veloxity;
+                particles[i].transfom.traslate += particles[i].veloxity*kDeltaTime;
                 Matrix4x4 worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
                 instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                 instancingData[i].World = worldMatrixInstance;
