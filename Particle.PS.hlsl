@@ -28,7 +28,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float4 transformedUV = mul(float4(input.texCoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
    
-    output.color = gMaterial.Color * textureColor;
+    output.color = gMaterial.Color * textureColor*input.color;
     if (textureColor.a < 0.1f)
     {
         discard; // 透明度が低いピクセルを破棄

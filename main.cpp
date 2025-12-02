@@ -1445,13 +1445,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     const uint32_t kNumInstance = 10;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource =
-        CreateBufferResource(device, sizeof(TransformationMatrix) * kNumInstance);
-    TransformationMatrix* instancingData = nullptr;
+        CreateBufferResource(device, sizeof(ParticleForGPU) * kNumInstance);
+    ParticleForGPU* instancingData = nullptr;
     instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
     for (uint32_t i = 0; i < kNumInstance; ++i)
     {
         instancingData[i].WVP = Makeidetity4x4();
         instancingData[i].World = Makeidetity4x4();
+        instancingData[i].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
 
     }
     std::random_device seedGen;
@@ -1461,15 +1463,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     
     for (uint32_t i = 0; i < kNumInstance; ++i)
     {
-        particles[i]=MakeNewParticle(randomEngine);
-
-       
+        particles[i]=MakeNewParticle(randomEngine);  
         // 3. GPUバッファに書き込む
         instancingData[i].World = worldMatrix;
         instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
-
         
-
+        instancingData[i].color = particles[i].color;
     }
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -1478,7 +1477,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     instancingSrvDesc.Buffer.FirstElement = 0;
     instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
     instancingSrvDesc.Buffer.NumElements = kNumInstance;
-    instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+    instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
     D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 3);
     D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 3);
     device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
