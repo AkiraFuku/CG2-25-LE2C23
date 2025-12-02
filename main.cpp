@@ -1591,7 +1591,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             for (uint32_t i = 0; i < kNumInstance; ++i)
             {
-                particles[i].transfom.traslate +=Multiply(kDeltaTime,particles->veloxity);
+                particles[i].transfom.traslate +=kDeltaTime*particles->veloxity;
                 Matrix4x4 worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
                 instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                 instancingData[i].World = worldMatrixInstance;

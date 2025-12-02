@@ -7,7 +7,81 @@
 
 	
 
-	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farCrip){
+Vector3 operator+(const Vector3& v1, const Vector3& v2)
+{
+    
+
+    Vector3 result;
+    result.x = v1.x + v2.x;
+    result.y = v1.y + v2.y;
+    result.z = v1.z + v2.z;
+    return result;
+}
+
+Vector3 operator+=(Vector3& v1, const Vector3& v2)
+{
+  
+    v1.x += v2.x;
+    v1.y += v2.y;
+    v1.z += v2.z;
+    return v1;
+}
+
+Vector3 operator-(const Vector3& v1, const Vector3& v2)
+{
+	
+    Vector3 result;
+    result.x = v1.x - v2.x;
+    result.y = v1.y - v2.y;
+    result.z = v1.z - v2.z;
+    return result;
+}
+
+Vector3 operator-=(Vector3& v1, const Vector3& v2)
+{
+
+    v1.x -= v2.x;
+    v1.y -= v2.y;
+    v1.z -= v2.z;
+    return v1;
+}
+
+
+Vector3 operator*(float scalar, const Vector3& v)
+{
+  
+    Vector3 result;
+    result.x = v.x*scalar;
+    result.y = v.y *scalar;
+    result.z = v.z *scalar;
+    return result;
+}
+
+Vector3 operator*(const Vector3& v, float scalar)
+{
+   return scalar*v;
+    
+}
+
+Vector3 operator/(const Vector3& v, float scalar)
+{
+    
+    Vector3 result;
+    result.x = v.x/scalar;
+    result.y = v.y /scalar;
+    result.z = v.z /scalar;
+    return result;
+}
+
+Vector3 operator/=(Vector3& v, float scalar)
+{
+    v.x /= scalar;
+    v.y /= scalar;
+    v.z /= scalar;
+    return v;
+}
+
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farCrip){
 		float cot = 1.0f / std::tan(fovY / 2.0f);
 		return Matrix4x4(
 			{
