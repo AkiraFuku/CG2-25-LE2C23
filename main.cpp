@@ -36,7 +36,6 @@
 #pragma comment(lib,"dxguid.lib")
 
 
-#include<random>
 
 #include "particle.h"
 
@@ -1459,20 +1458,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     std::mt19937 randomEngine(seedGen());
 
     Particle particles[kNumInstance];
-        std::uniform_real_distribution<float> distribution(-1.0f,1.0f);
+    
     for (uint32_t i = 0; i < kNumInstance; ++i)
     {
+        particles[i]=MakeNewParticle(randomEngine);
 
-        particles[i].transfom.scale = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
-        particles[i].transfom.rotate = { 0.0f,0.0f,0.0f };
-        particles[i].transfom.traslate = { distribution(randomEngine),distribution(randomEngine) ,distribution(randomEngine) };
-
+       
         // 3. GPUバッファに書き込む
         instancingData[i].World = worldMatrix;
         instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
 
-        particles[i].veloxity = { distribution(randomEngine),distribution(randomEngine),distribution(randomEngine) };
-        Matrix4x4 worldMatrix = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
+        
 
     }
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
@@ -1588,7 +1584,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             for (uint32_t i = 0; i < kNumInstance; ++i)
             {
                 std::string label = "Particle " + std::to_string(i);
-                ImGui::DragFloat3(label.c_str(), &(particles[i].veloxity.x), 0.01f, -10.0f, 10.0f);
+                ImGui::DragFloat3(label.c_str(), &(particles[i].velocity.x), 0.01f, -10.0f, 10.0f);
             }
 
             ImGui::End();
@@ -1611,7 +1607,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             for (uint32_t i = 0; i < kNumInstance; ++i)
             {
-                particles[i].transfom.traslate += particles[i].veloxity*kDeltaTime;
+                particles[i].transfom.traslate += particles[i].velocity*kDeltaTime;
                 Matrix4x4 worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
                 instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                 instancingData[i].World = worldMatrixInstance;
