@@ -7,6 +7,8 @@ struct Particle
     Transform transfom;
     Vector3 velocity;
     Vector4 color;
+    float lifeTime;
+    float currentTime;
 
 };
 

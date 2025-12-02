@@ -1442,13 +1442,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     audio->PlayAudio(soundData1);
 
 
-    const uint32_t kNumInstance = 10;
+    const uint32_t kMaxNumInstance = 10;
+
 
     Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource =
-        CreateBufferResource(device, sizeof(ParticleForGPU) * kNumInstance);
+        CreateBufferResource(device, sizeof(ParticleForGPU) * kMaxNumInstance);
     ParticleForGPU* instancingData = nullptr;
     instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-    for (uint32_t i = 0; i < kNumInstance; ++i)
+    for (uint32_t i = 0; i < kMaxNumInstance; ++i)
     {
         instancingData[i].WVP = Makeidetity4x4();
         instancingData[i].World = Makeidetity4x4();
@@ -1459,15 +1460,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     std::random_device seedGen;
     std::mt19937 randomEngine(seedGen());
 
-    Particle particles[kNumInstance];
-    
-    for (uint32_t i = 0; i < kNumInstance; ++i)
+    Particle particles[kMaxNumInstance];
+
+    for (uint32_t i = 0; i < kMaxNumInstance; ++i)
     {
-        particles[i]=MakeNewParticle(randomEngine);  
+        particles[i] = MakeNewParticle(randomEngine);
         // 3. GPUバッファに書き込む
         instancingData[i].World = worldMatrix;
         instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
-        
+
         instancingData[i].color = particles[i].color;
     }
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
@@ -1476,7 +1477,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     instancingSrvDesc.Buffer.FirstElement = 0;
     instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    instancingSrvDesc.Buffer.NumElements = kNumInstance;
+    instancingSrvDesc.Buffer.NumElements = kMaxNumInstance;
     instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
     D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 3);
     D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 3);
@@ -1576,11 +1577,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
 
-             ImGui::End();
-             ImGui::Begin("ParticleData");
+            ImGui::End();
+            ImGui::Begin("ParticleData");
             ImGui::Text("particle Veloxity");
 
-            for (uint32_t i = 0; i < kNumInstance; ++i)
+            for (uint32_t i = 0; i < kMaxNumInstance; ++i)
             {
                 std::string label = "Particle " + std::to_string(i);
                 ImGui::DragFloat3(label.c_str(), &(particles[i].velocity.x), 0.01f, -10.0f, 10.0f);
@@ -1604,12 +1605,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
             materialDataSprite->uvTransform = uvTransformMatrix;
 
-            for (uint32_t i = 0; i < kNumInstance; ++i)
+            uint32_t numInstance = 0;
+            for (uint32_t i = 0; i < kMaxNumInstance; ++i)
             {
-                particles[i].transfom.traslate += particles[i].velocity*kDeltaTime;
+                if (particles[i].lifeTime <= particles[i].currentTime)
+                {
+                    continue;
+                }
+
+                particles[i].transfom.traslate += particles[i].velocity * kDeltaTime;
+                particles[i].currentTime += kDeltaTime;
                 Matrix4x4 worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
                 instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                 instancingData[i].World = worldMatrixInstance;
+                ++numInstance;
             }
 
             //// ImGui::End(); の直前や、描画前の適切な場所で
@@ -1709,7 +1718,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
          //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-            commandList->DrawInstanced(UINT(modelData.vertices.size()), kNumInstance, 0, 0);
+            commandList->DrawInstanced(UINT(modelData.vertices.size()), numInstance, 0, 0);
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
