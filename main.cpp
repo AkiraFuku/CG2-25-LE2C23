@@ -1137,7 +1137,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
     depthStencilDesc.DepthEnable = true;//深度テストを有効にする
     //書き込み
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
     //比較関数
     depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
@@ -1308,7 +1308,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     );
 
     //
-    DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+    DirectX::ScratchImage mipImages = LoadTexture("resources/circle.png");
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
     Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = CreateTextureResourse(device, metadata);
     //ID3D12Resource* textureResource = CreateTextureResourse(device, metadata);
@@ -1553,7 +1553,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::ColorEdit4("Color", &(materialData->color).x);
 
             // ImGuiウィンドウ内（ImGui::Begin("MaterialData"); ～ ImGui::End(); の間）に追加
-            static int blendModeIndex = 0;
+            static int blendModeIndex = 1;
             const char* blendModeItems[] = {
              "Alpha", "Add", "Sub", "None", "Mul", "Screen"
             };
