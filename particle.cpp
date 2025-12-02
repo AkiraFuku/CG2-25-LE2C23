@@ -11,6 +11,7 @@ Particle MakeNewParticle(std::mt19937& ramdamEngine)
         particle.transfom.traslate = { distribution(ramdamEngine),distribution(ramdamEngine) ,distribution(ramdamEngine) };
         particle.velocity = { distribution(ramdamEngine),distribution(ramdamEngine),distribution(ramdamEngine) };
 
+        particle.color = { distribution(ramdamEngine),distribution(ramdamEngine),distribution(ramdamEngine),1.0f };
         return particle;
 
 }
