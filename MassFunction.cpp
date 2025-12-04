@@ -123,7 +123,16 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip
 		);
 	}
 
-	Matrix4x4 MakeAfineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& traslate)
+    Matrix4x4 MakeBillboardMatrix(const Vector3& scale, Matrix4x4& billboardMatrix, const Vector3& traslate)
+    {
+        Matrix4x4 scaleMatrix=MakeScaleMatrix(scale);
+		Matrix4x4 traslateMatrix=MakeTranslateMatrix(traslate);
+
+	    Matrix4x4 result=Multiply(Multiply(scaleMatrix,billboardMatrix),traslateMatrix);
+		return result ;
+    }
+
+    Matrix4x4 MakeAfineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& traslate)
 	{
 		Matrix4x4 scaleMatrix=MakeScaleMatrix(scale);
 		Matrix4x4 rotateMatrix=Multiply(MakeRotateXMatrix( rotate.x),Multiply(MakeRotateYMatrix( rotate.y),MakeRotateZMatrix( rotate.z)));

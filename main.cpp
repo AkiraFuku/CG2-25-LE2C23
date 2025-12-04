@@ -1085,17 +1085,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     BlendMode blendMode = BlendMode::kBrendMode_Alpha;
 
     changeBlendMode(blendDesc, blendMode);
-    // blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
-     //blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
-     //blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
-    // blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-    // blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//デストの係数
-    // blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
-    // blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
-    // blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
-     //RasteriwrStateの設定
+    //RasteriwrStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
     rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;//カリングなし
+
     //BACK;
 
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
@@ -1232,9 +1225,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     wvpData->World = Makeidetity4x4();
 
 
+
     //コマンドリストの初期化
     Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+     Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,std::numbers::pi_v<float>,0.0f},{0.0f,0.0f,10.0f} };
+   /* Transform cameraTransform{
+        {1.0f,1.0f,1.0f},
+        {std::numbers::pi_v<float>/3.0f,std::numbers::pi_v<float>,0.0f},
+        {0.0f,23.0f,10.0f}
+    };*/
 
     Microsoft::WRL::ComPtr<ID3D12Resource> transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
     //マテリアルデータの設定
@@ -1484,12 +1483,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     device->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
 
 
+    Matrix4x4 backFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
 
 
 
 
 
-
+    bool isBillboard = true;
 
 
 
@@ -1567,7 +1567,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::Checkbox("useMonsterBall", &useMonstorBall);
             ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x);
             //ImGui::ColorPicker4("ColorPicker", &(materialDataSprite->color).x);
-
+            ImGui::Checkbox("billboard", &isBillboard);
             ImGui::DragFloat3("traslateSprite", &(transformSprite.traslate.x));
             ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x);
             ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
@@ -1605,6 +1605,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));
             materialDataSprite->uvTransform = uvTransformMatrix;
 
+
+            Matrix4x4 billboardMatrix = Multiply(backFrontMatrix, cameraMatrix);
+            billboardMatrix.m[3][0] = 0.0f;
+            billboardMatrix.m[3][1] = 0.0f;
+            billboardMatrix.m[3][2] = 0.0f;
+
             uint32_t numInstance = 0;
             for (uint32_t i = 0; i < kMaxNumInstance; ++i)
             {
@@ -1617,8 +1623,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 particles[i].transfom.traslate += particles[i].velocity * kDeltaTime;
                 particles[i].currentTime += kDeltaTime;
 
-                instancingData[i].color.z=  alpha;
-                Matrix4x4 worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
+                instancingData[i].color.z = alpha;
+                Matrix4x4 worldMatrixInstance = {};
+                if (isBillboard)
+                {
+                    worldMatrixInstance = MakeBillboardMatrix(particles[i].transfom.scale, billboardMatrix, particles[i].transfom.traslate);
+
+                } else
+                {
+                    worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
+
+                }
                 instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                 instancingData[i].World = worldMatrixInstance;
                 ++numInstance;
