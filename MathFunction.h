@@ -29,8 +29,7 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height,fl
 
 
 //
-Matrix4x4 MakeBillboardMatrix(const Vector3& scale,Matrix4x4& billboardMatrix,  const Vector3& traslate);
-Matrix4x4 MakeAfineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& rotate, Matrix4x4& billboardMatrix, const Vector3& translate);Matrix4x4 MakeAfineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
 Matrix4x4 MakeTranslateMatrix(const Vector3& traslate);
 Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 /// <summary>

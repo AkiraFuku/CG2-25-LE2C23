@@ -1,4 +1,5 @@
-#include "MassFunction.h"
+#include "MathFunction.h"
+#include <numbers>
 //
 // 
 // 
@@ -123,15 +124,26 @@ Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip
 		);
 	}
 
-    Matrix4x4 MakeBillboardMatrix(const Vector3& scale, Matrix4x4& billboardMatrix, const Vector3& traslate)
-    {
-        Matrix4x4 scaleMatrix=MakeScaleMatrix(scale);
-		Matrix4x4 traslateMatrix=MakeTranslateMatrix(traslate);
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& rotate, Matrix4x4& billboardMatrix, const Vector3& translate)
+{
+    // 1. 各成分の行列を作成
+    Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+    Matrix4x4 rotateMatrix = MakeRotateZMatrix(rotate.z); // Z軸回転のみ使用
+    Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
 
-	    Matrix4x4 result=Multiply(Multiply(scaleMatrix,billboardMatrix),traslateMatrix);
-		return result ;
-    }
+    // 2. 行列を順番に合成 (Scale * RotateZ * Billboard * Translate)
+    
+    // Scale * RotateZ
+    Matrix4x4 matScaleRot = Multiply(scaleMatrix, rotateMatrix);
+    
+    // (Scale * RotateZ) * Billboard
+    Matrix4x4 matSRB = Multiply(matScaleRot, billboardMatrix);
+    
+    // 全体 * Translate
+    Matrix4x4 result = Multiply(matSRB, translateMatrix);
 
+    return result;
+}
     Matrix4x4 MakeAfineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& traslate)
 	{
 		Matrix4x4 scaleMatrix=MakeScaleMatrix(scale);

@@ -18,7 +18,7 @@
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 #include"Vector4.h"
-#include"MassFunction.h"
+#include"MathFunction.h"
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
@@ -1228,12 +1228,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     //コマンドリストの初期化
     Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-     Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,std::numbers::pi_v<float>,0.0f},{0.0f,0.0f,10.0f} };
-   /* Transform cameraTransform{
+    //Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,std::numbers::pi_v<float>,0.0f},{0.0f,0.0f,10.0f} };
+    Transform cameraTransform{
         {1.0f,1.0f,1.0f},
-        {std::numbers::pi_v<float>/3.0f,std::numbers::pi_v<float>,0.0f},
+        {std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float>,0.0f},
         {0.0f,23.0f,10.0f}
-    };*/
+    };
 
     Microsoft::WRL::ComPtr<ID3D12Resource> transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
     //マテリアルデータの設定
@@ -1579,12 +1579,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             ImGui::End();
             ImGui::Begin("ParticleData");
-            ImGui::Text("particle Veloxity");
+            ImGui::Text("particle ");
 
             for (uint32_t i = 0; i < kMaxNumInstance; ++i)
             {
                 std::string label = "Particle " + std::to_string(i);
-                ImGui::DragFloat3(label.c_str(), &(particles[i].velocity.x), 0.01f, -10.0f, 10.0f);
+                ImGui::SliderFloat3(label.c_str(), &(particles[i].transfom.rotate.z), -10.0f, 10.0f);
             }
 
             ImGui::End();
@@ -1614,6 +1614,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             uint32_t numInstance = 0;
             for (uint32_t i = 0; i < kMaxNumInstance; ++i)
             {
+
+
+
                 if (particles[i].lifeTime <= particles[i].currentTime)
                 {
                     continue;
@@ -1627,7 +1630,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 Matrix4x4 worldMatrixInstance = {};
                 if (isBillboard)
                 {
-                    worldMatrixInstance = MakeBillboardMatrix(particles[i].transfom.scale, billboardMatrix, particles[i].transfom.traslate);
+                    particles[i].transfom.rotate.z+=1.0f/60.0f;
+
+
+                    worldMatrixInstance = MakeBillboardMatrix(particles[i].transfom.scale,particles[i].transfom.rotate , billboardMatrix, particles[i].transfom.traslate);
 
                 } else
                 {
