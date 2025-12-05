@@ -28,6 +28,13 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height,float minDepth,float maxDepth);
 
 
+/// <summary>
+/// Y軸固定ビルボード行列の作成（各軸ビルボード）
+/// </summary>
+/// <param name="target">オブジェクト座標</param>
+/// <param name="eye">カメラ座標</param>
+/// <param name="up">上方向ベクトル(通常は0,1,0)</param>
+Matrix4x4 MakeYAxisBillboardMatrix(const Vector3& target, const Vector3& eye, const Vector3& up);
 //
 Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& rotate, Matrix4x4& billboardMatrix, const Vector3& translate);Matrix4x4 MakeAfineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
 Matrix4x4 MakeTranslateMatrix(const Vector3& traslate);
@@ -132,4 +139,4 @@ Matrix4x4 MakeRotateZMatrix( float radian);
 	/// <param name="v">ベクトル</param>
 	/// <returns>正規化数</returns>
 	Vector3 Normalize(const Vector3& v);
-  
+  Vector3 Cross(const Vector3& v1, const Vector3& v2);
