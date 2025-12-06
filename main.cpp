@@ -1463,7 +1463,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     for (uint32_t i = 0; i < kMaxNumInstance; ++i)
     {
-        particles.push_back(MakeNewParticle(randomEngine));
+        //particles.push_back(MakeNewParticle(randomEngine));
         // 3. GPUバッファに書き込む
         instancingData[i].World = worldMatrix;
         instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
@@ -1577,6 +1577,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
 
+
+            if (ImGui::Button("Add Particle"))
+            {
+                particles.push_back(MakeNewParticle(randomEngine));
+                particles.push_back(MakeNewParticle(randomEngine));
+                particles.push_back(MakeNewParticle(randomEngine));
+            }
+
             ImGui::End();
 
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
@@ -1622,6 +1630,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
                 if (numInstance < kMaxNumInstance)
                 {
+                    instancingData[numInstance].color = particles.back().color;
                     instancingData[numInstance].color.z = alpha;
                     Matrix4x4 worldMatrixInstance = {};
                     if (isBillboard)
@@ -1642,6 +1651,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     ++numInstance;
                 }
                 ++particleIterator;
+
             }
 
             //// ImGui::End(); の直前や、描画前の適切な場所で
