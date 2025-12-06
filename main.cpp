@@ -1459,16 +1459,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     std::random_device seedGen;
     std::mt19937 randomEngine(seedGen());
 
-    Particle particles[kMaxNumInstance];
+    std::list<Particle> particles;
 
     for (uint32_t i = 0; i < kMaxNumInstance; ++i)
     {
-        particles[i] = MakeNewParticle(randomEngine);
+        particles.push_back(MakeNewParticle(randomEngine));
         // 3. GPUバッファに書き込む
         instancingData[i].World = worldMatrix;
         instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
 
-        instancingData[i].color = particles[i].color;
+        instancingData[i].color = particles.back().color;
     }
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -1578,16 +1578,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
 
             ImGui::End();
-            ImGui::Begin("ParticleData");
-            ImGui::Text("particle ");
 
-            for (uint32_t i = 0; i < kMaxNumInstance; ++i)
-            {
-                std::string label = "Particle " + std::to_string(i);
-                ImGui::SliderFloat3(label.c_str(), &(particles[i].transfom.rotate.z), -10.0f, 10.0f);
-            }
-
-            ImGui::End();
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
@@ -1612,37 +1603,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             billboardMatrix.m[3][2] = 0.0f;
 
             uint32_t numInstance = 0;
-            for (uint32_t i = 0; i < kMaxNumInstance; ++i)
+            for (std::list<Particle>::iterator particleIterator = particles.begin();
+                particleIterator != particles.end();
+                )
             {
 
 
 
-                if (particles[i].lifeTime <= particles[i].currentTime)
+                if ((*particleIterator).lifeTime <= (*particleIterator).currentTime)
                 {
+                    particleIterator = particles.erase(particleIterator);
                     continue;
                 }
 
-                float alpha = 1.0f - (particles[i].currentTime / particles[i].lifeTime);
-                particles[i].transfom.traslate += particles[i].velocity * kDeltaTime;
-                particles[i].currentTime += kDeltaTime;
+                float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+                (*particleIterator).transfom.traslate += (*particleIterator).velocity * kDeltaTime;
+                (*particleIterator).currentTime += kDeltaTime;
 
-                instancingData[i].color.z = alpha;
-                Matrix4x4 worldMatrixInstance = {};
-                if (isBillboard)
+                if (numInstance < kMaxNumInstance)
                 {
-                    particles[i].transfom.rotate.z+=1.0f/60.0f;
+                    instancingData[numInstance].color.z = alpha;
+                    Matrix4x4 worldMatrixInstance = {};
+                    if (isBillboard)
+                    {
+                        (*particleIterator).transfom.rotate.z += 1.0f / 60.0f;
 
 
-                    worldMatrixInstance = MakeBillboardMatrix(particles[i].transfom.scale,particles[i].transfom.rotate , billboardMatrix, particles[i].transfom.traslate);
+                        worldMatrixInstance = MakeBillboardMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, billboardMatrix, (*particleIterator).transfom.traslate);
 
-                } else
-                {
-                    worldMatrixInstance = MakeAfineMatrix(particles[i].transfom.scale, particles[i].transfom.rotate, particles[i].transfom.traslate);
+                    } else
+                    {
+                        worldMatrixInstance = MakeAfineMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, (*particleIterator).transfom.traslate);
 
+                    }
+                    instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
+                    //instancingData[numInstance].World = worldMatrixInstance;
+
+                    ++numInstance;
                 }
-                instancingData[i].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
-                instancingData[i].World = worldMatrixInstance;
-                ++numInstance;
+                ++particleIterator;
             }
 
             //// ImGui::End(); の直前や、描画前の適切な場所で
