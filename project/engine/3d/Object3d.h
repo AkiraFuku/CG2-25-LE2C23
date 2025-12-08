@@ -3,7 +3,6 @@
 #include <Vector2.h>
 #include <wrl.h>
 #include <d3d12.h>
-#include "Vector4.h"
 #include <string>
 #include <vector>
 class Object3dCommon;

@@ -39,6 +39,8 @@
     <ClCompile Include="engine\2d\Sprite.cpp" />
     <ClCompile Include="engine\3d\Object3d.cpp" />
     <ClCompile Include="engine\3d\Object3dCommon.cpp" />
+    <ClCompile Include="engine\3d\Model.cpp" />
+    <ClCompile Include="engine\3d\ModelCommon.cpp" />
     <ClCompile Include="StringUtility.cpp" />
     <ClCompile Include="engine\2d\TextureManager.cpp" />
   </ItemGroup>
@@ -61,7 +63,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\2d\Data.h" />
     <ClInclude Include="engine\2d\Vector2.h" />
     <ClInclude Include="engine\3d\Vector3.h" />
     <ClInclude Include="engine\base\D3DResourceLeakChecker.h" />
@@ -84,6 +85,8 @@
     <ClInclude Include="engine\2d\Sprite.h" />
     <ClInclude Include="engine\3d\Object3d.h" />
     <ClInclude Include="engine\3d\Object3dCommon.h" />
+    <ClInclude Include="engine\3d\Model.h" />
+    <ClInclude Include="engine\3d\ModelCommon.h" />
     <ClInclude Include="StringUtility.h" />
     <ClInclude Include="engine\2d\TextureManager.h" />
   </ItemGroup>
