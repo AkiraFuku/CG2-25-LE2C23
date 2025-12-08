@@ -15,18 +15,18 @@ void Model::Initialize(ModelCommon* modelCom)
         modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
         TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
 
-        //頂点リソースの作成
-        CreateVertexBuffer();
-        //マテリアルリソースの作成
-        CreateMaterialResource();
-        //テクスチャの読み込み
-        TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
-        //テクスチャインデックスの取得
-        modelData_.material.textureIndex =
-            TextureManager::GetInstance()->GetTextureIndexByFilePath(
-                modelData_.material.textureFilePath
-            );
-    }
+
+
+    }  //頂点リソースの作成
+    CreateVertexBuffer();
+    //マテリアルリソースの作成
+    CreateMaterialResource();
+    //テクスチャの読み込み
+    TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
+    //テクスチャインデックスの取得
+    modelData_.material.textureIndex =
+        TextureManager::GetInstance()->GetTextureIndexByFilePath(
+            modelData_.material.textureFilePath);
 }
 void Model::Draw() {
     //VBVの設定

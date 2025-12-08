@@ -34,6 +34,8 @@
 
 #include"engine/3d/Object3DCommon.h"
 #include"engine/3d/Object3D.h"
+#include "ModelCommon.h"
+#include "Model.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -150,6 +152,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3dCommon = new Object3dCommon;
     object3dCommon->Initialize(dxCommon);
 
+    ModelCommon* modelcom=nullptr;
+    modelcom=new ModelCommon;
+    modelcom->Initialize(dxCommon);
+
+
+    
 
     Audio* audio = new Audio();
     audio->Initialize();
@@ -190,7 +198,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
      Object3d* object3d = nullptr;
      object3d = new Object3d();
      object3d->Initialize(object3dCommon);
+
+     Model* model =nullptr;
+     model= new Model();
+
+     model->Initialize(modelcom);
     
+     object3d->SetModel(model);
 
 
 
@@ -348,6 +362,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete input;
     delete object3dCommon;
     delete object3d;
+    delete modelcom;
+    delete model;
       for (Sprite* sprite: sprites)
         {
           
