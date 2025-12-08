@@ -23,5 +23,5 @@ struct Vector3{
 struct Transform{
     Vector3 scale;
     Vector3 rotate;
-    Vector3 traslate;
+    Vector3 translate;
 };

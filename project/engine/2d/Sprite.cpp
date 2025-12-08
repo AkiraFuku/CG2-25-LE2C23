@@ -103,7 +103,7 @@ void Sprite::Update() {
 
     Transform transform{ {size_.x,size_.y,1.0f},{0.0f,0.0f,rotation_},{postion_.x,postion_.y,0.0f} };
 
-    Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
+    Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.translate);
     Matrix4x4 viewMatrix = Makeidetity4x4();
     Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(WinApp::kClientWidth), static_cast<float>(WinApp::kClientHeight), 0.0f, 100.0f);
     //スプライトのワールド行列とビュー行列とプロジェクション行列を掛け算
