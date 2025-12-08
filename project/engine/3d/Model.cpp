@@ -3,9 +3,9 @@
 #include "ModelCommon.h"
 #include "MassFunction.h"
 #include <cassert>
-#include <fstream> // 追加: ifstreamの完全な型を利用するため
-#include <sstream> // 追加: istringstreamのため
-
+#include <fstream> 
+#include <sstream>
+#include <Windows.h>
 void Model::Initialize(ModelCommon* modelCom,const std::string& directryPath, const std::string& filename)
 {
     ModelCom_ = modelCom;
@@ -112,6 +112,7 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
     std::string line;
     //2. ファイルを開く
     std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+    
     assert(file.is_open());//ファイルが開けたか確認
 
     //3. ファイルからデータを読み込みモデルデータを作成

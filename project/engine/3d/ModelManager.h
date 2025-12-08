@@ -12,7 +12,8 @@ public:
     void Finalize();
     //Modelロード
     void LoadModel(const std::string& filePath);
-
+    //Model検索
+    Model* findModel(const std::string& filePath);
 private:
     static ModelManager* instance;
     ModelCommon* modelCommon_=nullptr;
