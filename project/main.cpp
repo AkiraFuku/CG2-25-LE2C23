@@ -195,6 +195,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
      bool fripY=false;
 
 
+     Object3d* object3d2 = nullptr;
+     object3d2 = new Object3d();
+     object3d2->Initialize(object3dCommon);
      Object3d* object3d = nullptr;
      object3d = new Object3d();
      object3d->Initialize(object3dCommon);
@@ -204,7 +207,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
      model->Initialize(modelcom);
     
+     object3d2->SetModel(model);
+     object3d2->SetTranslate(Vector3{0.0f,10.0f,0.0f });
      object3d->SetModel(model);
+
 
 
 
@@ -328,6 +334,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         dxCommon->PreDraw();
         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
+        object3d2->Draw();
         object3d->Draw();
        
 
@@ -361,6 +368,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete audio;
     delete input;
     delete object3dCommon;
+    delete object3d2;
     delete object3d;
     delete modelcom;
     delete model;
