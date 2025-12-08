@@ -10,6 +10,9 @@ public:
     void Initialize(DXCommon* dxCommon);
     static ModelManager* GetInstance();
     void Finalize();
+    //Modelロード
+    void LoadModel(const std::string& filePath);
+
 private:
     static ModelManager* instance;
     ModelCommon* modelCommon_=nullptr;
