@@ -39,7 +39,7 @@ public:
     static ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
 
-    void Setmodel
+  
 
 private:
     ModelCommon* ModelCom_ = nullptr;

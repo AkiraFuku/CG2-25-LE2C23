@@ -28,9 +28,7 @@ public:
     void Initialize(Object3dCommon* object3dCommon);
     void Update();
     void Draw();
-    void SetModel(Model* model) {
-        model_ = model;
-    }
+    void SetModel(const std::string& filePath); 
 
     //トランスフォームセッター
     void SetScale(const Vector3& scale) {
