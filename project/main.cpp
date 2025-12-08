@@ -21,9 +21,9 @@
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
 
-#include"engine/audio/Audio.h"
-#include "engine/input/Input.h"
-#include"engine/base/D3DResourceLeakChecker.h"
+#include"Audio.h"
+#include "Input.h"
+#include"D3DResourceLeakChecker.h"
 #include"StringUtility.h"
 #include"Logger.h"
 
@@ -32,10 +32,12 @@
 #include "engine/2d/TextureManager.h"
 
 
-#include"engine/3d/Object3DCommon.h"
-#include"engine/3d/Object3D.h"
+#include"Object3DCommon.h"
+#include"Object3D.h"
 #include "ModelCommon.h"
 #include "Model.h"
+#include "ModelManager.h"
+
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -132,6 +134,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
     TextureManager::GetInstance()->Initialize(dxCommon);
+    ModelManager::GetInstance()->Initialize(dxCommon);
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
     /*HRESULT hr;*/
@@ -205,7 +208,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
      Model* model =nullptr;
      model= new Model();
 
-     model->Initialize(modelcom);
+    // model->Initialize(modelcom);
     
      object3d2->SetModel(model);
      object3d2->SetTranslate(Vector3{0.0f,10.0f,0.0f });
@@ -370,7 +373,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete object3dCommon;
     delete object3d2;
     delete object3d;
-    delete modelcom;
+   
     delete model;
       for (Sprite* sprite: sprites)
         {
@@ -382,6 +385,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete dxCommon;
     dxCommon = nullptr;
     TextureManager::GetInstance()->Finalize();
+    ModelManager::GetInstance()->Finalize();
 
     winApp->Finalize();
     delete winApp;

@@ -29,7 +29,7 @@ public:
         MaterialData material; // マテリアルデータ
     };
 
-    void Initialize(ModelCommon* modelCom);
+    void Initialize(ModelCommon* modelCom,const std::string& directryPath, const std::string& filename);
 
     void Draw();
 

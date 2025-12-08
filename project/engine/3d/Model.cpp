@@ -6,11 +6,11 @@
 #include <fstream> // 追加: ifstreamの完全な型を利用するため
 #include <sstream> // 追加: istringstreamのため
 
-void Model::Initialize(ModelCommon* modelCom)
+void Model::Initialize(ModelCommon* modelCom,const std::string& directryPath, const std::string& filename)
 {
     ModelCom_ = modelCom;
 
-    modelData_ = LoadObjFile("resources", "axis.obj");
+    modelData_ = LoadObjFile( directryPath, filename);
     if (modelData_.material.textureFilePath.empty()) {
         modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
         TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
