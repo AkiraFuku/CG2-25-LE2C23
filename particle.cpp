@@ -20,3 +20,13 @@ Particle MakeNewParticle(std::mt19937& ramdamEngine)
         return particle;
 
 }
+
+std::list<Particle> Emit(const Emitter& emitter, std::mt19937& ramdamEngine)
+{
+   std::list<Particle>particles;
+   for (uint32_t i = 0; i < emitter.count; ++i)
+   {
+       particles.push_back(MakeNewParticle(ramdamEngine));
+   }
+   return particles;
+}

@@ -1441,7 +1441,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     audio->PlayAudio(soundData1);
 
 
-    const uint32_t kMaxNumInstance = 10;
+    const uint32_t kMaxNumInstance = 100;
 
 
     Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource =
@@ -1461,15 +1461,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     std::list<Particle> particles;
 
-    for (uint32_t i = 0; i < kMaxNumInstance; ++i)
-    {
-        //particles.push_back(MakeNewParticle(randomEngine));
-        // 3. GPUバッファに書き込む
-        instancingData[i].World = worldMatrix;
-        instancingData[i].WVP = worldMatrix; // ※本来は ViewProjection を掛ける必要がありますが、まずはWorldだけでも
+    Emitter emitter{};
+    emitter.count=3;
+    emitter.frequency=0.5f;
+    emitter.frequencyTime=0.0f;
 
-        instancingData[i].color = particles.back().color;
-    }
+
+   
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -1541,10 +1539,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 transform.rotate.y -= 0.1f; // 左に移動
 
             }
-
-
-
-            // ImGui::ShowDemoWindow();
+            uint32_t numInstance = 0;
+            emitter.frequencyTime+=kDeltaTime;
+            if (emitter.frequency<=emitter.frequencyTime)
+            {
+               particles.splice(particles.end(),Emit(emitter,randomEngine));
+               emitter.frequencyTime-=emitter.frequency;
+               
+            }
+           
+          
+              
 
 
             ImGui::Begin("MaterialData");
@@ -1566,7 +1571,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat3("traslate", &(transform.traslate.x));
             ImGui::Checkbox("useMonsterBall", &useMonstorBall);
             ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x);
-            //ImGui::ColorPicker4("ColorPicker", &(materialDataSprite->color).x);
             ImGui::Checkbox("billboard", &isBillboard);
             ImGui::DragFloat3("traslateSprite", &(transformSprite.traslate.x));
             ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x);
@@ -1580,9 +1584,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             if (ImGui::Button("Add Particle"))
             {
-                particles.push_back(MakeNewParticle(randomEngine));
-                particles.push_back(MakeNewParticle(randomEngine));
-                particles.push_back(MakeNewParticle(randomEngine));
+                
             }
 
             ImGui::End();
@@ -1610,7 +1612,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             billboardMatrix.m[3][1] = 0.0f;
             billboardMatrix.m[3][2] = 0.0f;
 
-            uint32_t numInstance = 0;
+             numInstance = 0;
             for (std::list<Particle>::iterator particleIterator = particles.begin();
                 particleIterator != particles.end();
                 )
@@ -1630,8 +1632,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
                 if (numInstance < kMaxNumInstance)
                 {
-                    instancingData[numInstance].color = particles.back().color;
-                    instancingData[numInstance].color.z = alpha;
+                    
+                    instancingData[numInstance].color.w = alpha;
                     Matrix4x4 worldMatrixInstance = {};
                     if (isBillboard)
                     {
@@ -1647,7 +1649,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     }
                     instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                     //instancingData[numInstance].World = worldMatrixInstance;
-
+                     instancingData[numInstance].color=particles.back().color;
                     ++numInstance;
                 }
                 ++particleIterator;
