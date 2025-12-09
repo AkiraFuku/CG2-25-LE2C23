@@ -1462,12 +1462,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     std::list<Particle> particles;
 
     Emitter emitter{};
-    emitter.count=3;
-    emitter.frequency=0.5f;
-    emitter.frequencyTime=0.0f;
+    emitter.count = 3;
+    emitter.frequency = 0.5f;
+    emitter.frequencyTime = 0.0f;
 
 
-   
+
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -1540,16 +1540,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             }
             uint32_t numInstance = 0;
-            emitter.frequencyTime+=kDeltaTime;
-            if (emitter.frequency<=emitter.frequencyTime)
+            emitter.frequencyTime += kDeltaTime;
+            if (emitter.frequency <= emitter.frequencyTime)
             {
-               particles.splice(particles.end(),Emit(emitter,randomEngine));
-               emitter.frequencyTime-=emitter.frequency;
-               
+                particles.splice(particles.end(), Emit(emitter, randomEngine));
+                emitter.frequencyTime -= emitter.frequency;
+
             }
-           
-          
-              
+
+
+
 
 
             ImGui::Begin("MaterialData");
@@ -1584,7 +1584,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             if (ImGui::Button("Add Particle"))
             {
-                
+
             }
 
             ImGui::End();
@@ -1612,7 +1612,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             billboardMatrix.m[3][1] = 0.0f;
             billboardMatrix.m[3][2] = 0.0f;
 
-             numInstance = 0;
+            numInstance = 0;
             for (std::list<Particle>::iterator particleIterator = particles.begin();
                 particleIterator != particles.end();
                 )
@@ -1632,7 +1632,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
                 if (numInstance < kMaxNumInstance)
                 {
-                    
+
                     instancingData[numInstance].color.w = alpha;
                     Matrix4x4 worldMatrixInstance = {};
                     if (isBillboard)
@@ -1649,7 +1649,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     }
                     instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                     //instancingData[numInstance].World = worldMatrixInstance;
-                     instancingData[numInstance].color=particles.back().color;
+                    instancingData[numInstance].color.x = particleIterator->color.x;
+                    instancingData[numInstance].color.y = particleIterator->color.y;
+                    instancingData[numInstance].color.z = particleIterator->color.z;
                     ++numInstance;
                 }
                 ++particleIterator;

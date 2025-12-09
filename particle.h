@@ -30,6 +30,6 @@ struct Emitter
 
 };
 
-Particle MakeNewParticle(std::mt19937& ramdamEngine);
+Particle MakeNewParticle(std::mt19937& ramdamEngine );
 
 std::list<Particle> Emit(const Emitter& emitter,std::mt19937& ramdamEngine);
