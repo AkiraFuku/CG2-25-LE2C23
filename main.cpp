@@ -1466,6 +1466,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     emitter.frequency = 0.5f;
     emitter.frequencyTime = 0.0f;
 
+    emitter.transfom={Vector3{1.0f,1.0f,1.0f},Vector3{0.0f,0.0f,0.0f},Vector3{0.0f,0.0f,0.0f}};
 
 
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
@@ -1581,12 +1582,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
 
-
-            if (ImGui::Button("Add Particle"))
-            {
-
-            }
-
+            ImGui::DragFloat3("emitter",&emitter.transfom.traslate.x,0.01f,-100.0f,100.0f);
+         
             ImGui::End();
 
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);

@@ -1,16 +1,17 @@
 #include "particle.h"
-
-Particle MakeNewParticle(std::mt19937& ramdamEngine)
+#include "MathFunction.h"
+Particle MakeNewParticle(std::mt19937& ramdamEngine,const Vector3 Transform)
 {
         std::uniform_real_distribution<float> distribution(-1.0f,1.0f);
-        std::uniform_real_distribution<float> distTime(1.0f,100.0f);
+        std::uniform_real_distribution<float> distTime(1.0f,10.0f);
    
 
         Particle particle;
         
         particle.transfom.scale = {1.0f,1.0f,1.0f  };
         particle.transfom.rotate = { 0.0f,0.0f,0.0f };
-        particle.transfom.traslate = { distribution(ramdamEngine),distribution(ramdamEngine) ,distribution(ramdamEngine) };
+        Vector3 randamTranslate={ distribution(ramdamEngine),distribution(ramdamEngine) ,distribution(ramdamEngine) };
+        particle.transfom.traslate = Transform+randamTranslate;
         particle.velocity = { distribution(ramdamEngine),distribution(ramdamEngine),distribution(ramdamEngine) };
 
         particle.color = { distribution(ramdamEngine),distribution(ramdamEngine),distribution(ramdamEngine),1.0f };
@@ -26,7 +27,7 @@ std::list<Particle> Emit(const Emitter& emitter, std::mt19937& ramdamEngine)
    std::list<Particle>particles;
    for (uint32_t i = 0; i < emitter.count; ++i)
    {
-       particles.push_back(MakeNewParticle(ramdamEngine));
+       particles.push_back(MakeNewParticle(ramdamEngine,emitter.transfom.traslate));
    }
    return particles;
 }
