@@ -1468,6 +1468,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     emitter.transfom={Vector3{1.0f,1.0f,1.0f},Vector3{0.0f,0.0f,0.0f},Vector3{0.0f,0.0f,0.0f}};
 
+    AcceleraionField accele;
+    accele.acceleraion={15.0f,0.0f,0.0f};
+    accele.area.min={-1.0f,-1.0f,-1.0f};
+    accele.area.max={1.0f,1.0f,1.0f};
+        
 
     D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
     instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -1490,7 +1495,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     bool isBillboard = true;
 
-
+    bool isAccele=true;
 
 
 
@@ -1573,6 +1578,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::Checkbox("useMonsterBall", &useMonstorBall);
             ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x);
             ImGui::Checkbox("billboard", &isBillboard);
+            ImGui::Checkbox("Accel", &isAccele);
             ImGui::DragFloat3("traslateSprite", &(transformSprite.traslate.x));
             ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x);
             ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
@@ -1614,6 +1620,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 particleIterator != particles.end();
                 )
             {
+                if (isAccele)
+                {
+                    if (IsCollision(accele.area,(*particleIterator).transfom.traslate))
+                    {
+                        (*particleIterator).velocity+=accele.acceleraion*kDeltaTime;
+                    }
+
+                }
 
 
 
@@ -1646,9 +1660,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     }
                     instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatirx));
                     //instancingData[numInstance].World = worldMatrixInstance;
-                    instancingData[numInstance].color.x = particleIterator->color.x;
-                    instancingData[numInstance].color.y = particleIterator->color.y;
-                    instancingData[numInstance].color.z = particleIterator->color.z;
+                    instancingData[numInstance].color.x = (*particleIterator).color.x;
+                    instancingData[numInstance].color.y = (*particleIterator).color.y;
+                    instancingData[numInstance].color.z = (*particleIterator).color.z;
                     ++numInstance;
                 }
                 ++particleIterator;

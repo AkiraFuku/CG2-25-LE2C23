@@ -1,6 +1,6 @@
 #include "particle.h"
 #include "MathFunction.h"
-Particle MakeNewParticle(std::mt19937& ramdamEngine,const Vector3 Transform)
+Particle MakeNewParticle(std::mt19937& ramdamEngine,const Vector3& Transform)
 {
         std::uniform_real_distribution<float> distribution(-1.0f,1.0f);
         std::uniform_real_distribution<float> distTime(1.0f,10.0f);
@@ -30,4 +30,17 @@ std::list<Particle> Emit(const Emitter& emitter, std::mt19937& ramdamEngine)
        particles.push_back(MakeNewParticle(ramdamEngine,emitter.transfom.traslate));
    }
    return particles;
+}
+
+bool IsCollision(const AABB& aabb, const Vector3& point)
+{
+    bool inX=aabb.max.x>point.x&&aabb.min.x<point.x;
+    bool inY=aabb.max.y>point.y&&aabb.min.y<point.y;
+    bool inZ=aabb.max.z>point.z&&aabb.min.z<point.z;
+    if (inX&&inY&&inZ)
+    {
+        return true;
+    }
+
+    return false;
 }

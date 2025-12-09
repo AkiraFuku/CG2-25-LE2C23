@@ -2,7 +2,7 @@
 #include "Vector4.h"
 #include<random>
 #include<list>
-
+#include "DrawFunction.h"
 struct Particle
 {
     Transform transfom;
@@ -30,6 +30,15 @@ struct Emitter
 
 };
 
-Particle MakeNewParticle(std::mt19937& ramdamEngine,const Vector3 Transform);
+struct AcceleraionField
+{
+    Vector3 acceleraion;
+
+    AABB area;
+};
+
+Particle MakeNewParticle(std::mt19937& ramdamEngine,const Vector3& Transform);
 
 std::list<Particle> Emit(const Emitter& emitter,std::mt19937& ramdamEngine);
+
+bool IsCollision(const AABB& aabb,const Vector3& point);
