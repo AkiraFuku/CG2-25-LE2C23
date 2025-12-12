@@ -1,25 +1,19 @@
 #include<Windows.h>
-#include<cstdint>
-#include<iostream>
-#include<string>
 #include<filesystem>
-#include<fstream>
-#include<chrono>
 #include<strsafe.h>
 #include<dbghelp.h>
 #pragma comment(lib,"Dbghelp.lib")
 #include<dxgidebug.h>
 #pragma comment(lib,"dxguid.lib")
 #include<dxcapi.h>
-#include "engine/base/WinApp.h"
-#include "engine/base/DXCommon.h"
+#include "WinApp.h"
+#include "DXCommon.h"
 #pragma comment(lib,"dxcompiler.lib")
-#include"engine/math/MassFunction.h"
+#include"MassFunction.h"
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
-#include"externals/DirectXTex/DirectXTex.h"
-#include"externals/DirectXTex/d3dx12.h"
+
 
 #include"Audio.h"
 #include "Input.h"
@@ -27,9 +21,9 @@
 #include"StringUtility.h"
 #include"Logger.h"
 
-#include "engine/2d/Sprite.h"
-#include "engine/2d/SpriteCommon.h"
-#include "engine/2d/TextureManager.h"
+#include "Sprite.h"
+#include "SpriteCommon.h"
+#include "TextureManager.h"
 
 
 #include"Object3DCommon.h"
@@ -137,15 +131,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     ModelManager::GetInstance()->Initialize(dxCommon);
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
-    /*HRESULT hr;*/
-
-
 
     //ここから書く　外部入力
     Input* input = nullptr;
     input = new Input();
     input->Initialize(winApp);
-
 
     SpriteCommon* spritecommon = nullptr;
     spritecommon = new SpriteCommon;
@@ -155,19 +145,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3dCommon = new Object3dCommon;
     object3dCommon->Initialize(dxCommon);
 
-
-
-
-
     Audio* audio = new Audio();
     audio->Initialize();
     Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.wav");
 
     audio->PlayAudio(soundData1);
-
-
-
-
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -209,11 +191,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
 
-
-
-
-
-
     //メインループ
 
     while (true) {
@@ -234,7 +211,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
         //// キー入力判定
-        //if (input->TriggerKeyDown(DIK_D)) {
+       //if (input->TriggerKeyDown(DIK_D)) {
         //    OutputDebugStringA("DIK_D\n");
         //    transform.rotate.y += 0.1f; // 右に移動
         //}
@@ -323,7 +300,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ///Update
         ///////
 
-
         ///
         //DRAW
         ///
@@ -337,16 +313,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         /////スプライトの描画
 
-
-
         for (Sprite* sprite : sprites)
         {
             spritecommon->SpriteCommonDraw();
             sprite->Draw();
 
         }
-
-
 
         ///
 
@@ -358,8 +330,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     }
 
-
-
     dxCommon->Finalize();
 
     delete audio;
@@ -368,12 +338,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete object3d2;
     delete object3d;
 
-
     for (Sprite* sprite : sprites)
     {
-
         delete sprite;
-
     }
     delete spritecommon;
     delete dxCommon;
@@ -384,7 +351,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     winApp->Finalize();
     delete winApp;
     winApp = nullptr;
-
 
     return 0;
 }
