@@ -67,7 +67,7 @@ private:
 
     //トランスフォーム
     Transform transform_;
-    Transform cameraTransform_;
+    //Transform cameraTransform_;
 
 };
 

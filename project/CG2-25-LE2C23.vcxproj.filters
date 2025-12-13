@@ -49,6 +49,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="engine\Tool">
+      <UniqueIdentifier>{09a81933-e639-445e-ba5c-ba2600fd0dfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -128,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="engine\3d\ModelManager.cpp">
       <Filter>engine\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>engine\Tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +225,9 @@
     </ClInclude>
     <ClInclude Include="engine\3d\ModelManager.h">
       <Filter>engine\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>engine\Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

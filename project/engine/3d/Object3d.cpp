@@ -20,18 +20,18 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 
 
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
+    //cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
 }
 void Object3d::Update()
 {
     //  WVP行列の作成
     Matrix4x4 worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-    Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-    Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+   // Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
+   // Matrix4x4 viewMatrix = Inverse(cameraMatrix);
     //透視投影行列の作成
-    Matrix4x4 projectionMatirx = MakePerspectiveFovMatrix(
+    /*Matrix4x4 projectionMatirx = MakePerspectiveFovMatrix(
         0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f
-    );
+    );*/
     //ワールド行列とビュー行列とプロジェクション行列を掛け算
     Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
     //行列をGPUに転送
