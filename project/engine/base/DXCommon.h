@@ -23,18 +23,18 @@ public:
     void PostDraw();
 
 
-    /// <summary>
-    /// SRVのCPUディスクリプタハンドルを取得
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-    /// <summary>
-    /// SRVのGPUディスクリプタハンドルを取得
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+    ///// <summary>
+    ///// SRVのCPUディスクリプタハンドルを取得
+    ///// </summary>
+    ///// <param name="index"></param>
+    ///// <returns></returns>
+    //D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
+    ///// <summary>
+    ///// SRVのGPUディスクリプタハンドルを取得
+    ///// </summary>
+    ///// <param name="index"></param>
+    ///// <returns></returns>
+    //D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
     //getter
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const {
         return device_.Get();
@@ -53,11 +53,11 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResourse(const DirectX::TexMetadata& metadata);
     //アップロードテクスチャ
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const  Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages);
-   
-   
+    //ディスクプリプターヒープ
+    Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible);
 
-     //最大テクスチャ数
-    static const uint32_t kMaxSRVCount;
+
+
 
 private:
     //FPS固定
@@ -96,11 +96,8 @@ private:
 
     //各種ディスクプリプターヒープ
     void CreateDescriptorHeaps();
-    Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(const  Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible);
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
-    uint32_t descriptorSizeSRV_;
     uint32_t descriptorSizeRTV_;
     uint32_t descriptorSizeDSV_;
 
@@ -135,6 +132,6 @@ private:
     D3D12_RESOURCE_BARRIER barrier_{};
     //フェンス値
     uint64_t fenceValue_ = 0;
-   
+
 };
 

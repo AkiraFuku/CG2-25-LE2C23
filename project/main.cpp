@@ -273,13 +273,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
           ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
           ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);*/
 
-          /* Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
-           Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-           Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-           wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
-           wvpData->World=worldMatrix;
-              directionalLightData->direction= Normalize(directionalLightData->direction);*/
-
+        
               /* Matrix4x4 uvTransformMatrix=MakeScaleMatrix(uvTransformSprite.scale);
                uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
                uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
