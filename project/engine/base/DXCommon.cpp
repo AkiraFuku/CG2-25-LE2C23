@@ -84,8 +84,8 @@ void DXCommon::PreDraw()
         1.0f, 0, 0, nullptr
     );
     //SRVヒープの設定
-    ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap_.Get() };
-    commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+    //ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap_.Get() };
+    //commandList_->SetDescriptorHeaps(1, descriptorHeaps);
     //ビューポート・シザー矩形の設定
     commandList_->RSSetViewports(1, &viewport_);//ビューポートの設定
     commandList_->RSSetScissorRects(1, &scissorRect_);//シザー矩形の設定
@@ -505,12 +505,12 @@ void DXCommon::CreateDepthStencilTextureResource() {
 
 void DXCommon::CreateDescriptorHeaps()
 {
-    descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+   // descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
     //SRVヒープの作成
-    srvHeap_ = CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+  //  srvHeap_ = CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
     //RTVヒープの作成
     rtvHeap_ = CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
     //DSVヒープの作成
@@ -637,7 +637,7 @@ void DXCommon::CreateDXCompiler()
 
 void DXCommon::InitializeImGui()
 {
-    IMGUI_CHECKVERSION();
+  /*  IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
     ImGui::StyleColorsDark();
@@ -649,7 +649,7 @@ void DXCommon::InitializeImGui()
         srvHeap_.Get(),
         srvHeap_.Get()->GetCPUDescriptorHandleForHeapStart(),
         srvHeap_.Get()->GetGPUDescriptorHandleForHeapStart()
-    );
+    );*/
 }
 
 

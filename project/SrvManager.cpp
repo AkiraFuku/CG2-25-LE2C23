@@ -22,7 +22,21 @@ D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index)
 
 D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUDescriptorHandle(uint32_t index)
 {
-    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU= descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr+=(descriptorSize_*index);
+    D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr += (descriptorSize_ * index);
     return handleGPU;
+}
+
+void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels)
+{
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = Format;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+    srvDesc.Texture2D.MipLevels = MipLevels;
+    // SRV
+    dxCommon_->GetDevice()->CreateShaderResourceView(
+        pResource,
+        &srvDesc,
+        );
 }
