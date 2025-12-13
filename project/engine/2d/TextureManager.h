@@ -7,7 +7,7 @@
 #include"externals/DirectXTex/d3dx12.h"
 
 class DXCommon;
-
+class SrvManager;
 class TextureManager
 {
 private:
@@ -31,10 +31,10 @@ private:
     std::vector<TextureData> textureDatas;
 
     DXCommon* dxCommon_=nullptr;
-
+    SrvManager* srvManager_;
     static uint32_t kSRVIndexTop;
 public:
-    void Initialize( DXCommon* dxCommon);
+    void Initialize( DXCommon* dxCommon,SrvManager* srvManager);
     static TextureManager* GetInstance();
     void Finalize();
     //テクスチャロード

@@ -28,6 +28,7 @@
 #include "Model.h"
 #include "ModelManager.h"
 #include "Camera.h"
+#include "SrvManager.h"
 
 
 
@@ -124,6 +125,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     DXCommon* dxCommon = nullptr;
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
+
+    SrvManager* srvMnager=nullptr;
+    srvMnager=new SrvManager();
+    srvMnager->Initialize(dxCommon);
+
     TextureManager::GetInstance()->Initialize(dxCommon);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
@@ -344,6 +350,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     {
         delete sprite;
     }
+    delete srvMnager;
     delete spritecommon;
     delete dxCommon;
     dxCommon = nullptr;
