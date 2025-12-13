@@ -4,9 +4,12 @@ class DXCommon;
 class SrvManager
 {
 public:
-    void Initialize(DXCommon* dxCommon);
     //最大テクスチャ数
     static const uint32_t kMaxSRVCount;
+    void Initialize(DXCommon* dxCommon);
+    void preDraw();
+    void SetGraphicsRootDescriptorTable (UINT RootParameterIndex, uint32_t srvIndex); 
+
 
     /// <summary>
    /// SRVのCPUディスクリプタハンドルを取得
