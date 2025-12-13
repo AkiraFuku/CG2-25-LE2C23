@@ -96,10 +96,10 @@
     <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp">
       <Filter>engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="StringUtility.cpp">
+    <ClCompile Include="engine\Tool\StringUtility.cpp">
       <Filter>engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="Logger.cpp">
+    <ClCompile Include="engine\Tool\Logger.cpp">
       <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\2d\SpriteCommon.cpp">
@@ -190,10 +190,10 @@
     <ClInclude Include="engine\base\D3DResourceLeakChecker.h">
       <Filter>engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h">
+    <ClInclude Include="engine\Tool\Logger.h">
       <Filter>engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="StringUtility.h">
+    <ClInclude Include="engine\Tool\StringUtility.h">
       <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\2d\SpriteCommon.h">

@@ -30,7 +30,8 @@ public:
     void SetFarCrip(const float farCrip) {
         this->farCrip = farCrip;
     }
-
+    const Vector3& GetRotate()const{return transform_.rotate;}
+    const Vector3& GetTranslate()const{return transform_.translate;}
     const Matrix4x4& GetWorldMatrix()const{return worldMatrix;};
     const Matrix4x4& GetViewMatrix()const{return viewMatrix;};
     const Matrix4x4& GetProjectionMatirx()const{return projectionMatirx;};

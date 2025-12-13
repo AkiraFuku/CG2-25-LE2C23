@@ -29,7 +29,7 @@
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
-    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="engine\Tool\Logger.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -43,7 +43,7 @@
     <ClCompile Include="engine\3d\Model.cpp" />
     <ClCompile Include="engine\3d\ModelCommon.cpp" />
     <ClCompile Include="engine\3d\ModelManager.cpp" />
-    <ClCompile Include="StringUtility.cpp" />
+    <ClCompile Include="engine\Tool\StringUtility.cpp" />
     <ClCompile Include="engine\2d\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +83,7 @@
     <ClInclude Include="engine\2d\Vector4.h" />
     <ClInclude Include="engine\input\Input.h" />
     <ClInclude Include="engine\base\WinApp.h" />
-    <ClInclude Include="Logger.h" />
+    <ClInclude Include="engine\Tool\Logger.h" />
     <ClInclude Include="engine\2d\SpriteCommon.h" />
     <ClInclude Include="engine\2d\Sprite.h" />
     <ClInclude Include="engine\3d\Object3d.h" />
@@ -91,7 +91,7 @@
     <ClInclude Include="engine\3d\Model.h" />
     <ClInclude Include="engine\3d\ModelCommon.h" />
     <ClInclude Include="engine\3d\ModelManager.h" />
-    <ClInclude Include="StringUtility.h" />
+    <ClInclude Include="engine\Tool\StringUtility.h" />
     <ClInclude Include="engine\2d\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -175,7 +175,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir);$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir);$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,7 +201,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir);$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir);$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -230,7 +230,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <TreatWarningAsError>false</TreatWarningAsError>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir);$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir);$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

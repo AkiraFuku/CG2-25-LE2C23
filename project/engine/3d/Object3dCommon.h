@@ -3,6 +3,7 @@
 #include <wrl/client.h>
 #include <cstdint>
 #include "DXCommon.h"
+#include "Camera.h"
 class Object3dCommon
 {
 public:

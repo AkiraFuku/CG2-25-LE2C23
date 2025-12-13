@@ -6,31 +6,28 @@
 #include<dxgidebug.h>
 #pragma comment(lib,"dxguid.lib")
 #include<dxcapi.h>
+#pragma comment(lib,"dxcompiler.lib")
+
+#include"imgui.h"
+#include"imgui_impl_dx12.h"
+#include"imgui_impl_win32.h"
 #include "WinApp.h"
 #include "DXCommon.h"
-#pragma comment(lib,"dxcompiler.lib")
 #include"MassFunction.h"
-#include"externals/imgui/imgui.h"
-#include"externals/imgui/imgui_impl_dx12.h"
-#include"externals/imgui/imgui_impl_win32.h"
-
-
 #include"Audio.h"
-#include "Input.h"
+#include"Input.h"
 #include"D3DResourceLeakChecker.h"
 #include"StringUtility.h"
 #include"Logger.h"
-
 #include "Sprite.h"
 #include "SpriteCommon.h"
 #include "TextureManager.h"
-
-
 #include"Object3DCommon.h"
 #include"Object3D.h"
 #include "ModelCommon.h"
 #include "Model.h"
 #include "ModelManager.h"
+#include "Camera.h"
 
 
 
@@ -145,6 +142,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3dCommon = new Object3dCommon;
     object3dCommon->Initialize(dxCommon);
 
+    Camera* camera = new Camera();
+    camera->SetRotate({ 0.0f,0.0f,0.0f });
+    camera->SetTranslate({ 0.0f,0.0f,-5.0f });
+    object3dCommon->SetDefaultCamera(camera);
+
     Audio* audio = new Audio();
     audio->Initialize();
     Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.wav");
@@ -190,6 +192,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
+
 
     //メインループ
 
@@ -238,8 +241,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
         ImGui::Begin("MaterialData");
-        //ImGui::DragFloat3("Camera Transrate",&(cameraTransform.traslate.x));
-        //ImGui::DragFloat3("Camera rotateate",&(cameraTransform.rotate.x));
+        Vector3 camreaTranslate = camera->GetTranslate();
+        Vector3 cameraRotate=camera->GetRotate();
+        ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
+        ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
+        camera->SetRotate(cameraRotate);
+        camera->SetTranslate(camreaTranslate);
         //ImGui::ColorEdit4("Color", &(materialData->color).x); 
         //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
         //ImGui::Checkbox("enable", &enableLighting);
@@ -277,8 +284,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
                uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
                //materialDataSprite->uvTransform = uvTransformMatrix;
-
+        camera->Update();
         object3d->Update();
+        object3d2->Update();
         ImGui::Text("Sprite");
         ImGui::Checkbox("fripX", &(fripx));
         ImGui::Checkbox("fripy", &(fripY));
