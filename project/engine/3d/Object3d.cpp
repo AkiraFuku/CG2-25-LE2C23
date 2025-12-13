@@ -11,29 +11,25 @@
 void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
     object3dCom_ = object3dCommon;
-
-
     //WVP行列リソースの作成
     CreateWVPResource();
     //平行光源リソースの作成
     CreateDirectionalLightResource();
-
-
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    //cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
+    camera_=object3dCom_->GetDefaultCamera();
 }
 void Object3d::Update()
 {
     //  WVP行列の作成
     Matrix4x4 worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-   // Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-   // Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-    //透視投影行列の作成
-    /*Matrix4x4 projectionMatirx = MakePerspectiveFovMatrix(
-        0.45f, static_cast<float>(WinApp::kClientWidth) / static_cast<float>(WinApp::kClientHeight), 0.1f, 100.0f
-    );*/
+  Matrix4x4 worldViewProjectionMatrix={};
     //ワールド行列とビュー行列とプロジェクション行列を掛け算
-    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
+  if (camera_)
+  {
+     worldViewProjectionMatrix= Multiply(worldMatrix, camera_->GetViewProtectionMatrix());
+  } else{
+    worldViewProjectionMatrix=worldMatrix;
+  }
     //行列をGPUに転送
     wvpResource_->WVP = worldViewProjectionMatrix;
     wvpResource_->World = worldMatrix;

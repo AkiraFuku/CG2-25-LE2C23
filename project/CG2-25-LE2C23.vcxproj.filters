@@ -132,7 +132,7 @@
     <ClCompile Include="engine\3d\ModelManager.cpp">
       <Filter>engine\3d</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="engine\Tool\Camera.cpp">
       <Filter>engine\Tool</Filter>
     </ClCompile>
   </ItemGroup>
@@ -226,7 +226,7 @@
     <ClInclude Include="engine\3d\ModelManager.h">
       <Filter>engine\3d</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="engine\Tool\Camera.h">
       <Filter>engine\Tool</Filter>
     </ClInclude>
   </ItemGroup>

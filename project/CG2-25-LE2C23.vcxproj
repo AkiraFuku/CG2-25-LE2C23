@@ -15,7 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="engine\Tool\Camera.cpp" />
     <ClCompile Include="engine\2d\Vector2.cpp" />
     <ClCompile Include="engine\3d\Vector3.cpp" />
     <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp" />
@@ -65,7 +65,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="engine\Tool\Camera.h" />
     <ClInclude Include="engine\2d\Vector2.h" />
     <ClInclude Include="engine\3d\Vector3.h" />
     <ClInclude Include="engine\base\D3DResourceLeakChecker.h" />

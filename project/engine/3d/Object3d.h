@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "Model.h"
+#include "Camera.h"
 class Object3dCommon;
 class Object3d
 {
@@ -41,6 +42,9 @@ public:
         transform_.translate = translate;
     }
 
+    void SetCamera( Camera *camera){camera_=camera;}
+    
+
     //トランスフォームゲッター
     const Vector3& GetScale()const {
         return transform_.scale;
@@ -66,8 +70,10 @@ private:
     void CreateDirectionalLightResource();
 
     //トランスフォーム
-    Transform transform_;
-    //Transform cameraTransform_;
+    Transform transform_={};
+    //カメラ　
+    Camera *camera_=nullptr;
+    
 
 };
 

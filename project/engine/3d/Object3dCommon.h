@@ -5,13 +5,19 @@
 #include "DXCommon.h"
 class Object3dCommon
 {
-    public:
+public:
     void Initialize(DXCommon* dxCommon);
     DXCommon* GetDxCommon()const {
         return dxCommon_;
     }
 
     void Object3dCommonDraw();
+    void SetDefaultCamera(Camera* camera) {
+        defaultCamera_ = camera;
+    }
+    Camera* GetDefaultCamera()const {
+        return defaultCamera_;
+    }
 
 private:
     HRESULT hr_;
@@ -24,5 +30,6 @@ private:
     //グラフィックパイプラインステート
     Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
     void CreatePSO();
+    Camera* defaultCamera_ = nullptr;
 };
 

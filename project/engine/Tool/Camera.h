@@ -1,0 +1,53 @@
+#pragma once
+#include "Vector4.h"
+#include "WinApp.h"
+class Camera
+{
+public:
+
+    Camera ();
+
+    void Update();
+
+    void SetRotate(const Vector3& rotate) {
+        transform_.rotate = rotate;
+    }
+    void SetTranslate(const Vector3& translate) {
+        transform_.translate = translate;
+    }
+    void SetTransform(const Transform& transForm) {
+        transform_ = transForm;
+    }
+    void SetFovY(const float fovY) {
+        this->fovY = fovY;
+    }
+    void SetAspectRatio(const float aspect) {
+        this->aspect = aspect;
+    }
+    void SetNearCrip(const float nearCrip) {
+        this->nearCrip = nearCrip;
+    }
+    void SetFarCrip(const float farCrip) {
+        this->farCrip = farCrip;
+    }
+
+    const Matrix4x4& GetWorldMatrix()const{return worldMatrix;};
+    const Matrix4x4& GetViewMatrix()const{return viewMatrix;};
+    const Matrix4x4& GetProjectionMatirx()const{return projectionMatirx;};
+    const Matrix4x4& GetViewProtectionMatrix()const{return viewProtectionMatrix;};
+
+
+private:
+    Transform transform_;
+    Matrix4x4 worldMatrix;
+    Matrix4x4 viewMatrix;
+    Matrix4x4 projectionMatirx;
+    Matrix4x4 viewProtectionMatrix;
+    float fovY ;
+    float aspect ;
+    float nearCrip ;
+    float farCrip ;
+
+
+};
+
