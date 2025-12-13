@@ -5,6 +5,10 @@ class SrvManager
 {
 public:
     void Initialize(DXCommon* dxCommon);
+    void PreDraw();
+
+    void SetGraphicsRootDescriptorTable(UINT RootParameterIndex,uint32_t srvIndex);
+
     //最大テクスチャ数
     static const uint32_t kMaxSRVCount;
 
@@ -20,6 +24,10 @@ public:
     /// <param name="index"></param>
     /// <returns></returns>
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
+
+    void CreateSRVForTexture2D(uint32_t srvIndex,ID3D12Resource* pResource,DXGI_FORMAT Format,UINT MipLevels);
+    void CreateSRVForStructuredBuffer(uint32_t srvIndex,ID3D12Resource* pResource,UINT numElements,UINT structureByteStride);
+
 private:
     uint32_t descriptorSize_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;

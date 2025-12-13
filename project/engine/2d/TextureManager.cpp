@@ -1,13 +1,14 @@
 #include "TextureManager.h"
 #include "DXCommon.h"
 #include "StringUtility.h"
+#include "SrvManager.h"
 TextureManager* TextureManager::instance=nullptr;
 
 uint32_t TextureManager::kSRVIndexTop = 1;
 
 void TextureManager::Initialize( DXCommon* dxCommon){
 
-    textureDatas.reserve(DXCommon::kMaxSRVCount);
+    textureDatas.reserve(SrvManager::kMaxSRVCount);
     dxCommon_=dxCommon;
 }
 
@@ -35,7 +36,7 @@ void TextureManager::LoadTexture(const std::string& filePath){
     if (it!=textureDatas.end()){
         return;
     }
-    assert(textureDatas.size()+kSRVIndexTop < DXCommon::kMaxSRVCount);
+    assert(textureDatas.size()+kSRVIndexTop < SrvManager::kMaxSRVCount);
 
 
      //テクスチャの読み込み
