@@ -45,6 +45,7 @@
     <ClCompile Include="engine\3d\ModelManager.cpp" />
     <ClCompile Include="engine\Tool\StringUtility.cpp" />
     <ClCompile Include="engine\2d\TextureManager.cpp" />
+    <ClCompile Include="SrvManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -93,6 +94,7 @@
     <ClInclude Include="engine\3d\ModelManager.h" />
     <ClInclude Include="engine\Tool\StringUtility.h" />
     <ClInclude Include="engine\2d\TextureManager.h" />
+    <ClInclude Include="SrvManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
