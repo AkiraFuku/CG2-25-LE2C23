@@ -4,17 +4,20 @@ const uint32_t SrvManager::kMaxSRVCount = 512;
 
 void SrvManager::Initialize(DXCommon* dxCommon) {
     dxCommon_ = dxCommon;
-    // 1. デスクリプタヒープの生成
-    D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
-    descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    descriptorHeapDesc.NumDescriptors = kMaxSRVCount; // 最大数
-    descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE; // シェーダーから見えるようにする
+    //// 1. デスクリプタヒープの生成
+    //D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
+    //descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    //descriptorHeapDesc.NumDescriptors = kMaxSRVCount; // 最大数
+    //descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE; // シェーダーから見えるようにする
 
-    HRESULT hr = dxCommon_->GetDevice()->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap_));
-    assert(SUCCEEDED(hr));
+    //HRESULT hr = dxCommon_->GetDevice()->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap_));
+    //assert(SUCCEEDED(hr));
 
-    // 2. デスクリプタ1個分のサイズを取得（これを忘れるとハンドル計算がずれます）
-    descriptorSize_ = dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    //// 2. デスクリプタ1個分のサイズを取得（これを忘れるとハンドル計算がずれます）
+    //descriptorSize_ = dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    descriptorHeap_=dxCommon_->CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+    descriptorSize_=dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 void SrvManager::PreDraw() {
     ID3D12DescriptorHeap* descritptorHeaps[] = { descriptorHeap_.Get() };
