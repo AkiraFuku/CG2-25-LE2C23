@@ -1,7 +1,7 @@
 #pragma once
 #include <wrl.h>
 #include <string>
-#include <vector>
+#include <unordered_map>
 #include<d3d12.h>
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
@@ -28,7 +28,7 @@ private:
     ~TextureManager() = default;
     TextureManager(TextureManager&) = delete;
     TextureManager& operator=(TextureManager&) = delete;
-    std::vector<TextureData> textureDatas;
+    std::unordered_map<std::string,TextureData> textureDatas;
 
     DXCommon* dxCommon_=nullptr;
     SrvManager* srvManager_=nullptr;
