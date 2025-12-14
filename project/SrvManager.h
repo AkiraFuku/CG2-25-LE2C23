@@ -1,6 +1,7 @@
 #pragma once
 #include <wrl.h>
 #include<d3d12.h>
+#include<cstdint>
 class DXCommon;
 class SrvManager
 {
@@ -10,7 +11,7 @@ public:
     void Initialize(DXCommon* dxCommon);
 
 
-    uint32_t Allocate();
+    uint32_t AllocateSRV();
 
     /// <summary>
    /// SRVのCPUディスクリプタハンドルを取得
@@ -32,6 +33,8 @@ public:
 
     void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex);
     void PreDraw();
+
+    bool IsMax();
 private:
     DXCommon* dxCommon_ = nullptr;
     uint32_t descriptorSize_;

@@ -33,15 +33,15 @@ void DXCommon::Initialize(WinApp* winApp)
     CreateViewport();
     CreateScissorRect();
     CreateDXCompiler();
-    InitializeImGui();
+    //InitializeImGui();
 }
 
 void DXCommon::Finalize()
 {
     //ImGui終了処理
-    ImGui_ImplDX12_Shutdown();
+  /*  ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
+    ImGui::DestroyContext();*/
     //フェンスイベントのクローズ
  //   CloseHandle(fenceEvent_);
 }

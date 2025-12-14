@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include <wrl.h>
 #include <d3d12.h>
+#include<string>
 
 class SpriteCommon;
 class Sprite
@@ -28,40 +29,80 @@ public:
 
     };
 
-    void Initialize(SpriteCommon* spriteCom,std::string textureFilePath);
+    void Initialize(SpriteCommon* spriteCom, std::string textureFilePath);
     void Update();
     void Draw();
 
-    const Vector2& GetPosition() const{return postion_;} 
-    void SetPosition(const Vector2& position){postion_=position;}
+    const Vector2& GetPosition() const {
+        return postion_;
+    }
+    void SetPosition(const Vector2& position) {
+        postion_ = position;
+    }
 
-    float GetRotation() const{return rotation_;}
-    void SetRotation(const float rotation){rotation_=rotation;}
-    
-    Vector4& GetColor() const {return materialData_->color;}
-    void SetColor(const Vector4& color){materialData_->color=color;}
+    float GetRotation() const {
+        return rotation_;
+    }
+    void SetRotation(const float rotation) {
+        rotation_ = rotation;
+    }
 
-    Matrix4x4& GetUV()const{return materialData_->uvTransform;}
-    void SetUV (Matrix4x4& uvTransfom){materialData_->uvTransform=uvTransfom;}
+    Vector4& GetColor() const {
+        return materialData_->color;
+    }
+    void SetColor(const Vector4& color) {
+        materialData_->color = color;
+    }
 
-    const Vector2& GetSize()const{return size_;}
-    void SetSize(const Vector2& Size){this->size_=Size;}
+    Matrix4x4& GetUV()const {
+        return materialData_->uvTransform;
+    }
+    void SetUV(Matrix4x4& uvTransfom) {
+        materialData_->uvTransform = uvTransfom;
+    }
 
-    const Vector2& GetAnchorPoint()const {return anchorPoint_;}
-    void SetAnchorPoint(const Vector2& anchorPoint){anchorPoint_=anchorPoint;}
+    const Vector2& GetSize()const {
+        return size_;
+    }
+    void SetSize(const Vector2& Size) {
+        this->size_ = Size;
+    }
 
-    bool GetIsFlipX()const {return isFlipX_;}
-    void SetIsFlipX(bool isFlipX){isFlipX_=isFlipX;}
-    bool GetIsFlipY()const {return isFlipY_;}
-    void SetIsFlipY(bool isFlipY){isFlipY_=isFlipY;}
+    const Vector2& GetAnchorPoint()const {
+        return anchorPoint_;
+    }
+    void SetAnchorPoint(const Vector2& anchorPoint) {
+        anchorPoint_ = anchorPoint;
+    }
 
-    Vector2 GetTextureLeftTop()const {return textureLeftTop;}
-    void SetTextureLeftTop(const Vector2& textureLeftTop){this->textureLeftTop=textureLeftTop;}
-    Vector2 GetTextureSize()const {return textureSize;}
-    void SetTextureSize(const Vector2& textureSize){this->textureSize=textureSize;}
+    bool GetIsFlipX()const {
+        return isFlipX_;
+    }
+    void SetIsFlipX(bool isFlipX) {
+        isFlipX_ = isFlipX;
+    }
+    bool GetIsFlipY()const {
+        return isFlipY_;
+    }
+    void SetIsFlipY(bool isFlipY) {
+        isFlipY_ = isFlipY;
+    }
+
+    Vector2 GetTextureLeftTop()const {
+        return textureLeftTop;
+    }
+    void SetTextureLeftTop(const Vector2& textureLeftTop) {
+        this->textureLeftTop = textureLeftTop;
+    }
+    Vector2 GetTextureSize()const {
+        return textureSize;
+    }
+    void SetTextureSize(const Vector2& textureSize) {
+        this->textureSize = textureSize;
+    }
 
     //テクスチャ変更
-    void SetTextureByFilePath(const std::string& textureFilePath) ;
+    void SetTextureByFilePath(const std::string& textureFilePath);
 
 private:
     void AdjustTextureSize();
@@ -69,10 +110,10 @@ private:
 private:
     SpriteCommon* spriteCom_ = nullptr;
 
-    Vector2 postion_={0.0f,0.0f};
-    float rotation_=0.0f;
+    Vector2 postion_ = { 0.0f,0.0f };
+    float rotation_ = 0.0f;
 
-    Vector2 size_={10.0f,10.0f};
+    Vector2 size_ = { 10.0f,10.0f };
 
     Vector2 anchorPoint_ = { 0.0f,0.0f };
 
@@ -80,9 +121,9 @@ private:
     bool isFlipY_ = false;
 
     //テクスチャ左上
-    Vector2 textureLeftTop={0.0f,0.0f};
+    Vector2 textureLeftTop = { 0.0f,0.0f };
     //テクスチャ切り出しサイズ
-    Vector2 textureSize{100.0f,100.0f};
+    Vector2 textureSize{ 100.0f,100.0f };
 
 
     //buffer
@@ -99,5 +140,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
     TransformationMatrix* transformationMatrixData_ = nullptr;
     uint32_t textureIndex_ = 0;
+    std::string textureFilePath_;
 };
 

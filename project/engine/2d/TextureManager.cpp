@@ -32,7 +32,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     if (textureDatas.contains(filePath)) {
         return;
     }
-    assert(textureDatas.size() + kSRVIndexTop < SrvManager::kMaxSRVCount);
+    assert(srvManager_->IsMax());
 
 
     //テクスチャの読み込み
@@ -63,7 +63,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     textureData.resource = dxCommon_->CreateTextureResourse(textureData.metadata);//テクスチャリソース
     //SRVインデックス
 //    uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1) + kSRVIndexTop;
-    textureData.srvIndex = srvManager_->Allocate();
+    textureData.srvIndex = srvManager_->AllocateSRV();
     textureData.srvHandleCPU = srvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
     textureData.srvHandleGPU = srvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
     //metaDataを基にSRVの設定

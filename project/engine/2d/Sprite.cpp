@@ -44,6 +44,7 @@ void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
     transformationMatrixData_->WVP = Makeidetity4x4();
     transformationMatrixData_->World = Makeidetity4x4();
 
+    textureFilePath_ = textureFilePath;
     //テクスチャの読み込み
     textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
     
@@ -68,7 +69,7 @@ void Sprite::Update() {
     }
 
     const DirectX::TexMetadata& metadata =
-        TextureManager::GetInstance()->GetMetaData(textureIndex_);
+        TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
     float tex_left = textureLeftTop.x / metadata.width;
     float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
@@ -148,7 +149,7 @@ void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
 void Sprite::AdjustTextureSize()
 {
     //メタデータの取得
-    const DirectX::TexMetadata& metadata= TextureManager::GetInstance()->GetMetaData(textureIndex_);
+    const DirectX::TexMetadata& metadata= TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
     textureSize.x = static_cast<float>(metadata.width);
     textureSize.y = static_cast<float>(metadata.height);

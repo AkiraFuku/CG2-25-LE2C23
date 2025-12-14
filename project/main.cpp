@@ -40,10 +40,10 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
-    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+   /* if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
     {
         return true;
-    }
+    }*/
 
     switch (msg) {
         //
@@ -211,9 +211,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         }
 
-        ImGui_ImplDX12_NewFrame();
+        /*ImGui_ImplDX12_NewFrame();
         ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
+        ImGui::NewFrame();*/
 
         input->Update();
 
@@ -246,13 +246,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-        ImGui::Begin("MaterialData");
+       /* ImGui::Begin("MaterialData");
         Vector3 camreaTranslate = camera->GetTranslate();
         Vector3 cameraRotate = camera->GetRotate();
         ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
         ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
         camera->SetRotate(cameraRotate);
-        camera->SetTranslate(camreaTranslate);
+        camera->SetTranslate(camreaTranslate);*/
         //ImGui::ColorEdit4("Color", &(materialData->color).x); 
         //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
         //ImGui::Checkbox("enable", &enableLighting);
@@ -293,9 +293,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         camera->Update();
         object3d->Update();
         object3d2->Update();
-        ImGui::Text("Sprite");
+       /* ImGui::Text("Sprite");
         ImGui::Checkbox("fripX", &(fripx));
-        ImGui::Checkbox("fripy", &(fripY));
+        ImGui::Checkbox("fripy", &(fripY));*/
 
 
         for (Sprite* sprite : sprites)
@@ -309,16 +309,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             sprite->Update();
 
         }
-        ImGui::End();
-        ///////
-        ///Update
-        ///////
+        //ImGui::End();
+        /////////
+        /////Update
+        /////////
 
-        ///
-        //DRAW
-        ///
-        ImGui::Render();
+        /////
+        ////DRAW
+        /////
+        //ImGui::Render();
         dxCommon->PreDraw();
+        srvManager->PreDraw();
+
         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
         object3d2->Draw();
@@ -336,8 +338,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         ///
 
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
-
+       // ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
         dxCommon->PostDraw();
 
         TextureManager::GetInstance()->ReleaseIntermediateResources();
