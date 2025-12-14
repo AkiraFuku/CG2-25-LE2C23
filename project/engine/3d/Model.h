@@ -42,6 +42,7 @@ public:
   
 
 private:
+
     ModelCommon* ModelCom_ = nullptr;
     ModelData modelData_;
 

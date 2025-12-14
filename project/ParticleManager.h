@@ -1,26 +1,55 @@
 #pragma once
 #include "Vector4.h"
+#include "Vector2.h"
 #include<random>
 #include<list>
 #include "DrawFunction.h"
+#include "DXCommon.h"
+#include <wrl/client.h>
+#include "d3d12.h"
+#include <cstdint>
+#include "DXCommon.h"
+#include "Camera.h"
 
 class DXCommon;
 class SrvManager;
 class TextureManager;
 class ParticleManager
 {
+public:
+    struct VertexData {
+        Vector4 position; // 4D position vector
+        Vector2 texcoord; // 2D texture coordinate vector
+        Vector3 normal;
+    };
+    void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
+
+
 private:
-     ParticleManager() = default;
+
+    ParticleManager() = default;
     ~ParticleManager() = default;
     ParticleManager(ParticleManager&) = delete;
     ParticleManager& operator=(ParticleManager&) = delete;
     static ParticleManager* instance;
-    DXCommon* dxCommon_=nullptr;
-    SrvManager* srvManager_=nullptr;
+    static uint32_t kMaxNumInstance;
+    DXCommon* dxCommon_ = nullptr;
+    SrvManager* srvManager_ = nullptr;
 
     std::random_device seedGen_;
-      std::mt19937 randomEngine_;
-public:
-    void Initialize(DXCommon* dxCommon,SrvManager* srvManager);
+    std::mt19937 randomEngine_;
+    HRESULT hr_;
+    //ルートシグネチャ
+    Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;
+    void CreateRootSignature();
+    //グラフィックパイプラインステート
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
+
+    //頂点リソース
+    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
+    VertexData* vertexData_ = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+    void CreateVertexBuffer();
+    void CreatePSO();
 };
 
