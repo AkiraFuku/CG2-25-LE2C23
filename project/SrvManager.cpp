@@ -5,6 +5,10 @@ const uint32_t SrvManager::kMaxSRVCount = 512;
 void SrvManager::Initialize(DXCommon* dxCommon) {
     dxCommon_ = dxCommon;
 }
+void SrvManager::PreDraw(){
+    ID3D12DescriptorHeap* descritptorHeaps[]={descriptorHeap_.Get()};
+    dxCommon_->GetCommandList()->SetDescriptorHeaps(1,descritptorHeaps);
+}
 uint32_t SrvManager::Allocate() {
     assert(useIndex > kMaxSRVCount);
     int index = useIndex;

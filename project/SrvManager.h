@@ -8,6 +8,7 @@ public:
     //最大テクスチャ数
     static const uint32_t kMaxSRVCount;
     void Initialize(DXCommon* dxCommon);
+     void PreDraw();
 
     uint32_t Allocate();
 
@@ -28,13 +29,12 @@ public:
 
 
     void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
- 
+
 
 private:
     DXCommon* dxCommon_ = nullptr;
     uint32_t descriptorSize_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
-
     uint32_t useIndex =0;
 };
 
