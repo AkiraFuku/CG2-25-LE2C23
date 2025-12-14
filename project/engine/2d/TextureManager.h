@@ -46,6 +46,6 @@ public:
     //テクスチャ番号からGPUハンドル
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHundleGPU(uint32_t textureindex);
     //メタデータ
-    const DirectX::TexMetadata& GetMetaData(uint32_t textureindex);
+    const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
 };
 

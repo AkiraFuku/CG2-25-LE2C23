@@ -22,6 +22,14 @@ uint32_t SrvManager::Allocate() {
     useIndex++;
     return index;
 }
+bool SrvManager::CheckMaxTex()
+{
+    if (useIndex > kMaxSRVCount)
+    {
+        return false;
+    }
+    return true;
+}
 D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();

@@ -38,7 +38,7 @@ void TextureManager::LoadTexture(const std::string& filePath){
     }
        
     
-    assert(textureDatas.size()+kSRVIndexTop < SrvManager::kMaxSRVCount);
+    assert(srvManager_->CheckMaxTex());
 
 
      //テクスチャの読み込み
@@ -102,36 +102,31 @@ void TextureManager::ReleaseIntermediateResources()
 
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 {
-    auto it = std::find_if(
-        textureDatas.begin(),
-        textureDatas.end(),
-        [&](TextureData& textureData) { return textureData.filePath == filePath; }//テクスチャデータ検索
-    );
-    if (it != textureDatas.end()) {
-        uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
-        return textureIndex ;
+    /// 1. すでに読み込まれているかチェック
+    if (textureDatas.contains(filePath))
+    {
+        // 読み込み済みなら、保存されている srvIndex を返す
+        return textureDatas[filePath].srvIndex;
     }
-    /*assert(0);
-    return 0;*/
-
-    //見つからなかった場合、その場で読み込む
+    
+    // 2. 見つからなかった場合、読み込む
     LoadTexture(filePath);
 
-    
-    return static_cast<uint32_t>(textureDatas.size() - 1);
+    // 3. 読み込んだ後のデータから srvIndex を返す
+    return textureDatas[filePath].srvIndex;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHundleGPU(uint32_t textureindex)
 {
-    assert(textureindex < textureDatas.size());
-    return textureDatas[textureindex].srvHandleGPU;
+    return srvManager_->GetGPUDescriptorHandle(textureindex);
 }
 
-const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureindex)
+const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
 {
-    // テクスチャ番号が正常範囲内であることをチェック
-    // textureindex は unsigned なので 0 未満のチェックは不要
-    assert(textureindex < textureDatas.size());
+   // 指定されたファイルパスのテクスチャが読み込まれているかチェック
+    // 読み込まれていなければアサートで停止（または LoadTexture(filePath) を呼ぶ設計も可）
+    assert(textureDatas.contains(filePath));
 
-    return textureDatas[textureindex].metadata;
+    // マップからデータを取得してメタデータを返す
+    return textureDatas[filePath].metadata;
 }

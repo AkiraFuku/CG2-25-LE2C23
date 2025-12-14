@@ -148,7 +148,7 @@ void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
 void Sprite::AdjustTextureSize()
 {
     //メタデータの取得
-    const DirectX::TexMetadata& metadata= TextureManager::GetInstance()->GetMetaData(textureIndex_);
+    const DirectX::TexMetadata& metadata= TextureManager::GetInstance()->GetMetaData();
 
     textureSize.x = static_cast<float>(metadata.width);
     textureSize.y = static_cast<float>(metadata.height);
