@@ -60,7 +60,7 @@ void SrvManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource*
     srvDesc.Buffer.NumElements = numElements;
     srvDesc.Buffer.StructureByteStride = structureByteStride;
     D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = GetCPUDescriptorHandle(srvIndex);
-    D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(srvIndex);
+   // D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(srvIndex);
     dxCommon_->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, instancingSrvHandleCPU);
 
 }

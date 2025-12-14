@@ -1,5 +1,7 @@
 #include "ParticleManager.h"
 #include "Logger.h"
+#include "TextureManager.h"
+#include "SrvManager.h"
 
 #pragma once
 ParticleManager* ParticleManager::instance = nullptr;
@@ -17,6 +19,20 @@ void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
     //頂点バッファビュー（VBV）を作成
     //頂点リソースにデータを書き込む
     CreateVertexBuffer();
+}
+
+void ParticleManager::CreateParticleGroup(const std::string name, const std::string textureFilepath)
+{
+    assert(particleGroups.contains(name));
+ParticleGroup newParticle=particleGroups[name];
+    newParticle.materialData.textureFilePath=textureFilepath;
+    newParticle.numInstance=100;
+    TextureManager::GetInstance()->LoadTexture(textureFilepath);
+    newParticle.materialData.textureIndex=srvManager_->AllocateSRV();
+    newParticle.instancingResource=dxCommon_-> CreateBufferResource(sizeof(ParticleForGPU)*newParticle.numInstance );
+
+    srvManager_->CreateSRVforStructuredBuffer(newParticle.materialData.textureIndex,newParticle.instancingResource.Get(),newParticle.numInstance,sizeof(ParticleForGPU));
+  
 }
 
 void ParticleManager::CreateRootSignature()

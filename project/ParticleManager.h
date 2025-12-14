@@ -10,7 +10,7 @@
 #include <cstdint>
 #include "Camera.h"
 
-
+class Camera;
 class DXCommon;
 class SrvManager;
 class TextureManager;
@@ -66,8 +66,13 @@ public:
 
 
     void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
+    void 
 
+    void CreateParticleGroup(const std::string name, const std::string textureFilepath);
 
+    void Setcamera(Camera* camera) {
+        camera_ = camera;
+    }
 private:
 
     ParticleManager() = default;
@@ -94,5 +99,9 @@ private:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
     void CreateVertexBuffer();
     void CreatePSO();
+
+    std::unordered_map<std::string, ParticleGroup> particleGroups;
+
+    Camera* camera_;
 };
 
