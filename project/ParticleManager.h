@@ -65,8 +65,10 @@ public:
 
     void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
     void Update();
-
+    void Draw();
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
+
+    void Emit (const std::string name, const Vector3& postion ,uint32_t count);
 
     void Setcamera(Camera* camera) {
         camera_ = camera;

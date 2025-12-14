@@ -58,18 +58,18 @@ void ParticleManager::Update() {
 
                 particleGroup.instancingData[numInstance].color.w = alpha;
                 Matrix4x4 worldMatrixInstance = {};
-              /*  if (isBillboard)
-                {*/
-                    (*particleIterator).transfom.rotate.z += 1.0f / 60.0f;
+                /*  if (isBillboard)
+                  {*/
+                (*particleIterator).transfom.rotate.z += 1.0f / 60.0f;
 
 
-                    worldMatrixInstance = MakeBillboardMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, billboardMatrix, (*particleIterator).transfom.translate);
+                worldMatrixInstance = MakeBillboardMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, billboardMatrix, (*particleIterator).transfom.translate);
 
-              /*  } else
-                {
-                    worldMatrixInstance = MakeAfineMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, (*particleIterator).transfom.traslate);
+                /*  } else
+                  {
+                      worldMatrixInstance = MakeAfineMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, (*particleIterator).transfom.traslate);
 
-                }*/
+                  }*/
                 particleGroup.instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatrix));
                 particleGroup.instancingData[numInstance].color.x = (*particleIterator).color.x;
                 particleGroup.instancingData[numInstance].color.y = (*particleIterator).color.y;
@@ -82,10 +82,26 @@ void ParticleManager::Update() {
 
     }
 }
+void ParticleManager::Draw() {
+    // RootSignatureの設定
+    dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+    //PSOの設定
+    dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+    dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //VBVの設定
+    dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
+    for (auto& [key, particleGroup] : particleGroups) {
+        dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
+        dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
+        dxCommon_->GetCommandList()->DrawInstanced(UINT(vertexData_), particleGroup.numInstance, 0, 0);
+    }
+}
 
 void ParticleManager::CreateParticleGroup(const std::string name, const std::string textureFilepath)
 {
     assert(particleGroups.contains(name));
+    //
     ParticleGroup newParticle = particleGroups[name];
     newParticle.materialData.textureFilePath = textureFilepath;
     newParticle.numInstance = 100;
@@ -93,7 +109,33 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
     newParticle.materialData.textureIndex = srvManager_->AllocateSRV();
     newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.numInstance);
 
+
     srvManager_->CreateSRVforStructuredBuffer(newParticle.materialData.textureIndex, newParticle.instancingResource.Get(), newParticle.numInstance, sizeof(ParticleForGPU));
+
+}
+
+void ParticleManager::Emit(const std::string name, const Vector3& postion, uint32_t count)
+{
+    assert(particleGroups.contains(name));
+
+    std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+    std::uniform_real_distribution<float> distTime(1.0f, 10.0f);
+
+    for (int i = 0; i < count; ++i)
+    {
+        Particle particle;
+        particle.transfom.scale = { 1.0f,1.0f,1.0f };
+        particle.transfom.rotate = { 0.0f,0.0f,0.0f };
+        Vector3 randamTranslate = { distribution(randomEngine_),distribution(randomEngine_) ,distribution(randomEngine_) };
+        particle.transfom.translate = postion + randamTranslate;
+        particle.velocity = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+
+        particle.color = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_),1.0f };
+
+        particle.lifeTime = distTime(randomEngine_);
+        particle.currentTime = 0.0f;
+        particleGroups[name].particles.push_back(particle);
+    }
 
 }
 
