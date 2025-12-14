@@ -30,14 +30,14 @@ void TextureManager::Finalize(){
 }
 void TextureManager::LoadTexture(const std::string& filePath){
     //すでに読み込まれているか確認
-    auto it =std::find_if(
-    textureDatas.begin(),
-        textureDatas.end(),
-        [&](TextureData& textureData){return textureData.filePath==filePath; }
-    );
-    if (it!=textureDatas.end()){
+  
+    if (textureDatas.contains(filePath))
+    {
         return;
+
     }
+       
+    
     assert(textureDatas.size()+kSRVIndexTop < SrvManager::kMaxSRVCount);
 
 
@@ -64,16 +64,16 @@ void TextureManager::LoadTexture(const std::string& filePath){
     );
     assert(SUCCEEDED(hr));
     //テクスチャデータ追加
-    textureDatas.resize(textureDatas.size()+1);
-    TextureData& textureData=textureDatas.back();
-    textureData.filePath=filePath;//ファイルパス
+    //textureDatas.resize(textureDatas.size()+1);
+    TextureData& textureData=textureDatas[filePath];
     textureData.metadata=mipImages.GetMetadata();//メタデータ
     textureData.resource=dxCommon_->CreateTextureResourse(textureData.metadata);//テクスチャリソース
     //SRVインデックス
-    uint32_t srvIndex=static_cast<uint32_t>(textureDatas.size()-1)+kSRVIndexTop;
+    //uint32_t srvIndex=static_cast<uint32_t>(textureDatas.size()-1)+kSRVIndexTop;
 
-    textureData.srvHandleCPU=dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
-    textureData.srvHandleGPU=dxCommon_->GetSRVGPUDescriptorHandle(srvIndex);
+    textureData.srvIndex=srvManager_->Allocate();
+    textureData.srvHandleCPU=srvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
+    textureData.srvHandleGPU=srvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
      //metaDataを基にSRVの設定
     //
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -92,7 +92,7 @@ void TextureManager::LoadTexture(const std::string& filePath){
 }
 void TextureManager::ReleaseIntermediateResources()
 {
-    for (TextureData& textureData : textureDatas) {
+    for (auto& [key, textureData] : textureDatas){
         if (textureData.intermediateResource) {
             // ComPtrのResetを呼び出してリソースを解放し、nullptrにする
             textureData.intermediateResource.Reset();

@@ -23,6 +23,7 @@ public:
     /// <param name="index"></param>
     /// <returns></returns>
     D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
+    uint32_t Allocate();
 
     void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels);
     void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
@@ -31,6 +32,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
     DXCommon* dxCommon_ = nullptr;
     uint32_t useIndex = 0;
-    uint32_t Allocate();
 };
 

@@ -1,10 +1,10 @@
 #pragma once
 #include <wrl.h>
 #include <string>
-#include <vector>
 #include<d3d12.h>
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
+#include<unordered_map>
 
 class DXCommon;
 class SrvManager;
@@ -15,9 +15,9 @@ private:
     //テクスチャデータ構造体
     struct TextureData
     {
-        std::string filePath;
         DirectX::TexMetadata metadata;
         Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+        uint32_t srvIndex;
         D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
         Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource;
@@ -28,7 +28,7 @@ private:
     ~TextureManager() = default;
     TextureManager(TextureManager&) = delete;
     TextureManager& operator=(TextureManager&) = delete;
-    std::vector<TextureData> textureDatas;
+    std::unordered_map<std::string,TextureData> textureDatas;
 
     DXCommon* dxCommon_=nullptr;
     SrvManager* srvManager_;
