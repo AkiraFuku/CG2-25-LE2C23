@@ -28,6 +28,7 @@
 #include "Model.h"
 #include "ModelManager.h"
 #include "Camera.h"
+#include "SrvManager.h"
 
 
 
@@ -124,6 +125,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     DXCommon* dxCommon = nullptr;
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
+    SrvManager* srvManager=nullptr;
+
+    srvManager=new SrvManager();
+    srvManager->Initialize(dxCommon);
+
     TextureManager::GetInstance()->Initialize(dxCommon);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
@@ -242,7 +248,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         ImGui::Begin("MaterialData");
         Vector3 camreaTranslate = camera->GetTranslate();
-        Vector3 cameraRotate=camera->GetRotate();
+        Vector3 cameraRotate = camera->GetRotate();
         ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
         ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
         camera->SetRotate(cameraRotate);
@@ -351,6 +357,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         delete sprite;
     }
     delete spritecommon;
+    delete srvManager;
     delete dxCommon;
     dxCommon = nullptr;
     TextureManager::GetInstance()->Finalize();
