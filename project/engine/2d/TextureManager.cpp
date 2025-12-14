@@ -6,10 +6,11 @@ TextureManager* TextureManager::instance=nullptr;
 
 uint32_t TextureManager::kSRVIndexTop = 1;
 
-void TextureManager::Initialize( DXCommon* dxCommon){
+void TextureManager::Initialize( DXCommon* dxCommon, SrvManager* srvManager){
 
     textureDatas.reserve(SrvManager::kMaxSRVCount);
     dxCommon_=dxCommon;
+    srvManager_=srvManager;
 }
 
 TextureManager* TextureManager::GetInstance(){

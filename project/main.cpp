@@ -130,7 +130,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     srvManager=new SrvManager();
     srvManager->Initialize(dxCommon);
 
-    TextureManager::GetInstance()->Initialize(dxCommon);
+    TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
