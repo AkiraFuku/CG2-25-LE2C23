@@ -1,13 +1,14 @@
 #include "TextureManager.h"
 #include "DXCommon.h"
 #include "StringUtility.h"
+#include "SrvManager.h"
 TextureManager* TextureManager::instance=nullptr;
 
 uint32_t TextureManager::kSRVIndexTop = 1;
 
 void TextureManager::Initialize( DXCommon* dxCommon){
 
-    textureDatas.reserve(DXCommon::kMaxSRVCount);
+    textureDatas.reserve(SrvManager::kMaxSRVCount);
     dxCommon_=dxCommon;
 }
 
@@ -35,7 +36,7 @@ void TextureManager::LoadTexture(const std::string& filePath){
     if (it!=textureDatas.end()){
         return;
     }
-    assert(textureDatas.size()+kSRVIndexTop < DXCommon::kMaxSRVCount);
+    assert(textureDatas.size()+kSRVIndexTop < SrvManager::kMaxSRVCount);
 
 
      //テクスチャの読み込み
@@ -73,17 +74,17 @@ void TextureManager::LoadTexture(const std::string& filePath){
     textureData.srvHandleGPU=dxCommon_->GetSRVGPUDescriptorHandle(srvIndex);
      //metaDataを基にSRVの設定
     //
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = textureData. metadata.format;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-    srvDesc.Texture2D.MipLevels = UINT( textureData.metadata.mipLevels);//最初のミップマップ
-    // SRV
-    dxCommon_->GetDevice()->CreateShaderResourceView(
-        textureData.resource.Get(),
-        &srvDesc,
-        textureData.srvHandleCPU
-    );
+    //D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    //srvDesc.Format = textureData. metadata.format;
+    //srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    //srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+    //srvDesc.Texture2D.MipLevels = UINT( textureData.metadata.mipLevels);//最初のミップマップ
+    //// SRV
+    //dxCommon_->GetDevice()->CreateShaderResourceView(
+    //    textureData.resource.Get(),
+    //    &srvDesc,
+    //    textureData.srvHandleCPU
+    //);
     textureData.intermediateResource = dxCommon_->UploadTextureData(textureData.resource,mipImages);
 
 }
