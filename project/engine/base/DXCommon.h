@@ -23,18 +23,7 @@ public:
     void PostDraw();
 
 
-    /// <summary>
-    /// SRVのCPUディスクリプタハンドルを取得
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-    /// <summary>
-    /// SRVのGPUディスクリプタハンドルを取得
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+   
     //getter
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const {
         return device_.Get();
@@ -42,9 +31,9 @@ public:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {
         return commandList_.Get();
     }
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() const {
+   /* Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() const {
         return srvHeap_.Get();
-    }
+    }*/
     //コンパイルシェーダー
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
     //クリエイトバッファ
