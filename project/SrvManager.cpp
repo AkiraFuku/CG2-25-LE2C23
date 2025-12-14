@@ -52,3 +52,6 @@ void SrvManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource*
     dxCommon_->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, instancingSrvHandleCPU);
 
 }
+void SrvManager::SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex){
+    dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameterIndex,GetGPUDescriptorHandle(srvIndex));
+}
