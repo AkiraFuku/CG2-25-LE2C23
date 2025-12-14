@@ -135,8 +135,14 @@
     <ClCompile Include="engine\Tool\Camera.cpp">
       <Filter>engine\Tool</Filter>
     </ClCompile>
-    <ClCompile Include="SrvManager.cpp">
+    <ClCompile Include="ParticleManager.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\SrvManager.cpp">
+      <Filter>engine\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\math\DrawFunction.cpp">
+      <Filter>engine\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +150,12 @@
       <Filter>シェーダー ファイル</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\Object3d\Object3d.VS.hlsl">
+      <Filter>シェーダー ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle\Particle.PS.hlsl">
+      <Filter>シェーダー ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle\Particle.VS.hlsl">
       <Filter>シェーダー ファイル</Filter>
     </FxCompile>
   </ItemGroup>
@@ -232,8 +244,14 @@
     <ClInclude Include="engine\Tool\Camera.h">
       <Filter>engine\Tool</Filter>
     </ClInclude>
-    <ClInclude Include="SrvManager.h">
+    <ClInclude Include="ParticleManager.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\SrvManager.h">
+      <Filter>engine\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\DrawFunction.h">
+      <Filter>engine\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +261,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d\Object3d.hlsli">
+      <Filter>シェーダー ファイル</Filter>
+    </None>
+    <None Include="resources\shaders\Particle\Particle.hlsli">
       <Filter>シェーダー ファイル</Filter>
     </None>
   </ItemGroup>
