@@ -144,6 +144,9 @@
     <ClCompile Include="engine\math\DrawFunction.cpp">
       <Filter>engine\math</Filter>
     </ClCompile>
+    <ClCompile Include="PatricleEmitter.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -252,6 +255,9 @@
     </ClInclude>
     <ClInclude Include="engine\math\DrawFunction.h">
       <Filter>engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="PatricleEmitter.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,8 @@
 ///using namespace std;
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
+ Vector3 Cross(const Vector3& v1, const Vector3& v2);
+ Vector3 Division(const Vector3& v1,const Vector3& v2);
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2);
 Vector3 operator+=(Vector3& v1, const Vector3& v2);

@@ -21,6 +21,14 @@ void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
     //頂点リソースにデータを書き込む
     CreateVertexBuffer();
 }
+ParticleManager* ParticleManager::GetInstance() {
+    if (instance == nullptr)
+    {
+        instance = new ParticleManager;
+    }
+    return instance;
+
+};
 void ParticleManager::Update() {
     Matrix4x4 backFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
     //ビルボード行列計算
@@ -57,20 +65,20 @@ void ParticleManager::Update() {
             {
 
                 particleGroup.instancingData[numInstance].color.w = alpha;
-                Matrix4x4 worldMatrixInstance = {};
+                Matrix4x4 worldMatrix = {};
                 /*  if (isBillboard)
                   {*/
                 (*particleIterator).transfom.rotate.z += 1.0f / 60.0f;
 
 
-                worldMatrixInstance = MakeBillboardMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, billboardMatrix, (*particleIterator).transfom.translate);
+                worldMatrix = MakeBillboardMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, billboardMatrix, (*particleIterator).transfom.translate);
 
                 /*  } else
                   {
                       worldMatrixInstance = MakeAfineMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, (*particleIterator).transfom.traslate);
 
                   }*/
-                particleGroup.instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatrix));
+                particleGroup.instancingData[numInstance].WVP = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
                 particleGroup.instancingData[numInstance].color.x = (*particleIterator).color.x;
                 particleGroup.instancingData[numInstance].color.y = (*particleIterator).color.y;
                 particleGroup.instancingData[numInstance].color.z = (*particleIterator).color.z;
@@ -94,7 +102,7 @@ void ParticleManager::Draw() {
     for (auto& [key, particleGroup] : particleGroups) {
         dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
         dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
-        dxCommon_->GetCommandList()->DrawInstanced(UINT(vertexData_), particleGroup.numInstance, 0, 0);
+        dxCommon_->GetCommandList()->DrawInstanced(6, particleGroup.numInstance, 0, 0);
     }
 }
 
@@ -121,7 +129,7 @@ void ParticleManager::Emit(const std::string name, const Vector3& postion, uint3
     std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
     std::uniform_real_distribution<float> distTime(1.0f, 10.0f);
 
-    for (int i = 0; i < count; ++i)
+    for (uint32_t i = 0; i < count; ++i)
     {
         Particle particle;
         particle.transfom.scale = { 1.0f,1.0f,1.0f };

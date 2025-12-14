@@ -42,14 +42,14 @@ public:
 
     };
 
-    struct Emitter
-    {
-        Transform transfom;//位置
-        uint32_t count;//パーティクル数
-        float frequency;//範囲
-        float frequencyTime;//発生時間
+    //struct Emitter
+    //{
+    //    Transform transfom;//位置
+    //    uint32_t count;//パーティクル数
+    //    float frequency;//範囲
+    //    float frequencyTime;//発生時間
 
-    };
+    //};
 
     struct ParticleGroup
     {
@@ -67,7 +67,7 @@ public:
     void Update();
     void Draw();
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
-
+    static ParticleManager* GetInstance();
     void Emit (const std::string name, const Vector3& postion ,uint32_t count);
 
     void Setcamera(Camera* camera) {
@@ -86,7 +86,7 @@ private:
 
     std::random_device seedGen_;
     std::mt19937 randomEngine_;
-    HRESULT hr_;
+    HRESULT hr_ =0;
     //ルートシグネチャ
     Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;
     void CreateRootSignature();
@@ -104,6 +104,6 @@ private:
 
     
 
-    Camera* camera_;
+    Camera* camera_=nullptr;
 };
 

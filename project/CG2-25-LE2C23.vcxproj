@@ -48,6 +48,7 @@
     <ClCompile Include="engine\2d\TextureManager.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
+    <ClCompile Include="PatricleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -109,6 +110,7 @@
     <ClInclude Include="engine\2d\TextureManager.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
+    <ClInclude Include="PatricleEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
