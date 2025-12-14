@@ -15,7 +15,7 @@ private:
     //テクスチャデータ構造体
     struct TextureData
     {
-        std::string filePath;
+        uint32_t srvIndex;
         DirectX::TexMetadata metadata;
         Microsoft::WRL::ComPtr<ID3D12Resource> resource;
         D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
@@ -47,6 +47,6 @@ public:
     //テクスチャ番号からGPUハンドル
     D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHundleGPU(uint32_t textureindex);
     //メタデータ
-    const DirectX::TexMetadata& GetMetaData(uint32_t textureindex);
+    const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
 };
 
