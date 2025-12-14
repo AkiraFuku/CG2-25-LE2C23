@@ -3,11 +3,11 @@
 
 #pragma once
 ParticleManager* ParticleManager::instance = nullptr;
-uint32_t ParticleManager::kMaxNumInstance=100;
-void ParticleManager::Initialize(DXCommon* dxCommon,SrvManager* srvManager){
+uint32_t ParticleManager::kMaxNumInstance = 100;
+void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
     //DXCommonとSRVマネージャーの受け取り
-    dxCommon_=dxCommon;
-    srvManager_=srvManager;
+    dxCommon_ = dxCommon;
+    srvManager_ = srvManager;
     //ランダムエンジンの初期化
     randomEngine_.seed(seedGen_());
     //パイプラインステート生成
@@ -21,7 +21,7 @@ void ParticleManager::Initialize(DXCommon* dxCommon,SrvManager* srvManager){
 
 void ParticleManager::CreateRootSignature()
 {
-///ディスクプリプターレンジの作成
+    ///ディスクプリプターレンジの作成
     D3D12_DESCRIPTOR_RANGE descriptorRange[1]{};
     descriptorRange[0].BaseShaderRegister = 0;//シェーダーのレジスタ番号0
     descriptorRange[0].NumDescriptors = 1;//ディスクリプタの数1つ
@@ -43,7 +43,7 @@ void ParticleManager::CreateRootSignature()
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
     rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
     rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//ディスクリプタレンジの数
- 
+
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//ディスクリプタテーブルを使う
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
@@ -56,7 +56,7 @@ void ParticleManager::CreateRootSignature()
     descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
     descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
-     D3D12_STATIC_SAMPLER_DESC staticSamplers[1]{};
+    D3D12_STATIC_SAMPLER_DESC staticSamplers[1]{};
     staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//線形フィルタリング
     staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
     staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//テクスチャのアドレスモードはラップ
@@ -78,7 +78,7 @@ void ParticleManager::CreateRootSignature()
         &errorBlob
     );
     if (FAILED(hr_)) {
-       Logger::Log( reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+        Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
     //バイナリを元にルートシグネチャー生成
@@ -94,8 +94,8 @@ void ParticleManager::CreateRootSignature()
 
 
 }
-void ParticleManager::CreatePSO(){
-     CreateRootSignature();
+void ParticleManager::CreatePSO() {
+    CreateRootSignature();
     //InputLayoutの設定
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
     inputElementDescs[0].SemanticName = "POSITION";
@@ -182,26 +182,26 @@ void ParticleManager::CreatePSO(){
     );
     assert(SUCCEEDED(hr_));
 }
-void ParticleManager::CreateVertexBuffer(){
-     VertexData vertices[] = {
+void ParticleManager::CreateVertexBuffer() {
+    VertexData vertices[] = {
         // Position(x,y,z,w)             TexCoord(u,v)   Normal(x,y,z)
         {{-1.0f,  1.0f, 0.0f, 1.0f},     {0.0f, 0.0f},   {0.0f, 0.0f, 1.0f}}, // 左上
         {{ 1.0f,  1.0f, 0.0f, 1.0f},     {1.0f, 0.0f},   {0.0f, 0.0f, 1.0f}}, // 右上
         {{-1.0f, -1.0f, 0.0f, 1.0f},     {0.0f, 1.0f},   {0.0f, 0.0f, 1.0f}}, // 左下
         {{ 1.0f, -1.0f, 0.0f, 1.0f},     {1.0f, 1.0f},   {0.0f, 0.0f, 1.0f}}, // 右下
     };
-      //頂点リソースの作成
+    //頂点リソースの作成
     vertexResourse_ =
-       dxCommon_->
-        CreateBufferResource(sizeof(VertexData) );
+        dxCommon_->
+        CreateBufferResource(sizeof(VertexData));
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) );
+    vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData));
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
     vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
     //頂点データの転送
-    memcpy(vertexData_, vertices, sizeof(VertexData) );
+    memcpy(vertexData_, vertices, sizeof(VertexData));
 
 }

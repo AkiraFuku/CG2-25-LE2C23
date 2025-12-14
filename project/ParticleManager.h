@@ -8,8 +8,8 @@
 #include <wrl/client.h>
 #include "d3d12.h"
 #include <cstdint>
-#include "DXCommon.h"
 #include "Camera.h"
+
 
 class DXCommon;
 class SrvManager;
@@ -17,11 +17,54 @@ class TextureManager;
 class ParticleManager
 {
 public:
+    struct MaterialData {
+        std::string textureFilePath;
+        uint_fast16_t textureIndex = 0;
+    };
     struct VertexData {
         Vector4 position; // 4D position vector
         Vector2 texcoord; // 2D texture coordinate vector
         Vector3 normal;
     };
+    struct Particle
+    {
+        Transform transfom;
+        Vector3 velocity;
+        Vector4 color;
+        float lifeTime;
+        float currentTime;
+
+    };
+
+    struct ParticleForGPU
+    {
+        Matrix4x4 WVP;
+        Matrix4x4 World;
+        Vector4 color;
+
+    };
+
+    struct Emitter
+    {
+        Transform transfom;//位置
+        uint32_t count;//パーティクル数
+        float frequency;//範囲
+        float frequencyTime;//発生時間
+
+    };
+
+    struct ParticleGroup
+    {
+        MaterialData materialData;
+        std::list<Particle> particles;
+        D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc;
+        Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;
+        uint32_t numInstance;
+        ParticleForGPU* instancingData;
+
+    };
+
+
     void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
 
 
