@@ -9,8 +9,6 @@
 #include "d3d12.h"
 #include <cstdint>
 #include "Camera.h"
-
-class Camera;
 class DXCommon;
 class SrvManager;
 class TextureManager;
@@ -66,7 +64,7 @@ public:
 
 
     void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
-    void 
+    void Update();
 
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
 
@@ -101,6 +99,8 @@ private:
     void CreatePSO();
 
     std::unordered_map<std::string, ParticleGroup> particleGroups;
+
+    
 
     Camera* camera_;
 };

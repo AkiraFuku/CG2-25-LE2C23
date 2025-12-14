@@ -4,7 +4,97 @@
 // 
 // 
 // 
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& rotate, Matrix4x4& billboardMatrix, const Vector3& translate)
+{
+    // 1. 各成分の行列を作成
+    Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+    Matrix4x4 rotateMatrix = MakeRotateZMatrix(rotate.z); // Z軸回転のみ使用
+    Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
 
+    // 2. 行列を順番に合成 (Scale * RotateZ * Billboard * Translate)
+
+    // Scale * RotateZ
+    Matrix4x4 matScaleRot = Multiply(scaleMatrix, rotateMatrix);
+
+    // (Scale * RotateZ) * Billboard
+    Matrix4x4 matSRB = Multiply(matScaleRot, billboardMatrix);
+
+    // 全体 * Translate
+    Matrix4x4 result = Multiply(matSRB, translateMatrix);
+
+    return result;
+}
+Vector3 operator+(const Vector3& v1, const Vector3& v2)
+{
+
+
+    Vector3 result;
+    result.x = v1.x + v2.x;
+    result.y = v1.y + v2.y;
+    result.z = v1.z + v2.z;
+    return result;
+}
+
+Vector3 operator+=(Vector3& v1, const Vector3& v2)
+{
+
+    v1.x += v2.x;
+    v1.y += v2.y;
+    v1.z += v2.z;
+    return v1;
+}
+
+Vector3 operator-(const Vector3& v1, const Vector3& v2)
+{
+
+    Vector3 result;
+    result.x = v1.x - v2.x;
+    result.y = v1.y - v2.y;
+    result.z = v1.z - v2.z;
+    return result;
+}
+
+Vector3 operator-=(Vector3& v1, const Vector3& v2)
+{
+
+    v1.x -= v2.x;
+    v1.y -= v2.y;
+    v1.z -= v2.z;
+    return v1;
+}
+
+Vector3 operator*(float scalar, const Vector3& v)
+{
+
+    Vector3 result;
+    result.x = v.x * scalar;
+    result.y = v.y * scalar;
+    result.z = v.z * scalar;
+    return result;
+}
+
+Vector3 operator*(const Vector3& v, float scalar)
+{
+    return scalar * v;
+
+}
+Vector3 operator/(const Vector3& v, float scalar)
+{
+
+    Vector3 result;
+    result.x = v.x / scalar;
+    result.y = v.y / scalar;
+    result.z = v.z / scalar;
+    return result;
+}
+
+Vector3 operator/=(Vector3& v, float scalar)
+{
+    v.x /= scalar;
+    v.y /= scalar;
+    v.z /= scalar;
+    return v;
+}
 	
 
 	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farCrip){

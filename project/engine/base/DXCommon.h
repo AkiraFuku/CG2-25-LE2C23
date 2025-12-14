@@ -23,7 +23,7 @@ public:
     void PostDraw();
 
 
-   
+
     //getter
     Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() const {
         return device_.Get();
@@ -31,10 +31,10 @@ public:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {
         return commandList_.Get();
     }
-   /* Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() const {
-        return srvHeap_.Get();
-    }*/
-    //コンパイルシェーダー
+    /* Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() const {
+         return srvHeap_.Get();
+     }*/
+     //コンパイルシェーダー
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
     //クリエイトバッファ
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -43,10 +43,10 @@ public:
     //アップロードテクスチャ
     Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const  Microsoft::WRL::ComPtr<ID3D12Resource> textur, const DirectX::ScratchImage& mipImages);
 
-    Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible);
+    Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible);
 
 
-
+    static const float kDeltaTime;
 
 private:
     //FPS固定
@@ -55,6 +55,7 @@ private:
     void UpdateFixFPS();
     //記録用時間
     std::chrono::steady_clock::time_point reference_;
+
 
 
 private:

@@ -2,7 +2,8 @@
 #include "Logger.h"
 #include "TextureManager.h"
 #include "SrvManager.h"
-
+#include "MassFunction.h"
+#include <numbers>
 #pragma once
 ParticleManager* ParticleManager::instance = nullptr;
 uint32_t ParticleManager::kMaxNumInstance = 100;
@@ -20,19 +21,80 @@ void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
     //頂点リソースにデータを書き込む
     CreateVertexBuffer();
 }
+void ParticleManager::Update() {
+    Matrix4x4 backFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+    //ビルボード行列計算
+    Matrix4x4 billboardMatrix = Multiply(backFrontMatrix, camera_->GetWorldMatrix());
+    billboardMatrix.m[3][0] = 0.0f;
+    billboardMatrix.m[3][1] = 0.0f;
+    billboardMatrix.m[3][2] = 0.0f;
+    //カメラからビューとプロジェクション行列
+    Matrix4x4 viewMatrix = camera_->GetViewMatrix();
+    Matrix4x4 projectionMatrix = camera_->GetProjectionMatirx();
+    //
+    for (auto& [key, particleGroup] : particleGroups)
+    {
+        uint32_t  numInstance = 0;
+        for (std::list<Particle>::iterator particleIterator = particleGroup.particles.begin();
+            particleIterator != particleGroup.particles.end();
+            )
+        {
+
+
+
+
+            if ((*particleIterator).lifeTime <= (*particleIterator).currentTime)
+            {
+                particleIterator = particleGroup.particles.erase(particleIterator);
+                continue;
+            }
+
+            float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+            (*particleIterator).transfom.translate += (*particleIterator).velocity * DXCommon::kDeltaTime;
+            (*particleIterator).currentTime += DXCommon::kDeltaTime;
+
+            if (numInstance < kMaxNumInstance)
+            {
+
+                particleGroup.instancingData[numInstance].color.w = alpha;
+                Matrix4x4 worldMatrixInstance = {};
+              /*  if (isBillboard)
+                {*/
+                    (*particleIterator).transfom.rotate.z += 1.0f / 60.0f;
+
+
+                    worldMatrixInstance = MakeBillboardMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, billboardMatrix, (*particleIterator).transfom.translate);
+
+              /*  } else
+                {
+                    worldMatrixInstance = MakeAfineMatrix((*particleIterator).transfom.scale, (*particleIterator).transfom.rotate, (*particleIterator).transfom.traslate);
+
+                }*/
+                particleGroup.instancingData[numInstance].WVP = Multiply(worldMatrixInstance, Multiply(viewMatrix, projectionMatrix));
+                particleGroup.instancingData[numInstance].color.x = (*particleIterator).color.x;
+                particleGroup.instancingData[numInstance].color.y = (*particleIterator).color.y;
+                particleGroup.instancingData[numInstance].color.z = (*particleIterator).color.z;
+                ++numInstance;
+            }
+            ++particleIterator;
+
+        }
+
+    }
+}
 
 void ParticleManager::CreateParticleGroup(const std::string name, const std::string textureFilepath)
 {
     assert(particleGroups.contains(name));
-ParticleGroup newParticle=particleGroups[name];
-    newParticle.materialData.textureFilePath=textureFilepath;
-    newParticle.numInstance=100;
+    ParticleGroup newParticle = particleGroups[name];
+    newParticle.materialData.textureFilePath = textureFilepath;
+    newParticle.numInstance = 100;
     TextureManager::GetInstance()->LoadTexture(textureFilepath);
-    newParticle.materialData.textureIndex=srvManager_->AllocateSRV();
-    newParticle.instancingResource=dxCommon_-> CreateBufferResource(sizeof(ParticleForGPU)*newParticle.numInstance );
+    newParticle.materialData.textureIndex = srvManager_->AllocateSRV();
+    newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.numInstance);
 
-    srvManager_->CreateSRVforStructuredBuffer(newParticle.materialData.textureIndex,newParticle.instancingResource.Get(),newParticle.numInstance,sizeof(ParticleForGPU));
-  
+    srvManager_->CreateSRVforStructuredBuffer(newParticle.materialData.textureIndex, newParticle.instancingResource.Get(), newParticle.numInstance, sizeof(ParticleForGPU));
+
 }
 
 void ParticleManager::CreateRootSignature()

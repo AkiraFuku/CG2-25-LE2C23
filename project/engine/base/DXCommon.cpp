@@ -12,8 +12,7 @@
 #include <thread>
 
 
-
-
+const float DXCommon::kDeltaTime=1.0f/60.0f;
 
 void DXCommon::Initialize(WinApp* winApp)
 {
