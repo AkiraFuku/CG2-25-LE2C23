@@ -29,6 +29,8 @@
 #include "ModelManager.h"
 #include "Camera.h"
 #include "SrvManager.h"
+#include "ParticleManager.h"
+#include "PatricleEmitter.h"
 
 
 
@@ -133,6 +135,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
+    ParticleManager::GetInstance()->Initialize(dxCommon,srvManager);
+
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
     //ここから書く　外部入力
@@ -153,6 +157,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     camera->SetTranslate({ 0.0f,0.0f,-5.0f });
     object3dCommon->SetDefaultCamera(camera);
 
+     ParticleManager::GetInstance()->Setcamera(camera);
+
+
     Audio* audio = new Audio();
     audio->Initialize();
     Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.wav");
@@ -161,6 +168,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
+    ParticleManager::GetInstance()->CreateParticleGroup("Test","resources/uvChecker.png");
     std::vector<Sprite*> sprites;
     for (uint32_t i = 0; i < 5; i++)
     {
@@ -247,13 +255,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
        // ImGui::Begin("MaterialData");
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.1f,0.0f});
-        Vector3 cameraRotate = camera->GetRotate();
-        //ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
-        //ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
-        camera->SetRotate(cameraRotate);
-        camera->SetTranslate(camreaTranslate);
+        //Vector3 camreaTranslate = camera->GetTranslate();
+        //camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.1f,0.0f});
+        //Vector3 cameraRotate = camera->GetRotate();
+        ////ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
+        ////ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
+        //camera->SetRotate(cameraRotate);
+        //camera->SetTranslate(camreaTranslate);
         //ImGui::ColorEdit4("Color", &(materialData->color).x); 
         //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
         //ImGui::Checkbox("enable", &enableLighting);
@@ -364,6 +372,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     dxCommon = nullptr;
     TextureManager::GetInstance()->Finalize();
     ModelManager::GetInstance()->Finalize();
+    ParticleManager::GetInstance()->Finalize();
 
     winApp->Finalize();
     delete winApp;

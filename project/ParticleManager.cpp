@@ -29,6 +29,12 @@ ParticleManager* ParticleManager::GetInstance() {
     return instance;
 
 };
+void ParticleManager::Finalize() {
+
+    delete instance;
+    instance = nullptr;
+}
+
 void ParticleManager::Update() {
     Matrix4x4 backFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
     //ビルボード行列計算

@@ -69,7 +69,7 @@ public:
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
     static ParticleManager* GetInstance();
     void Emit (const std::string name, const Vector3& postion ,uint32_t count);
-
+    void Finalize();
     void Setcamera(Camera* camera) {
         camera_ = camera;
     }
