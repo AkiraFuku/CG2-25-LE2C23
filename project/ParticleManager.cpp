@@ -108,13 +108,13 @@ void ParticleManager::Draw() {
     for (auto& [key, particleGroup] : particleGroups) {
         dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
         dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
-        dxCommon_->GetCommandList()->DrawInstanced(6, particleGroup.numInstance, 0, 0);
+        dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.numInstance, 0, 0);
     }
 }
 
 void ParticleManager::CreateParticleGroup(const std::string name, const std::string textureFilepath)
 {
-    assert(particleGroups.contains(name));
+    assert(!particleGroups.contains(name));
     //
     ParticleGroup newParticle = particleGroups[name];
     newParticle.materialData.textureFilePath = textureFilepath;
@@ -216,13 +216,12 @@ void ParticleManager::CreateRootSignature()
         assert(false);
     }
     //バイナリを元にルートシグネチャー生成
-    Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature = nullptr;
     //ID3D12RootSignature* rootSignature = nullptr;
     hr_ = dxCommon_->GetDevice()->CreateRootSignature(
         0,
         signatureBlob.Get()->GetBufferPointer(),
         signatureBlob.Get()->GetBufferSize(),
-        IID_PPV_ARGS(&rootSignature)
+        IID_PPV_ARGS(&rootSignature_)
     );
     assert(SUCCEEDED(hr_));
 

@@ -33,7 +33,6 @@
 #include "PatricleEmitter.h"
 
 
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
@@ -206,7 +205,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
-
+Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
+    PatricleEmitter *emitter=new PatricleEmitter("Test",M,10,5.0f,0.0f);
 
     //メインループ
 
@@ -225,7 +225,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         input->Update();
 
-
+        emitter->Update();
+        ParticleManager::GetInstance()->Update();
 
         //// キー入力判定
        //if (input->TriggerKeyDown(DIK_D)) {
@@ -330,6 +331,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         dxCommon->PreDraw();
         srvManager->PreDraw();
 
+        ParticleManager::GetInstance()->Draw();
         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
         object3d2->Draw();

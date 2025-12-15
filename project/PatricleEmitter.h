@@ -2,6 +2,7 @@
 #include "Vector4.h"
 class PatricleEmitter
 {
+public:
     PatricleEmitter(const  std::string name, Transform transfom,uint32_t count,float frequency,float frequencyTime);
     void Update();
 private:
