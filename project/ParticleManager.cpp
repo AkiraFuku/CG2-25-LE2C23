@@ -95,7 +95,7 @@ void ParticleManager::Update() {
             ++particleIterator;
 
         }
-
+        particleGroup.numInstance = numInstance;
     }
 }
 void ParticleManager::Draw() {
@@ -108,21 +108,20 @@ void ParticleManager::Draw() {
     dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
     for (auto& [key, particleGroup] : particleGroups) {
-        // Index 0: CBV (b0) - マテリアル用定数バッファ等があればセット（なければ空でもよいが、RootSigで定義した以上何か入れるのが普通）
-        // 現状のコードではCBVの作成が見当たらないため、仮に飛ばすとエラーになる可能性があります。
-        // もしCBVを使わないなら、CreateRootSignatureでIndex 0を削除し、詰める必要があります。
+        if (particleGroup.numInstance > 0) {
 
-        // とりあえずコードの意図を汲んで修正すると：
-        dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0,materialResource_.Get()->GetGPUVirtualAddress());
+            // とりあえずコードの意図を汲んで修正すると：
+            dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
 
-        // [1] Descriptor Table (Instancing Data): インスタンシング用SRV
-        dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.instancingSRVIndex));
+            // [1] Descriptor Table (Instancing Data): インスタンシング用SRV
+            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.instancingSRVIndex));
 
-        // [2] Descriptor Table (Texture): テクスチャ用SRV
-        dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
-        // DrawCall
-        // 後述するトポロジーの修正に合わせて頂点数を変更 (6 -> 4)
-        dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.numInstance, 0, 0);
+            // [2] Descriptor Table (Texture): テクスチャ用SRV
+            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
+            // DrawCall
+            // 後述するトポロジーの修正に合わせて頂点数を変更 (6 -> 4)
+            dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.numInstance, 0, 0);
+        }
     }
 }
 
@@ -133,8 +132,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
     ParticleGroup& newParticle = particleGroups[name];
     newParticle.materialData.textureFilePath = textureFilepath;
     newParticle.numInstance = kMaxNumInstance;
-   // TextureManager::GetInstance()->LoadTexture(textureFilepath);
-    newParticle.materialData.textureIndex = newParticle.materialData.textureIndex = 
+    newParticle.materialData.textureIndex = newParticle.materialData.textureIndex =
         TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilepath);
     newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.numInstance);
 
@@ -279,7 +277,7 @@ void ParticleManager::CreateRootSignature()
     );
 
     assert(SUCCEEDED(hr_) && "Root Signature Creation Failed");
-  
+
 }
 void ParticleManager::CreatePSO() {
     CreateRootSignature();
@@ -396,8 +394,8 @@ void ParticleManager::CreateVertexBuffer() {
 
 void ParticleManager::CreateMaterialBuffer()
 {
-     //データの設定
-   
+    //データの設定
+
     materialResource_ =
         dxCommon_->
         CreateBufferResource(sizeof(Material));

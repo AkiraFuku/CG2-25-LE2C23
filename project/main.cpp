@@ -256,13 +256,13 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
 
        // ImGui::Begin("MaterialData");
-        //Vector3 camreaTranslate = camera->GetTranslate();
-        //camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.1f,0.0f});
+        Vector3 camreaTranslate = camera->GetTranslate();
+        camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.0f,-0.5f});
         //Vector3 cameraRotate = camera->GetRotate();
         ////ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
         ////ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
         //camera->SetRotate(cameraRotate);
-        //camera->SetTranslate(camreaTranslate);
+        camera->SetTranslate(camreaTranslate);
         //ImGui::ColorEdit4("Color", &(materialData->color).x); 
         //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
         //ImGui::Checkbox("enable", &enableLighting);
@@ -334,18 +334,18 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
         ParticleManager::GetInstance()->Draw();
         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
-        object3d2->Draw();
-        object3d->Draw();
+        //object3d2->Draw();
+        //object3d->Draw();
 
 
-        /////スプライトの描画
+        ///////スプライトの描画
 
-        for (Sprite* sprite : sprites)
-        {
-            spritecommon->SpriteCommonDraw();
-            sprite->Draw();
+        //for (Sprite* sprite : sprites)
+        //{
+        //    spritecommon->SpriteCommonDraw();
+        //    sprite->Draw();
 
-        }
+        //}
 
         ///
 
@@ -368,6 +368,7 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
     {
         delete sprite;
     }
+    delete emitter;
     delete spritecommon;
     delete srvManager;
     delete dxCommon;
