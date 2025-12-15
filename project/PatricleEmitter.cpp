@@ -18,3 +18,9 @@ void PatricleEmitter::Update() {
 
     }
 }
+
+void PatricleEmitter::Emit()
+{
+           ParticleManager::GetInstance()->Emit(name_,transfom_.translate,count_);
+
+}

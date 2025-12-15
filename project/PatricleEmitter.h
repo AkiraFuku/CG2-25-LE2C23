@@ -5,6 +5,7 @@ class PatricleEmitter
 public:
     PatricleEmitter(const  std::string name, Transform transfom,uint32_t count,float frequency,float frequencyTime);
     void Update();
+    void Emit();
 private:
         Transform transfom_;//位置
         uint32_t count_;//パーティクル数
