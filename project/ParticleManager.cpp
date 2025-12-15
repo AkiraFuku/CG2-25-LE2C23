@@ -106,8 +106,8 @@ void ParticleManager::Draw() {
     dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
     for (auto& [key, particleGroup] : particleGroups) {
-        dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
         dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
+        dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
         dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.numInstance, 0, 0);
     }
 }
@@ -116,16 +116,20 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 {
     assert(!particleGroups.contains(name));
     //
-    ParticleGroup newParticle = particleGroups[name];
+    ParticleGroup& newParticle = particleGroups[name];
     newParticle.materialData.textureFilePath = textureFilepath;
-    newParticle.numInstance = 100;
+    newParticle.numInstance = kMaxNumInstance;
     TextureManager::GetInstance()->LoadTexture(textureFilepath);
     newParticle.materialData.textureIndex = srvManager_->AllocateSRV();
     newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.numInstance);
 
 
     srvManager_->CreateSRVforStructuredBuffer(newParticle.materialData.textureIndex, newParticle.instancingResource.Get(), newParticle.numInstance, sizeof(ParticleForGPU));
-
+    newParticle.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newParticle.instancingData));
+    for (uint32_t i = 0; i < newParticle.numInstance; ++i) {
+        newParticle.instancingData[i].WVP = Makeidetity4x4(); // 単位行列などで埋める
+        newParticle.instancingData[i].color = { 1.0f, 1.0f, 1.0f, 0.0f };
+    }
 }
 
 void ParticleManager::Emit(const std::string name, const Vector3& postion, uint32_t count)
@@ -323,18 +327,19 @@ void ParticleManager::CreateVertexBuffer() {
         {{-1.0f, -1.0f, 0.0f, 1.0f},     {0.0f, 1.0f},   {0.0f, 0.0f, 1.0f}}, // 左下
         {{ 1.0f, -1.0f, 0.0f, 1.0f},     {1.0f, 1.0f},   {0.0f, 0.0f, 1.0f}}, // 右下
     };
+    size_t sizeIB = sizeof(vertices);
     //頂点リソースの作成
     vertexResourse_ =
         dxCommon_->
-        CreateBufferResource(sizeof(VertexData));
+        CreateBufferResource(sizeIB);
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
-    vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData));
+    vertexBufferView_.SizeInBytes = UINT(sizeIB);
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
     vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
     //頂点データの転送
-    memcpy(vertexData_, vertices, sizeof(VertexData));
+    memcpy(vertexData_, vertices, sizeIB);
 
 }

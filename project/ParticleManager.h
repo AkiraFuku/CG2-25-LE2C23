@@ -42,14 +42,7 @@ public:
 
     };
 
-    //struct Emitter
-    //{
-    //    Transform transfom;//位置
-    //    uint32_t count;//パーティクル数
-    //    float frequency;//範囲
-    //    float frequencyTime;//発生時間
-
-    //};
+    
 
     struct ParticleGroup
     {
