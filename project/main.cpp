@@ -256,13 +256,13 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
 
        // ImGui::Begin("MaterialData");
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.0f,-0.5f});
-        //Vector3 cameraRotate = camera->GetRotate();
-        ////ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
-        ////ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
-        //camera->SetRotate(cameraRotate);
-        camera->SetTranslate(camreaTranslate);
+        //Vector3 camreaTranslate = camera->GetTranslate();
+        //camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.0f,-0.5f});
+        ////Vector3 cameraRotate = camera->GetRotate();
+        //////ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
+        //////ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
+        ////camera->SetRotate(cameraRotate);
+        //camera->SetTranslate(camreaTranslate);
         //ImGui::ColorEdit4("Color", &(materialData->color).x); 
         //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
         //ImGui::Checkbox("enable", &enableLighting);
