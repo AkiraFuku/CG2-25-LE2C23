@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "TextureManager.h"
 #include "ModelCommon.h"
-#include "MassFunction.h"
+#include "MathFunction.h"
 #include <cassert>
 #include <fstream> 
 #include <sstream>

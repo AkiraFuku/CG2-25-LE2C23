@@ -35,7 +35,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
     </ClCompile>
-    <ClCompile Include="engine\math\MassFunction.cpp" />
+    <ClCompile Include="engine\math\MathFunction.cpp" />
     <ClCompile Include="engine\base\WinApp.cpp" />
     <ClCompile Include="engine\2d\SpriteCommon.cpp" />
     <ClCompile Include="engine\2d\Sprite.cpp" />
@@ -48,7 +48,7 @@
     <ClCompile Include="engine\2d\TextureManager.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
-    <ClCompile Include="PatricleEmitter.cpp" />
+    <ClCompile Include="ParicleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -94,7 +94,7 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="engine\math\MassFunction.h" />
+    <ClInclude Include="engine\math\MathFunction.h" />
     <ClInclude Include="engine\2d\Vector4.h" />
     <ClInclude Include="engine\input\Input.h" />
     <ClInclude Include="engine\base\WinApp.h" />
@@ -110,7 +110,7 @@
     <ClInclude Include="engine\2d\TextureManager.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
-    <ClInclude Include="PatricleEmitter.h" />
+    <ClInclude Include="ParicleEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

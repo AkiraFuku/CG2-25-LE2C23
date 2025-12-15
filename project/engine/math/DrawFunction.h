@@ -1,7 +1,7 @@
 #pragma once
 
 #pragma once
-#include "MassFunction.h"
+#include "MathFunction.h"
 #include "Vector4.h"
 struct Sphere{
 	Vector3 center;//中心

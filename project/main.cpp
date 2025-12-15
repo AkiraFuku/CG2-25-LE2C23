@@ -13,7 +13,7 @@
 #include"imgui_impl_win32.h"
 #include "WinApp.h"
 #include "DXCommon.h"
-#include"MassFunction.h"
+#include"MathFunction.h"
 #include"Audio.h"
 #include"Input.h"
 #include"D3DResourceLeakChecker.h"
@@ -30,7 +30,7 @@
 #include "Camera.h"
 #include "SrvManager.h"
 #include "ParticleManager.h"
-#include "PatricleEmitter.h"
+#include "ParicleEmitter.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -206,7 +206,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
 Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
-    PatricleEmitter *emitter=new PatricleEmitter("Test",M,10,5.0f,0.0f);
+    ParicleEmitter *emitter=new ParicleEmitter("Test",M,10,5.0f,0.0f);
 
     //メインループ
 

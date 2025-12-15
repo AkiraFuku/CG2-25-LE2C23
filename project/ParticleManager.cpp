@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include "TextureManager.h"
 #include "SrvManager.h"
-#include "MassFunction.h"
+#include "MathFunction.h"
 #include <numbers>
 #pragma once
 ParticleManager* ParticleManager::instance = nullptr;

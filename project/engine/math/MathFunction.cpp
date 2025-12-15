@@ -1,4 +1,4 @@
-#include "MassFunction.h"
+#include "MathFunction.h"
 //
 // 
 // 

@@ -1,9 +1,9 @@
 #pragma once
 #include "Vector4.h"
-class PatricleEmitter
+class ParicleEmitter
 {
 public:
-    PatricleEmitter(const  std::string name, Transform transfom,uint32_t count,float frequency,float frequencyTime);
+    ParicleEmitter(const  std::string name, Transform transfom,uint32_t count,float frequency,float frequencyTime);
     void Update();
     void Emit();
 private:

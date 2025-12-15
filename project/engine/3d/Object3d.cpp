@@ -3,7 +3,7 @@
 #include <cassert>
 #include <fstream> // 追加: ifstreamの完全な型を利用するため
 #include <sstream> // 追加: istringstreamのため
-#include "MassFunction.h"
+#include "MathFunction.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
 

@@ -1,6 +1,6 @@
 #include "Sprite.h"
 #include "SpriteCommon.h"
-#include "MassFunction.h"
+#include "MathFunction.h"
 #include "TextureManager.h"
 void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
 

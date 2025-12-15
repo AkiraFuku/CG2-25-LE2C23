@@ -1,7 +1,7 @@
-#include "PatricleEmitter.h"
+#include "ParicleEmitter.h"
 #include "DXCommon.h"
 #include "ParticleManager.h"
-PatricleEmitter::PatricleEmitter(const  std::string name, Transform transfom, uint32_t count, float frequency, float frequencyTime) {
+ParicleEmitter::ParicleEmitter(const  std::string name, Transform transfom, uint32_t count, float frequency, float frequencyTime) {
     transfom_ = transfom;
     count_ = count;
     frequency_ = frequency;
@@ -9,7 +9,7 @@ PatricleEmitter::PatricleEmitter(const  std::string name, Transform transfom, ui
     name_ = name;
 
 }
-void PatricleEmitter::Update() {
+void ParicleEmitter::Update() {
     frequencyTime_ += DXCommon::kDeltaTime;
     if (frequency_ <= frequencyTime_)
     {
@@ -19,7 +19,7 @@ void PatricleEmitter::Update() {
     }
 }
 
-void PatricleEmitter::Emit()
+void ParicleEmitter::Emit()
 {
            ParticleManager::GetInstance()->Emit(name_,transfom_.translate,count_);
 
