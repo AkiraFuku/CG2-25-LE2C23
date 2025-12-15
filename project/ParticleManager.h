@@ -24,6 +24,13 @@ public:
         Vector2 texcoord; // 2D texture coordinate vector
         Vector3 normal;
     };
+    struct Material
+    {
+        Vector4 color;
+        int32_t enableLighting;
+        float padding[3]; // パディングを追加してサイズを揃える
+        Matrix4x4 uvTransform; // UV変換行列
+    };
     struct Particle
     {
         Transform transfom;
@@ -42,13 +49,13 @@ public:
 
     };
 
-    
+
 
     struct ParticleGroup
     {
         MaterialData materialData;
         std::list<Particle> particles;
-        D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc;
+        uint32_t instancingSRVIndex;
         Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;
         uint32_t numInstance;
         ParticleForGPU* instancingData;
@@ -61,7 +68,7 @@ public:
     void Draw();
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
     static ParticleManager* GetInstance();
-    void Emit (const std::string name, const Vector3& postion ,uint32_t count);
+    void Emit(const std::string name, const Vector3& postion, uint32_t count);
     void Finalize();
     void Setcamera(Camera* camera) {
         camera_ = camera;
@@ -79,7 +86,7 @@ private:
 
     std::random_device seedGen_;
     std::mt19937 randomEngine_;
-    HRESULT hr_ =0;
+    HRESULT hr_ = 0;
     //ルートシグネチャ
     Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;
     void CreateRootSignature();
@@ -90,13 +97,17 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
     VertexData* vertexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+    //マテリアル
+    Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+    Material* materialData_ = nullptr;
     void CreateVertexBuffer();
+    void CreateMaterialBuffer();
     void CreatePSO();
 
     std::unordered_map<std::string, ParticleGroup> particleGroups;
 
-    
 
-    Camera* camera_=nullptr;
+
+    Camera* camera_ = nullptr;
 };
 
