@@ -85,3 +85,7 @@ enum BlendMode
 
 
 };
+struct CameraForGPU
+{
+    Vector3 worldPostion;
+};

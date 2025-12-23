@@ -14,6 +14,12 @@ struct DirectionalLight
 
 
 };
+struct Camera
+{
+    float3 worldPostion;
+};
+
+ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 struct PixelShaderOutput{
@@ -23,6 +29,7 @@ Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 PixelShaderOutput main(VertexShaderOutput input)
 {
+    float3 toEye = normalize(gCamera.worldPostion - input.worldPostion);
     float4 transformedUV = mul(float4(input.texCoord,0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
     if (textureColor.a < 0.1f)
