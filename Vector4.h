@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 
+
 struct Vector4{
     float x;
     float y;
@@ -39,7 +40,7 @@ struct Material
     int32_t enableLighting;
     float padding[3]; // パディングを追加してサイズを揃える
     Matrix4x4 uvTransform; // UV変換行列
-    
+    float  shininess;
 };
 
 struct TransformationMatrix
@@ -52,8 +53,6 @@ struct DirectionalLight{
     Vector4 color;//ライトの色
     Vector3 direction;//ライトの向き
     float intensity;// 明るさ
-
-
 };
 struct MaterialData
 {

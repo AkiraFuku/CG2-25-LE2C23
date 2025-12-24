@@ -985,7 +985,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     ///ルートパラメータの設定
-    D3D12_ROOT_PARAMETER rootParameters[4]{};
+    D3D12_ROOT_PARAMETER rootParameters[5]{};
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
@@ -999,7 +999,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[3].Descriptor.ShaderRegister = 1;
-
+    rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
+    rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
+    rootParameters[4].Descriptor.RegisterSpace = 0;
+    rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーのみ見える
     descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
     descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
@@ -1070,15 +1073,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     BlendMode blendMode = BlendMode::kBrendMode_Alpha;
 
     changeBlendMode(blendDesc, blendMode);
-    // blendDesc.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;
-     //blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドしない
-     //blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの係数
-    // blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-    // blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//デストの係数
-    // blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの係数
-    // blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
-    // blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの係数
-     //RasteriwrStateの設定
+    //RasteriwrStateの設定
     D3D12_RASTERIZER_DESC rasterizerDesc{};
     rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;//カリングなし
     //BACK;
@@ -1187,7 +1182,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     vertexResourceSphere->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
     //インデックスバッファビューの設定
 
-     Microsoft::WRL::ComPtr<ID3D12Resource>indexResourceSphere = CreateBufferResource(device, (sizeof(uint32_t) * 6) * kSubdivision * (kSubdivision + 1));
+    Microsoft::WRL::ComPtr<ID3D12Resource>indexResourceSphere = CreateBufferResource(device, (sizeof(uint32_t) * 6) * kSubdivision * (kSubdivision + 1));
     D3D12_INDEX_BUFFER_VIEW indexBufferViewSphere{};
 
     indexBufferViewSphere.BufferLocation = indexResourceSphere->GetGPUVirtualAddress();
@@ -1352,7 +1347,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     materialData->enableLighting = true;
     materialData->uvTransform = Makeidetity4x4();
-
+    materialData->shininess = 50.0f;
     ///WVP行列リソースの設定
     Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = CreateBufferResource(device, sizeof(TransformationMatrix));
     //WVP行列データの設定
@@ -1572,7 +1567,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+    // 1. カメラ用定数バッファのリソースを作成 (サイズは256バイトの倍数である必要がある)
+//    CreateBufferResource関数はmain.cppにある既存のものを使用
+    Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource = CreateBufferResource(device, (sizeof(CameraForGPU) + 0xff) & ~0xff);
 
+    // 2. 定数バッファにデータを書き込むためのポインタを取得 (Map)
+    CameraForGPU* cameraData = nullptr;
+    cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+
+    // 3. 初期値を設定 (例: (0, 0, -5) )
+    cameraData->worldPostion = cameraTransform.traslate;
 
 
 
@@ -1631,6 +1635,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             }
 
+            cameraData->worldPostion = cameraTransform.traslate;
 
 
             // ImGui::ShowDemoWindow();
@@ -1762,12 +1767,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             commandList->SetPipelineState(graphicsPipelineState.Get());
             //VBVの設定
             //commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-            
+
              //VBVの設定
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             //IBVの設定
             commandList->IASetIndexBuffer(&indexBufferViewSphere);
-            
+
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1779,11 +1784,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             // 追加: 平行光源CBVをバインド
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
             //
+             commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
             //描画コマンド
-              commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-         //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-           // commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-            ///
+            commandList->DrawIndexedInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
+            //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
+              // commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+               ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 
