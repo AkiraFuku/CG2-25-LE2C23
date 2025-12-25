@@ -1357,6 +1357,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //行列の初期化
     wvpData->WVP = Makeidetity4x4();
     wvpData->World = Makeidetity4x4();
+    wvpData->WorldInverseTranspose=Inverse( wvpData->World );
 
 
     //コマンドリストの初期化
@@ -1658,6 +1659,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             materialData->enableLighting = enableLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate", &(transform.rotate.x));
             ImGui::DragFloat3("traslate", &(transform.traslate.x));
+            ImGui::DragFloat3("scale", &(transform.scale.x));
             ImGui::Checkbox("useMonsterBall", &useMonstorBall);
             ImGui::ColorEdit4("ColorSprite", &(materialDataSprite->color).x);
             //ImGui::ColorPicker4("ColorPicker", &(materialDataSprite->color).x);
@@ -1676,11 +1678,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
             wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
             wvpData->World = worldMatrix;
+            wvpData->WorldInverseTranspose=Inverse(worldMatrix);
             Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
             Matrix4x4 viewMatrixSprite = Makeidetity4x4();
             Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(kClientWidth), static_cast<float>(kClientHeight), 0.0f, 100.0f);
             transformationMatrixDataSprite->WVP = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
             transformationMatrixDataSprite->World = worldMatrixSprite;
+            transformationMatrixDataSprite->WorldInverseTranspose=Makeidetity4x4();
             directionalLightData->direction = Normalize(directionalLightData->direction);
 
             Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
