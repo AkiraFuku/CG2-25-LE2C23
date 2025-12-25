@@ -39,10 +39,12 @@ PixelShaderOutput main(VertexShaderOutput input)
     {
         discard; // 透明度が低いピクセルを破棄
     }
+    float3 halfVector = normalize(-gDirectionalLight.direction + toEye);
     
+    float NDotH = dot(normalize(input.normal), halfVector);
     PixelShaderOutput output;
     
-    
+    float specularPow;
     if (gMaterial.enableLighting != 0)
     {
         float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
@@ -51,7 +53,8 @@ PixelShaderOutput main(VertexShaderOutput input)
        // output.color.rgb = gMaterial.Color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
        // output.color.a = gMaterial.Color.a * textureColor.a;
         float RdotE = dot(reflectLight, toEye);
-        float specularPow = pow(saturate(RdotE), gMaterial.shininess);
+        //specularPow = pow(saturate(RdotE), gMaterial.shininess);
+        specularPow = pow(saturate(NDotH), gMaterial.shininess);
         float3 diffuse =
     gMaterial.Color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
         float3 speculer =
