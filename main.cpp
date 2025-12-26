@@ -985,7 +985,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     ///ルートパラメータの設定
-    D3D12_ROOT_PARAMETER rootParameters[5]{};
+    D3D12_ROOT_PARAMETER rootParameters[6]{};
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
@@ -999,13 +999,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
     rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//ディスクリプタレンジの数
     ///
-    //rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-    //rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
-    //rootParameters[3].Descriptor.ShaderRegister = 1;
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
-    rootParameters[3].Descriptor.ShaderRegister = 3;                    // register(b3)
-    rootParameters[3].Descriptor.RegisterSpace = 0;                     // space0
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用
+    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
+    rootParameters[3].Descriptor.ShaderRegister = 1;
+    rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
+    rootParameters[5].Descriptor.ShaderRegister = 3;                    // register(b3)
+    rootParameters[5].Descriptor.RegisterSpace = 0;                     // space0
+    rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用
     //
     rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
     rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
@@ -1593,7 +1593,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-    static int currentLightingType = 2; // デフォルトはBlinn-Phong
+ 
 
 
 
@@ -1683,12 +1683,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::End();
             ImGui::Begin("Settings");
             // ラジオボタンで切り替え
-            ImGui::RadioButton("Lambert", &currentLightingType, 0);
+            ImGui::RadioButton("Lambert", & materialData->lightingType, 0);
             ImGui::SameLine();
-            ImGui::RadioButton("Phong", &currentLightingType, 1);
+            ImGui::RadioButton("Phong", & materialData->lightingType, 1);
             ImGui::SameLine();
-            ImGui::RadioButton("Blinn-Phong", &currentLightingType, 2);
+            ImGui::RadioButton("Blinn-Phong", & materialData->lightingType, 2);
             ImGui::End();
+          
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
