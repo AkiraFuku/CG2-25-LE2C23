@@ -1688,6 +1688,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::RadioButton("Phong", &currentLightingType, 1);
             ImGui::SameLine();
             ImGui::RadioButton("Blinn-Phong", &currentLightingType, 2);
+            ImGui::SameLine();
+            ImGui::RadioButton("Half-Lambert", &currentLightingType, 3);
             ImGui::End();
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);

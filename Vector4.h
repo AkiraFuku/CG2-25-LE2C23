@@ -94,7 +94,8 @@ enum LightingType
 {
     Lambert,
     Phong,
-    BlinnPhong
+    BlinnPhong,
+    HarfLambert,
 };
 struct CameraForGPU
 {
