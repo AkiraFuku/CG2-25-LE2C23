@@ -48,6 +48,7 @@ ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<PointLight> gPointLight : register(b3);
+ConstantBuffer<SpotLight> gSpotLight : register(b4);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -134,6 +135,37 @@ PixelShaderOutput main(VertexShaderOutput input)
     float factor = pow(saturate(-distance/gPointLight.radius+1.0f),gPointLight.decay);
     finalLighting += CalculateLight(N, L_point, V, gPointLight.color.rgb, gPointLight.intensity*factor);
 
+    // -----------------------------------------------------------
+    // Spot Light の計算
+    // -----------------------------------------------------------
+    // 1. 光源への方向ベクトルと距離を計算
+    float3 directionToSpotLight =  input.worldPosition -gSpotLight.position;
+    float distanceSpot = length(directionToSpotLight);
+    float3 L_spot = normalize(directionToSpotLight); // 光源方向 (単位ベクトル)
+
+    // 2. 距離による減衰 (Falloff)
+    // PointLightと同じく、指定距離(distance)で強度が0になるよう計算
+    float distFactor = pow(saturate(-distanceSpot / gSpotLight.distance + 1.0f), gSpotLight.decay);
+
+    // 3. 角度による減衰 (Cone Falloff)
+    // ライトの向き(direction)と、現在地点への方向(-L_spot)の角度を計算
+    float3 spotDirection = normalize(gSpotLight.direction);
+    // 表面からライトへのベクトル(L_spot) と ライトの照射方向(spotDirection) の「逆向き」の内積をとる
+    // これにより、ライトの正面方向とのズレ(cosθ)が求まる
+    float cosAngle = dot(L_spot, gSpotLight.direction);
+
+    // 指定された角度(cosAngle)を下回ったら0、中心(1.0)なら1になるように補間
+    // (cosTheta - 閾値) / (1.0 - 閾値) で正規化して saturate
+    float angleFactor = saturate((cosAngle - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
+    
+    // ※もし「境界ぼかし」なしでくっきり切りたい場合は以下を使用:
+    // float angleFactor = step(gSpotLight.cosAngle, cosAngle);
+
+    // 4. ライティング計算と合成
+    // 距離減衰 * 角度減衰 をライト強度(intensity)に乗算して渡す
+    finalLighting += CalculateLight(N, L_spot, V, gSpotLight.color.rgb, gSpotLight.intensity * distFactor * angleFactor);
+    
+    
     // -----------------------------------------------------------
     // 結果の合成
     // -----------------------------------------------------------
