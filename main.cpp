@@ -1354,6 +1354,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //データの設定
     materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     materialData->enableLighting = true;
+    materialData->diffuseType = true;
+    materialData->specularType = Phong;
     materialData->uvTransform = Makeidetity4x4();
     materialData->shininess = 50.0f;
     ///WVP行列リソースの設定
@@ -1593,7 +1595,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
- 
+
 
 
 
@@ -1662,9 +1664,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             };
             ImGui::Combo("BlendMode", &blendModeIndex, blendModeItems, IM_ARRAYSIZE(blendModeItems));
 
-            bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
-            ImGui::Checkbox("enable", &enableLighting);
-            materialData->enableLighting = enableLighting; // Update the original value after modification
+            //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
+            //ImGui::Checkbox("enable", &enableLighting);
+            //materialData->enableLighting = enableLighting; // Update the original value after modification
             ImGui::DragFloat3("rotate", &(transform.rotate.x));
             ImGui::DragFloat3("traslate", &(transform.traslate.x));
             ImGui::DragFloat3("scale", &(transform.scale.x));
@@ -1682,14 +1684,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
             ImGui::End();
             ImGui::Begin("Settings");
-            // ラジオボタンで切り替え
-            ImGui::RadioButton("Lambert", & materialData->lightingType, 0);
-            ImGui::SameLine();
-            ImGui::RadioButton("Phong", & materialData->lightingType, 1);
-            ImGui::SameLine();
-            ImGui::RadioButton("Blinn-Phong", & materialData->lightingType, 2);
+            int* pEnableLighting = reinterpret_cast<int*>(&materialData->enableLighting);
+            ImGui::Checkbox("Enable Lighting", (bool*)pEnableLighting);
+            if (materialData->enableLighting) {
+                // 拡散反射 (Diffuse) の設定
+                ImGui::Text("Diffuse (Base)");
+                const char* diffuseItems[] = { "Lambert", "Half-Lambert" };
+                ImGui::Combo("Diffuse Type", &materialData->diffuseType, diffuseItems, IM_ARRAYSIZE(diffuseItems));
+
+                // 鏡面反射 (Specular) の設定
+                ImGui::Text("Specular (Shininess)");
+                const char* specularItems[] = { "None", "Phong", "Blinn-Phong" };
+                ImGui::Combo("Specular Type", &materialData->specularType, specularItems, IM_ARRAYSIZE(specularItems));
+
+                // 光沢度
+                ImGui::DragFloat("Shininess", &materialData->shininess, 0.1f, 1.0f, 256.0f);
+            }
             ImGui::End();
-          
+
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);

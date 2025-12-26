@@ -37,8 +37,10 @@ struct VertexData {
 struct Material {
     Vector4 color;
     int32_t enableLighting;
-    int32_t lightingType; // 0:Lambert, 1:Phong, 2:BlinnPhong
-    float padding[2];     // パディングを減らす
+    int32_t diffuseType;  // 0:Lambert, 1:Half-Lambert
+    int32_t specularType; // 0:None, 1:Phong, 2:BlinnPhong
+
+    float padding[1];
     Matrix4x4 uvTransform;
     float shininess;
 };
@@ -94,7 +96,7 @@ enum LightingType
 {
     Lambert,
     Phong,
-    BlinnPhong
+    BlinnPhong,
 };
 struct CameraForGPU
 {
