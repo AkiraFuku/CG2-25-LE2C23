@@ -1371,7 +1371,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
     //コマンドリストの初期化
-    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-2.5f,0.0f} };
     Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
     Microsoft::WRL::ComPtr<ID3D12Resource> transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -1557,7 +1557,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     directionalLightResourse.Get()->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
     directionalLightData->color = { 1.0f,1.0f,1.0f,1.0f };
     directionalLightData->direction = { 0.0f,-1.0f,0.0f };
-    directionalLightData->intensity = 1.0f;
+    directionalLightData->intensity = 0.0f;
 
     //uvTransformの初期化
     Transform uvTransformSprite{
@@ -1587,7 +1587,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
 
     // 3. 初期値を設定 (例: (0, 0, -5) )
-    cameraData->worldPostion = cameraTransform.traslate;
+    cameraData->worldPosition = cameraTransform.traslate;
 
 
 
@@ -1604,7 +1604,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 4. 初期値を設定
     pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白
     pointLightData->position = { 0.0f, 2.0f, 0.0f };    // 座標 (Y=2.0)
-    pointLightData->intensity = 1.0f;                   // 強度
+    pointLightData->intensity = 1.0f;  // 強度
+    pointLightData->radius=1.0f;
+    pointLightData->decay=0.1f;
 
 
     BYTE preKey[256] = {};
@@ -1654,7 +1656,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             }
 
-            cameraData->worldPostion = cameraTransform.traslate;
+            cameraData->worldPosition = cameraTransform.traslate;
 
 
             // ImGui::ShowDemoWindow();
@@ -1709,6 +1711,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 ImGui::DragFloat("Shininess", &materialData->shininess, 0.1f, 1.0f, 256.0f);
             }
              ImGui::DragFloat3("traslate", &(pointLightData->position.x));
+             ImGui::DragFloat("radius", &(pointLightData->radius));
+             ImGui::DragFloat("decay", &(pointLightData->decay));
+
             ImGui::End();
 
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);

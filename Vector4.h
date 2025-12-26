@@ -61,6 +61,9 @@ struct PointLight {
     Vector4 color;//ライトの色
     Vector3 position;//ライトの向き
     float intensity;// 明るさ
+    float radius;
+    float decay;
+    float padding[2];
 };
 struct MaterialData
 {
@@ -100,5 +103,5 @@ enum LightingType
 };
 struct CameraForGPU
 {
-    Vector3 worldPostion;
+    Vector3 worldPosition;
 };
