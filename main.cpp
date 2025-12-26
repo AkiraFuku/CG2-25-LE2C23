@@ -1161,7 +1161,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     );
     assert(SUCCEEDED(hr));
     ///
-    ModelData modelData = LoadObjFile("resources", "fence.obj");
+    ModelData modelData = LoadObjFile("resources", "terrain.obj");
 
     //頂点リソース
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
@@ -1593,10 +1593,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource = CreateBufferResource(device, sizeof(PointLight));
 
+    PointLight* pointLightData = nullptr;
 
+    // 3. データを書き込むためのアドレスを取得 (Map)
+    hr = pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+    assert(SUCCEEDED(hr));
 
-
+    // 4. 初期値を設定
+    pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白
+    pointLightData->position = { 0.0f, 2.0f, 0.0f };    // 座標 (Y=2.0)
+    pointLightData->intensity = 1.0f;                   // 強度
 
 
     BYTE preKey[256] = {};
@@ -1700,6 +1708,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 // 光沢度
                 ImGui::DragFloat("Shininess", &materialData->shininess, 0.1f, 1.0f, 256.0f);
             }
+             ImGui::DragFloat3("traslate", &(pointLightData->position.x));
             ImGui::End();
 
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
@@ -1818,10 +1827,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
             //
             commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+            commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
             //描画コマンド
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             commandList->DrawIndexedInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
             //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-              // commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+            commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
                ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
