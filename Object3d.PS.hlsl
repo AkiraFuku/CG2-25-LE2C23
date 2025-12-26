@@ -4,7 +4,8 @@ struct Material
 {
     float4 Color;
     int enableLighting;
-    float4x4 uvTransform; // UV変換行列
+    int lightingType;
+    float4x4 uvTransform;
     float shininess;
 };
 struct DirectionalLight
@@ -53,42 +54,61 @@ PixelShaderOutput main(VertexShaderOutput input)
     float NDotH = dot(normalize(input.normal), halfVector);
     PixelShaderOutput output;
     
-    float specularPow;
     if (gMaterial.enableLighting != 0)
     {
-        float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(Ndotl * 0.5f + 0.5f, 2.0f);
-        
-       // output.color.rgb = gMaterial.Color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-       // output.color.a = gMaterial.Color.a * textureColor.a;
-        float RdotE = dot(reflectLight, toEye);
-        //specularPow = pow(saturate(RdotE), gMaterial.shininess);
-        specularPow = pow(saturate(NDotH), gMaterial.shininess);
-        float3 diffuse =
-    gMaterial.Color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-        float3 speculer =
-        gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
-        
-        output.color.rgb = diffuse + speculer;
-        output.color.a = gMaterial.Color.a * textureColor.a;
-        if (output.color.a < 0.1f)
+    // 基本的なベクトル計算
+        float3 N = normalize(input.normal);
+        float3 L = normalize(-gDirectionalLight.direction); // ライトへの向き
+        float3 V = normalize(toEye); // 視点への向き (toEye)
+
+    // ランバート (拡散反射)
+    // NとLの内積。0未満にならないようにsaturateまたはmax(0, ...)
+        float NdotL = dot(N, L);
+        float cos = saturate(NdotL);
+
+    // 拡散反射光 (Diffuse)
+    // ランバート、フォン、ブリンフォンすべてで共通して使用
+        float3 diffuse = gMaterial.Color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+
+    // 鏡面反射光 (Specular)
+        float3 specular = float3(0, 0, 0);
+        float specularPow = 0.0f;
+
+    // --- ライティングモデルの切り替え ---
+        if (gMaterial.lightingType == 0)
         {
-            discard; // 透明度が低いピクセルを破棄
-            
+        // [0: Lambert] スペキュラなし
+            specular = float3(0, 0, 0);
         }
+        else if (gMaterial.lightingType == 1)
+        {
+        // [1: Phong] 反射ベクトル R を使う
+            float3 R = reflect(-L, N); // ライト方向を反射
+            float RdotV = dot(R, V);
+            specularPow = pow(saturate(RdotV), gMaterial.shininess);
         
+            specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow;
+        }
+        else if (gMaterial.lightingType == 2)
+        {
+        // [2: Blinn-Phong] ハーフベクトル H を使う
+            float3 H = normalize(L + V);
+            float NdotH = dot(N, H);
+            specularPow = pow(saturate(NdotH), gMaterial.shininess);
+        
+            specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow;
+        }
+
+    // 最終合成
+        output.color.rgb = diffuse + specular;
+        output.color.a = gMaterial.Color.a * textureColor.a;
+
     }
     else
     {
-        output.color = gMaterial.Color * textureColor; // Red color
-        if (output.color.a < 0.1f)
-        {
-            discard; // 透明度が低いピクセルを破棄
-            
-        }
+    // ライティング無効時
+        output.color = gMaterial.Color * textureColor;
     }
-    
-  
-    
+
     return output;
 }

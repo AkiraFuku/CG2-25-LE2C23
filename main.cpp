@@ -1593,7 +1593,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-
+    static int currentLightingType = 2; // デフォルトはBlinn-Phong
 
 
 
@@ -1680,6 +1680,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x, 0.01f, -10.0f, 10.0f);
             ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
             ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);
+            ImGui::End();
+            ImGui::Begin("Settings");
+            // ラジオボタンで切り替え
+            ImGui::RadioButton("Lambert", &currentLightingType, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("Phong", &currentLightingType, 1);
+            ImGui::SameLine();
+            ImGui::RadioButton("Blinn-Phong", &currentLightingType, 2);
             ImGui::End();
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
