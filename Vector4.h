@@ -73,7 +73,8 @@ struct SpotLight {
     float distance;
     float decay;
     float cosAngle;
-    float padding[2];
+    float cosFalloffStart;
+    float padding;
 };
 struct MaterialData
 {

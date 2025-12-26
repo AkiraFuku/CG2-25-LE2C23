@@ -36,6 +36,7 @@ struct SpotLight
     float distance;
     float decay;
     float cosAngle;
+    float cosFalloffStart;
    
 };
 
@@ -148,15 +149,20 @@ PixelShaderOutput main(VertexShaderOutput input)
     float distFactor = pow(saturate(-distanceSpot / gSpotLight.distance + 1.0f), gSpotLight.decay);
 
     // 3. 角度による減衰 (Cone Falloff)
-    // ライトの向き(direction)と、現在地点への方向(-L_spot)の角度を計算
-    float3 spotDirection = normalize(gSpotLight.direction);
+    // ライトの向き(direction)と、現在地点への方向(-L_sp
     // 表面からライトへのベクトル(L_spot) と ライトの照射方向(spotDirection) の「逆向き」の内積をとる
     // これにより、ライトの正面方向とのズレ(cosθ)が求まる
     float cosAngle = dot(L_spot, gSpotLight.direction);
 
     // 指定された角度(cosAngle)を下回ったら0、中心(1.0)なら1になるように補間
     // (cosTheta - 閾値) / (1.0 - 閾値) で正規化して saturate
-    float angleFactor = saturate((cosAngle - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
+    // 1. 差分を計算
+    float cosDiff = gSpotLight.cosFalloffStart - gSpotLight.cosAngle;
+
+// 2. 差分が 0.0001 未満にならないように max 関数でガードする (0除算回避)
+// これにより、値が揃ってしまっても分母は最低でも 0.0001 が保証されます
+    float range = max(cosDiff, 0.0001f);
+    float angleFactor = saturate((cosAngle - gSpotLight.cosAngle) / range);
     
     // ※もし「境界ぼかし」なしでくっきり切りたい場合は以下を使用:
     // float angleFactor = step(gSpotLight.cosAngle, cosAngle);

@@ -1615,7 +1615,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     spotLightData->decay = 2.0f;
     spotLightData->cosAngle=
         std::cos(std::numbers::pi_v<float>/3.0f);
-
+    spotLightData->cosFalloffStart=1.0f;
     Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource = CreateBufferResource(device, sizeof(PointLight));
 
     PointLight* pointLightData = nullptr;
@@ -1630,6 +1630,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     pointLightData->intensity = 1.0f;  // 強度
     pointLightData->radius = 1.0f;
     pointLightData->decay = 0.1f;
+
 
 
     BYTE preKey[256] = {};
@@ -1740,6 +1741,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ImGui::DragFloat("radius", &(spotLightData->distance));
             ImGui::DragFloat("decay", &(spotLightData->decay));
             ImGui::DragFloat("intensity", &(spotLightData->intensity));
+            ImGui::DragFloat("cosFalloffStart", &(spotLightData->cosFalloffStart));
 
             ImGui::End();
 
