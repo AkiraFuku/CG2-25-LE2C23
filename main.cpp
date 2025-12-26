@@ -989,16 +989,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+    //
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//ヴァーテックスシェーダーで使う
     rootParameters[1].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
+    //
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//ディスクリプタテーブルを使う
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//ディスクリプタレンジの設定
     rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//ディスクリプタレンジの数
-    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
-    rootParameters[3].Descriptor.ShaderRegister = 1;
+    ///
+    //rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+    //rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
+    //rootParameters[3].Descriptor.ShaderRegister = 1;
+    rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
+    rootParameters[3].Descriptor.ShaderRegister = 3;                    // register(b3)
+    rootParameters[3].Descriptor.RegisterSpace = 0;                     // space0
+    rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用
+    //
     rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
     rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
     rootParameters[4].Descriptor.RegisterSpace = 0;
@@ -1357,7 +1365,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //行列の初期化
     wvpData->WVP = Makeidetity4x4();
     wvpData->World = Makeidetity4x4();
-    wvpData->WorldInverseTranspose=Inverse( wvpData->World );
+    wvpData->WorldInverseTranspose = Inverse(wvpData->World);
 
 
     //コマンドリストの初期化
@@ -1678,13 +1686,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
             wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
             wvpData->World = worldMatrix;
-            wvpData->WorldInverseTranspose=Inverse(worldMatrix);
+            wvpData->WorldInverseTranspose = Inverse(worldMatrix);
             Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
             Matrix4x4 viewMatrixSprite = Makeidetity4x4();
             Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(kClientWidth), static_cast<float>(kClientHeight), 0.0f, 100.0f);
             transformationMatrixDataSprite->WVP = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));;
             transformationMatrixDataSprite->World = worldMatrixSprite;
-            transformationMatrixDataSprite->WorldInverseTranspose=Makeidetity4x4();
+            transformationMatrixDataSprite->WorldInverseTranspose = Makeidetity4x4();
             directionalLightData->direction = Normalize(directionalLightData->direction);
 
             Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
@@ -1788,7 +1796,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             // 追加: 平行光源CBVをバインド
             commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
             //
-             commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
+            commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
             //描画コマンド
             commandList->DrawIndexedInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
             //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);

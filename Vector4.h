@@ -55,6 +55,11 @@ struct DirectionalLight{
     Vector3 direction;//ライトの向き
     float intensity;// 明るさ
 };
+struct PointLight{
+    Vector4 color;//ライトの色
+    Vector3 postion;//ライトの向き
+    float intensity;// 明るさ
+};
 struct MaterialData
 {
     std::string textureFilePath;

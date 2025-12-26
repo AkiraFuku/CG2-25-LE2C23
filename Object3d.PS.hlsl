@@ -15,6 +15,14 @@ struct DirectionalLight
 
 
 };
+struct PointLight
+{
+    float4 color; //ライトの色
+    float3 postion; //ライトの向き
+    float intensity; // 明るさ
+
+
+};
 struct Camera
 {
     float3 worldPostion;
@@ -23,6 +31,7 @@ struct Camera
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
+ConstantBuffer<PointLight> gPointLight : register(b3);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
