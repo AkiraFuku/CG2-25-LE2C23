@@ -985,7 +985,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     ///ルートパラメータの設定
-    D3D12_ROOT_PARAMETER rootParameters[6]{};
+    D3D12_ROOT_PARAMETER rootParameters[7]{};
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
@@ -1002,15 +1002,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[3].Descriptor.ShaderRegister = 1;
-    rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
-    rootParameters[5].Descriptor.ShaderRegister = 3;                    // register(b3)
-    rootParameters[5].Descriptor.RegisterSpace = 0;                     // space0
-    rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用
+
     //
     rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
     rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
     rootParameters[4].Descriptor.RegisterSpace = 0;
     rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーのみ見える
+    rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
+    rootParameters[5].Descriptor.ShaderRegister = 3;                    // register(b3)
+    rootParameters[5].Descriptor.RegisterSpace = 0;                     // space0
+    rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用  
+
+    rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // 定数バッファビュー
+    rootParameters[6].Descriptor.ShaderRegister = 4;                    // レジスタ番号: 4 (b4)
+    rootParameters[6].Descriptor.RegisterSpace = 0;                     // デフォルトの空間
+    rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーで使う
+
     descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
     descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
@@ -1605,8 +1612,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白
     pointLightData->position = { 0.0f, 2.0f, 0.0f };    // 座標 (Y=2.0)
     pointLightData->intensity = 1.0f;  // 強度
-    pointLightData->radius=1.0f;
-    pointLightData->decay=0.1f;
+    pointLightData->radius = 1.0f;
+    pointLightData->decay = 0.0f;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource = CreateBufferResource(device, sizeof(SpotLight));
+
+    SpotLight* spotLightData = nullptr;
+
+    // 3. データを書き込むためのアドレスを取得 (Map)
+    hr = spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+    assert(SUCCEEDED(hr));
+
+    // 4. 初期値を設定
+    spotLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白
+    spotLightData->position = { 2.0f, 1.25f, 0.0f };    // 座標 (Y=2.0)
+    spotLightData->distance = 7.0f;
+    spotLightData->direction = Normalize({ -1.0f,-1.0f,0.0f });
+    spotLightData->intensity = 4.0f;  // 強度
+    spotLightData->decay = 2.0f;
+    spotLightData->cosAngle=
+        std::cos(std::numbers::pi_v<float>/3.0f);
 
 
     BYTE preKey[256] = {};
@@ -1710,9 +1735,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 // 光沢度
                 ImGui::DragFloat("Shininess", &materialData->shininess, 0.1f, 1.0f, 256.0f);
             }
-             ImGui::DragFloat3("traslate", &(pointLightData->position.x));
-             ImGui::DragFloat("radius", &(pointLightData->radius));
-             ImGui::DragFloat("decay", &(pointLightData->decay));
+            ImGui::DragFloat3("traslate", &(pointLightData->position.x));
+            ImGui::DragFloat("radius", &(pointLightData->radius));
+            ImGui::DragFloat("decay", &(pointLightData->decay));
 
             ImGui::End();
 
@@ -1819,7 +1844,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             //IBVの設定
             commandList->IASetIndexBuffer(&indexBufferViewSphere);
-
+            
             //形状の設定
             commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             //マテリアルリソースの設定
@@ -1833,13 +1858,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             //
             commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
             commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+            commandList->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
             //描画コマンド
             commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
             commandList->DrawIndexedInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
             //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
-             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-               ///
+            ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 

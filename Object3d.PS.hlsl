@@ -48,6 +48,7 @@ ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<PointLight> gPointLight : register(b3);
+ConstantBuffer<SpotLight> gSpotLight : register(b4);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -134,6 +135,35 @@ PixelShaderOutput main(VertexShaderOutput input)
     float factor = pow(saturate(-distance/gPointLight.radius+1.0f),gPointLight.decay);
     finalLighting += CalculateLight(N, L_point, V, gPointLight.color.rgb, gPointLight.intensity*factor);
 
+    
+    // -----------------------------------------------------------
+    // Spot Light の計算 (減衰なし)
+    // -----------------------------------------------------------
+  // -----------------------------------------------------------
+    // Spot Light の計算
+    // -----------------------------------------------------------
+    // 1. 表面から光源へのベクトル(L) と 距離の計算
+    // 現在のコード(input.worldPosition - gSpotLight.position)は向きが逆なので修正します
+    float3 directionToSpotLight =  input.worldPosition- gSpotLight.position;
+    float distanceSpot = length(directionToSpotLight);
+    float3 L_Spot = normalize(directionToSpotLight); // 正規化してCalculateLightに渡す方向ベクトル
+
+    // 2. 距離減衰 (PointLightと同様のロジック)
+    // gSpotLight.distanceを最大距離として、decay乗で減衰させます
+    float distanceAttenuation = pow(saturate(-distanceSpot / gSpotLight.distance + 1.0f), gSpotLight.decay);
+
+    // 3. 角度減衰 (円錐の範囲判定)
+    // ライトの向き(direction) と ライトから表面への方向(-L_Spot) のなす角(cos)を計算
+    float3 spotDirection = normalize(gSpotLight.direction);
+    float cosAngle = dot(spotDirection, L_Spot);
+
+    // 指定された角度(cosAngle)より内側なら明るくする
+    // 境界を滑らかに減衰させる計算: (現在のcos - 閾値cos) / (1.0 - 閾値cos)
+    float spotFalloff = saturate((cosAngle - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
+
+    // 4. 合成
+    // CalculateLight関数に、減衰係数を乗算した強度を渡します
+    finalLighting += CalculateLight(N, L_Spot, V, gSpotLight.color.rgb, gSpotLight.intensity * distanceAttenuation * spotFalloff);
     // -----------------------------------------------------------
     // 結果の合成
     // -----------------------------------------------------------
