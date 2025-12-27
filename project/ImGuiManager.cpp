@@ -5,6 +5,8 @@
 #include "SrvManager.h"
 #include "WinApp.h"
 #include "DXCommon.h"
+
+
 void ImGuiManager::Initialize(WinApp* winApp, DXCommon* dxCommon, SrvManager* srv) {
 
     assert(winApp);
