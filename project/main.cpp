@@ -365,7 +365,7 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
         TextureManager::GetInstance()->ReleaseIntermediateResources();
 
     }
-
+    imguiManager->Finalize();
     dxCommon->Finalize();
 
     delete audio;

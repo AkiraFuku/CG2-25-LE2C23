@@ -13,7 +13,7 @@ void ImGuiManager::Initialize(WinApp* winApp, DXCommon* dxCommon, SrvManager* sr
     dxCommon_ = dxCommon;
     assert(srv);
     srvManager_ = srv;
-    IMGUI_CHECKVERSION();
+    
     ImGui::CreateContext();
     ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
     ImGui::StyleColorsDark();
@@ -30,4 +30,9 @@ void ImGuiManager::Initialize(WinApp* winApp, DXCommon* dxCommon, SrvManager* sr
         srvManager_->GetGPUDescriptorHandle(fontSrvIndex)
 
     );
+}
+void ImGuiManager::Finalize() {
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
 }
