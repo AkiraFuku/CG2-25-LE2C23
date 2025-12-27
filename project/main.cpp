@@ -8,9 +8,9 @@
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
-#include"imgui.h"
-#include"imgui_impl_dx12.h"
-#include"imgui_impl_win32.h"
+//#include"imgui.h"
+//#include"imgui_impl_dx12.h"
+//#include"imgui_impl_win32.h"
 #include "WinApp.h"
 #include "DXCommon.h"
 #include"MathFunction.h"
@@ -31,6 +31,7 @@
 #include "SrvManager.h"
 #include "ParticleManager.h"
 #include "ParicleEmitter.h"
+#include "ImGuiManager.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -130,6 +131,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     srvManager=new SrvManager();
     srvManager->Initialize(dxCommon);
+
+    ImGuiManager* imguiManager = nullptr;
+    imguiManager = new ImGuiManager();
+    imguiManager->Initialize(dxCommon, srvManager);
 
     TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
@@ -363,7 +368,9 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
     delete object3dCommon;
     delete object3d2;
     delete object3d;
-
+    delete camera;
+    imguiManager->Finalize();
+    delete imguiManager;
     for (Sprite* sprite : sprites)
     {
         delete sprite;

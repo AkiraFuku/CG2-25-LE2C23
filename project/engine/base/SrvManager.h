@@ -33,6 +33,9 @@ public:
 
     void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex);
     void PreDraw();
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() {
+        return descriptorHeap_;
+    }
 
     bool IsMax();
 private:

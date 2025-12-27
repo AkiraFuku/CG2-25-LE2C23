@@ -46,6 +46,13 @@ public:
     Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heepType, UINT numDescriptors, bool shaderVisible);
 
 
+    uint32_t GetSwapChainBufferCount() const {
+        return swapChainDesc_.BufferCount;
+    }
+
+    WinApp* GetWinApp() const {
+        return winApp_;
+    }
     static const float kDeltaTime;
 
 private:
