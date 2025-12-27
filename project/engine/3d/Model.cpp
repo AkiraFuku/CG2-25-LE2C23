@@ -6,11 +6,11 @@
 #include <fstream> 
 #include <sstream>
 #include <Windows.h>
-void Model::Initialize(ModelCommon* modelCom,const std::string& directryPath, const std::string& filename)
+void Model::Initialize(ModelCommon* modelCom, const std::string& directryPath, const std::string& filename)
 {
     ModelCom_ = modelCom;
 
-    modelData_ = LoadObjFile( directryPath, filename);
+    modelData_ = LoadObjFile(directryPath, filename);
     if (modelData_.material.textureFilePath.empty()) {
         modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
         TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
@@ -38,11 +38,7 @@ void Model::Draw() {
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
-    //SRVのディスクリプタテーブルの設定
-    ModelCom_->GetDxCommon()->
-        GetCommandList()->
-        SetGraphicsRootDescriptorTable(2,
-            TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
+
     //描画コマンド
     ModelCom_->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
@@ -112,7 +108,7 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
     std::string line;
     //2. ファイルを開く
     std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
-    
+
     assert(file.is_open());//ファイルが開けたか確認
 
     //3. ファイルからデータを読み込みモデルデータを作成

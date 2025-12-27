@@ -100,7 +100,7 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHundleGPU(uint32_t textureindex)
 {
-    assert(textureindex < textureDatas.size());
+    assert(textureindex < SrvManager::kMaxSRVCount);
     return srvManager_->GetGPUDescriptorHandle(textureindex);
 }
 

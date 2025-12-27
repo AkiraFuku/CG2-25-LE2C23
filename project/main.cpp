@@ -341,11 +341,11 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
         dxCommon->PreDraw();
         srvManager->PreDraw();
 
-        ParticleManager::GetInstance()->Draw();
+       // ParticleManager::GetInstance()->Draw();
         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
         //object3d2->Draw();
-        //object3d->Draw();
+        object3d->Draw();
 
 
         ///////スプライトの描画

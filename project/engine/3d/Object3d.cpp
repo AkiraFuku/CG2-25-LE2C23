@@ -20,19 +20,44 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 }
 void Object3d::Update()
 {
+
+    // カメラがセットされていなければ、共通部分からデフォルトカメラを取得を試みる
+    if (!camera_ && object3dCom_) {
+        camera_ = object3dCom_->GetDefaultCamera();
+    }
+
     //  WVP行列の作成
     Matrix4x4 worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-  Matrix4x4 worldViewProjectionMatrix={};
-    //ワールド行列とビュー行列とプロジェクション行列を掛け算
-  if (camera_)
-  {
-     worldViewProjectionMatrix= Multiply(worldMatrix, camera_->GetViewProtectionMatrix());
-  } else{
-    worldViewProjectionMatrix=worldMatrix;
-  }
+    Matrix4x4 worldViewProjectionMatrix = {};
+
+    // ワールド行列とビュー行列とプロジェクション行列を掛け算
+    if (camera_)
+    {
+        // カメラがある場合、視点と投影を適用
+        const Matrix4x4& viewProjection = camera_->GetViewProtectionMatrix();
+        worldViewProjectionMatrix = Multiply(worldMatrix, viewProjection);
+    }
+    else {
+        // カメラがない場合、とりあえずワールド行列だけで描画（※画面に映らない可能性大）
+        worldViewProjectionMatrix = worldMatrix;
+    }
+
     //行列をGPUに転送
     wvpResource_->WVP = worldViewProjectionMatrix;
     wvpResource_->World = worldMatrix;
+  //  //  WVP行列の作成
+  //  Matrix4x4 worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+  //Matrix4x4 worldViewProjectionMatrix={};
+  //  //ワールド行列とビュー行列とプロジェクション行列を掛け算
+  //if (camera_)
+  //{
+  //   worldViewProjectionMatrix= Multiply(worldMatrix, camera_->GetViewProtectionMatrix());
+  //} else{
+  //  worldViewProjectionMatrix=worldMatrix;
+  //}
+  //  //行列をGPUに転送
+  //  wvpResource_->WVP = worldViewProjectionMatrix;
+  //  wvpResource_->World = worldMatrix;
 }
 
 void Object3d::Draw()
