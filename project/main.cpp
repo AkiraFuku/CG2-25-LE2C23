@@ -31,6 +31,7 @@
 #include "SrvManager.h"
 #include "ParticleManager.h"
 #include "ParicleEmitter.h"
+#include "ImGuiManager.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -126,6 +127,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     DXCommon* dxCommon = nullptr;
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
+
+    ImGuiManager* imguiManager = nullptr;
+    imguiManager = new ImGuiManager();
+    imguiManager->Initialize(winApp);
+
     SrvManager* srvManager=nullptr;
 
     srvManager=new SrvManager();
@@ -363,6 +369,8 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
     delete object3dCommon;
     delete object3d2;
     delete object3d;
+    delete camera;
+    delete imguiManager;
 
     for (Sprite* sprite : sprites)
     {
