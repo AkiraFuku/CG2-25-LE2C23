@@ -229,9 +229,7 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
         }
 
-        /*ImGui_ImplDX12_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();*/
+        imguiManager->Begin();
 
         input->Update();
 
@@ -330,6 +328,8 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
         }
         //ImGui::End();
+        // 
+        imguiManager->End();
         /////////
         /////Update
         /////////
@@ -337,14 +337,14 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
         /////
         ////DRAW
         /////
-        //ImGui::Render();
+        
         dxCommon->PreDraw();
         srvManager->PreDraw();
 
        // ParticleManager::GetInstance()->Draw();
         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
-        //object3d2->Draw();
+        object3d2->Draw();
         object3d->Draw();
 
 
@@ -359,7 +359,7 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
         ///
 
-       // ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
+        imguiManager->Draw();
         dxCommon->PostDraw();
 
         TextureManager::GetInstance()->ReleaseIntermediateResources();
