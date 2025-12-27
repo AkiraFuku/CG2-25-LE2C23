@@ -35,6 +35,10 @@ public:
     void PreDraw();
 
     bool IsMax();
+
+     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() {
+         return descriptorHeap_;
+     }
 private:
     DXCommon* dxCommon_ = nullptr;
     uint32_t descriptorSize_;

@@ -128,14 +128,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
 
-    ImGuiManager* imguiManager = nullptr;
-    imguiManager = new ImGuiManager();
-    imguiManager->Initialize(winApp);
+    
 
     SrvManager* srvManager=nullptr;
-
     srvManager=new SrvManager();
     srvManager->Initialize(dxCommon);
+
+
+    ImGuiManager* imguiManager = nullptr;
+    imguiManager = new ImGuiManager();
+    imguiManager->Initialize(winApp,dxCommon,srvManager);
+
+    
 
     TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);

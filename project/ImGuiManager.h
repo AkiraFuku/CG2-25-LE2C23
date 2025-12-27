@@ -1,13 +1,17 @@
 #pragma once
-#include "WinApp.h"
-#include "DXCommon.h"
+
+
+class WinApp;
+class DXCommon;
+class SrvManager;
 class ImGuiManager
 {
 public:
-    void Initialize(WinApp* winApp,DXCommon *dxCommon);
+    void Initialize(WinApp* winApp,DXCommon *dxCommon,SrvManager* srv);
 
 private:
     WinApp* winApp_ = nullptr;
     DXCommon* dxCommon_ = nullptr;
+    SrvManager* srvManager_ = nullptr;
 };
 
