@@ -257,4 +257,7 @@
       <Filter>imgui</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="externals\imgui\imgui.vcxproj" />
+  </ItemGroup>
 </Project>
