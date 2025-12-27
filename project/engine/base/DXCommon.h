@@ -6,6 +6,8 @@
 #include "WinApp.h"
 #include <array> // 
 #include<dxcapi.h>
+#pragma comment(lib,"dxcompiler.lib")
+
 #include"externals/DirectXTex/DirectXTex.h"
 #include"externals/DirectXTex/d3dx12.h"
 #include <chrono>
@@ -31,9 +33,6 @@ public:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {
         return commandList_.Get();
     }
-    /* Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() const {
-         return srvHeap_.Get();
-     }*/
      //コンパイルシェーダー
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
     //クリエイトバッファ
@@ -47,6 +46,9 @@ public:
 
     UINT GetSwapChainBufferCount() const {
         return swapChainDesc_.BufferCount;
+    }
+    WinApp* GetWinApp() const {
+        return winApp_;
     }
     static const float kDeltaTime;
 

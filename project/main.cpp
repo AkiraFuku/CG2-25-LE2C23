@@ -3,14 +3,12 @@
 #include<strsafe.h>
 #include<dbghelp.h>
 #pragma comment(lib,"Dbghelp.lib")
-#include<dxgidebug.h>
-#pragma comment(lib,"dxguid.lib")
-#include<dxcapi.h>
-#pragma comment(lib,"dxcompiler.lib")
+//#include<dxgidebug.h>
+//#pragma comment(lib,"dxguid.lib")
+//#include<dxcapi.h>
+//#pragma comment(lib,"dxcompiler.lib")
 
-#include"imgui.h"
-#include"imgui_impl_dx12.h"
-#include"imgui_impl_win32.h"
+
 #include "WinApp.h"
 #include "DXCommon.h"
 #include"MathFunction.h"
@@ -116,7 +114,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     ImGuiManager* imguiManager = nullptr;
     imguiManager = new ImGuiManager();
-    imguiManager->Initialize(winApp,dxCommon,srvManager);
+    imguiManager->Initialize(dxCommon,srvManager);
 
     
 
