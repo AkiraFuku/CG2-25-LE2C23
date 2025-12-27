@@ -149,20 +149,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.PS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.VS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="engine\Tool\resources\shaders\Particle\Particle.PS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="engine\Tool\resources\shaders\Particle\Particle.VS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -264,13 +250,5 @@
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="engine\Tool\resources\shaders\Object3d\Object3d.hlsli">
-      <Filter>シェーダー ファイル</Filter>
-    </None>
-    <None Include="engine\Tool\resources\shaders\Particle\Particle.hlsli">
-      <Filter>シェーダー ファイル</Filter>
-    </None>
   </ItemGroup>
 </Project>
