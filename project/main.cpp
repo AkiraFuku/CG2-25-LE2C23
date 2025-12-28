@@ -112,13 +112,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     srvManager = new SrvManager();
     srvManager->Initialize(dxCommon);
-#ifdef USE_IMGUI
 
 
     ImGuiManager* imguiManager = nullptr;
     imguiManager = new ImGuiManager();
     imguiManager->Initialize(dxCommon, srvManager);
-#endif // USE_IMGUI
 
     TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
@@ -240,11 +238,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          rotat+=0.1f;
          sprite->SetRotation(rotat);*/
 
-#ifdef USE_IMGUI
 
         ImGui::Begin("Debug");
         ImGui::End();
-#endif // USE_IMGUI
 
         // ImGui::Begin;
          //Vector3 camreaTranslate = camera->GetTranslate();
@@ -314,9 +310,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         /////////
         /////Update
         /////////
-#ifdef USE_IMGUI
         imguiManager->End();
-#endif
         /////
         ////DRAW
         /////
@@ -324,8 +318,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         dxCommon->PreDraw();
         srvManager->PreDraw();
 
-       // ParticleManager::GetInstance()->Draw();
-        // 3Dオブジェクトの描画
+        // ParticleManager::GetInstance()->Draw();
+         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
         //object3d2->Draw();
         object3d->Draw();
@@ -341,9 +335,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         ///
 
-#ifdef USE_IMGUI
         imguiManager->Draw();
-#endif
         dxCommon->PostDraw();
 
         TextureManager::GetInstance()->ReleaseIntermediateResources();
@@ -358,10 +350,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete object3d2;
     delete object3d;
     delete camera;
-#ifdef USE_IMGUI
     imguiManager->Finalize();
     delete imguiManager;
-#endif
     for (Sprite* sprite : sprites)
     {
         delete sprite;
