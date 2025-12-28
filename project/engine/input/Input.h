@@ -32,7 +32,7 @@ public:
     bool PushedKeyUp(BYTE keys);
     bool TriggerKeyDown(BYTE keys);
     bool TriggerKeyUp(BYTE keys);
-    
+
     // --- マウス用 ---
     /// <summary>
     /// マウスボタンが押されているか
@@ -56,8 +56,33 @@ public:
     /// マウスの移動量を取得
     /// </summary>
     MoveMouse GetMouseMove();
-   
 
+    //　ゲームパッド用もここに追加予定
+    bool GetJoyStick(int32_t stickNo, XINPUT_STATE& out) const;
+    bool GetPreJoyStick(int32_t stickNo, XINPUT_STATE& out) const;
+    void SetDeadZone(int32_t stickNo, int32_t deadZoneL, int32_t deadZoneR);
+
+    size_t GetConnectedPadNum();
+
+    /// <summary>
+
+   /// padのボタンが押されているか
+   /// </summary>
+    bool PushPadDown( XINPUT_STATE& out,WORD button);
+
+    /// <summary>
+    /// padのボタンが押されないか
+    /// </summary>
+    bool PushPadUP(XINPUT_STATE& out,WORD button);
+
+    /// <summary>
+    /// マウスボタンがトリガーされたか（押した瞬間）
+    /// </summary>
+    bool TriggerPadDown(XINPUT_STATE& out,WORD button);
+    /// <summary>
+    /// マウスボタンがトリガーされたか（離した瞬間）
+    /// </summary>
+    bool TriggerPadUP(XINPUT_STATE& out,WORD button);
 private:
     ComPtr<IDirectInputDevice8> keyboard;
     ComPtr<IDirectInputDevice8> mouse;
@@ -69,7 +94,6 @@ private:
     // マウスの状態を格納する構造体
     DIMOUSESTATE mouseState = {};
     DIMOUSESTATE preMouseState = {};
-
     WinApp* winApp_ = nullptr;
 };
 

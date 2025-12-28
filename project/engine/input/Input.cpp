@@ -158,3 +158,43 @@ Input::MoveMouse Input::GetMouseMove()
     );
 }
 
+bool Input::GetJoyStick(int32_t stickNo, XINPUT_STATE& out) const
+{
+    return false;
+}
+
+bool Input::GetPreJoyStick(int32_t stickNo, XINPUT_STATE& out) const
+{
+    return false;
+}
+
+void Input::SetDeadZone(int32_t stickNo, int32_t deadZoneL, int32_t deadZoneR)
+{
+}
+
+size_t Input::GetConnectedPadNum()
+{
+    return size_t();
+}
+
+bool Input::PushPadDown(XINPUT_STATE& out, WORD button)
+{
+    return out.Gamepad.wButtons & button;
+}
+
+bool Input::PushPadUP(XINPUT_STATE& out, WORD button)
+{
+    return out.Gamepad.wButtons & button;
+}
+
+bool Input::TriggerPadDown(XINPUT_STATE& out, WORD button)
+{
+    return out.Gamepad.wButtons & button;
+}
+
+bool Input::TriggerPadUP(XINPUT_STATE& out, WORD button)
+{
+    return out.Gamepad.wButtons & button;
+}
+
+
