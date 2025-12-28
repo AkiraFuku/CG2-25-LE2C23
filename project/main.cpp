@@ -237,7 +237,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          rotat+=0.1f;
          sprite->SetRotation(rotat);*/
 
-        
+#ifdef USE_IMGUI
+
+        ImGui::Begin("Debug");
+        ImGui::End();
+#endif // USE_IMGUI
 
          // ImGui::Begin;
           //Vector3 camreaTranslate = camera->GetTranslate();
