@@ -62,27 +62,29 @@ public:
     bool GetPreJoyStick(int32_t stickNo, XINPUT_STATE& out) const;
     void SetDeadZone(int32_t stickNo, int32_t deadZoneL, int32_t deadZoneR);
 
-    size_t GetConnectedPadNum();
+    size_t GetConnectedStickNum();
 
     /// <summary>
 
-   /// padのボタンが押されているか
-   /// </summary>
-    bool PushPadDown( XINPUT_STATE& out,WORD button);
-
-    /// <summary>
-    /// padのボタンが押されないか
+   /// <summary>
+    /// padのボタンが押されているか (Press)
     /// </summary>
-    bool PushPadUP(XINPUT_STATE& out,WORD button);
+    bool PushPadDown(int32_t stickNo, WORD button) const;
 
     /// <summary>
-    /// マウスボタンがトリガーされたか（押した瞬間）
+    /// padのボタンが押されていないか (Release state)
     /// </summary>
-    bool TriggerPadDown(XINPUT_STATE& out,WORD button);
+    bool PushPadUP(int32_t stickNo, WORD button) const;
+
     /// <summary>
-    /// マウスボタンがトリガーされたか（離した瞬間）
+    /// padのボタンがトリガーされたか（押した瞬間 / Trigger）
     /// </summary>
-    bool TriggerPadUP(XINPUT_STATE& out,WORD button);
+    bool TriggerPadDown(int32_t stickNo, WORD button) const;
+
+    /// <summary>
+    /// padのボタンが離されたか（離した瞬間 / Release trigger）
+    /// </summary>
+    bool TriggerPadUP(int32_t stickNo, WORD button) const;
 private:
     ComPtr<IDirectInputDevice8> keyboard;
     ComPtr<IDirectInputDevice8> mouse;
@@ -95,5 +97,13 @@ private:
     DIMOUSESTATE mouseState = {};
     DIMOUSESTATE preMouseState = {};
     WinApp* winApp_ = nullptr;
+
+    // --- ゲームパッド用変数 ---
+    // メンバ変数として保持する
+    int deadZoneL_[XUSER_MAX_COUNT];
+    int deadZoneR_[XUSER_MAX_COUNT];
+    
+    XINPUT_STATE state_[XUSER_MAX_COUNT];    // 現在の状態
+    XINPUT_STATE preState_[XUSER_MAX_COUNT]; // 1フレーム前の状態
 };
 

@@ -241,19 +241,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+        input->GetJoyStick(0, state);
 
         // Aボタンを押していたら
 
-        if (state.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+        if (input->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
 
 
 
             // Aボタンを押したときの処理
-
+            fripx = !fripx;
 
 
         }
-        if ()
+        if (input->TriggerPadDown(0, XINPUT_GAMEPAD_B))
         {
             fripY = !fripY;
         }
@@ -267,6 +268,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             camera->SetTranslate(camreaTranslate);
 
         }
+        if (input->GetJoyStick(0, state))
+        {
+            // 左スティックの値を取得
+            float x = (float)state.Gamepad.sThumbLX;
+            float y = (float)state.Gamepad.sThumbLY;
+
+            // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+            float normalizedX = x / 32767.0f;
+            float normalizedY = y / 32767.0f;
+            Vector3 camreaTranslate = camera->GetTranslate();
+            camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX/60.0f,normalizedY/60.0f,0.0f });
+            camera->SetTranslate(camreaTranslate);
+        }
+
+
         // 
 
        /* Vector2 pos=sprite->GetPosition();
