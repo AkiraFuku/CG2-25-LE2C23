@@ -1,7 +1,7 @@
 #pragma once
 #include <wrl.h>
 #include<fstream>
-
+#include <string>
 #include <xaudio2.h>
 #pragma comment(lib,"xaudio2.lib")
 
@@ -38,7 +38,7 @@ struct SoundData
     ~Audio();
   
     void Initialize();
-  static  SoundData SoundLoadWave(const char* filename);
+  static  SoundData SoundLoadFile(const std::string& filename);
 
     
     void PlayAudio(const SoundData& soundData );
