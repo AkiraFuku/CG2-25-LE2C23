@@ -3,8 +3,9 @@
 #include<fstream>
 #include <string>
 #include <xaudio2.h>
-#pragma comment(lib,"xaudio2.lib")
 
+#pragma comment(lib,"xaudio2.lib")
+#include <vector>
 
 class Audio
 {
@@ -30,10 +31,9 @@ struct SoundData
 {
     //波形フォーマット
     WAVEFORMATEX wfex; // 波形フォーマット
-    // バッファ先頭アドレス
-    BYTE* pBuffer;
-    // バッファサイズ
-    unsigned int bufferSize;
+    
+    //音声データバッファ
+    std::vector<BYTE> buffer; // 音声データバッファ
 };
     ~Audio();
   
