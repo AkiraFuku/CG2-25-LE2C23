@@ -228,6 +228,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ///Update
         ///////
 
+        if (input->TriggerMouseDown(Input::MouseButton::Left)){
+            fripx = !fripx;
+
+        }
+        if (input->TriggerMouseDown(Input::MouseButton::Right))
+        {
+            fripY = !fripY;
+        }
+
+        //マウスホイールの入力取得
+
+        if (input->GetMouseMoveZ())
+        {
+            Vector3 camreaTranslate = camera->GetTranslate();
+            camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(input->GetMouseMoveZ()) * 0.1f });
+            camera->SetTranslate(camreaTranslate);
+
+        }
        // 
 
       /* Vector2 pos=sprite->GetPosition();
