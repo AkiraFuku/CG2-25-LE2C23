@@ -6,8 +6,9 @@
 #include "WinApp.h"
 #include <array> // 
 #include<dxcapi.h>
-#include"externals/DirectXTex/DirectXTex.h"
-#include"externals/DirectXTex/d3dx12.h"
+#pragma comment(lib,"dxcompiler.lib")
+#include"DirectXTex.h"
+#include"d3dx12.h"
 #include <chrono>
 
 
