@@ -2,7 +2,7 @@
 #include "SrvManager.h"
 #include "WinApp.h"
 #include "DXCommon.h"
-void ImGuiManager::Initialize( DXCommon* dxCommon, SrvManager* srv) {
+void ImGuiManager::Initialize([[maybe_unused]] DXCommon* dxCommon, [[maybe_unused]]SrvManager* srv) {
     #ifdef USE_IMGUI
 
     assert(srv);

@@ -112,10 +112,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     srvManager = new SrvManager();
     srvManager->Initialize(dxCommon);
+#ifdef USE_IMGUI
+
 
     ImGuiManager* imguiManager = nullptr;
     imguiManager = new ImGuiManager();
     imguiManager->Initialize(dxCommon, srvManager);
+#endif // USE_IMGUI
 
     TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
@@ -204,9 +207,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             break;
 
         }
-
+        #ifdef USE_IMGUI
         imguiManager->Begin();
-
+        #endif
         input->Update();
 
         emitter->Update();
@@ -311,7 +314,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         /////////
         /////Update
         /////////
+        #ifdef USE_IMGUI
         imguiManager->End();
+        #endif
         /////
         ////DRAW
         /////
@@ -337,9 +342,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         ///
 
-
+        #ifdef USE_IMGUI
         imguiManager->Draw();
-
+        #endif
         dxCommon->PostDraw();
 
         TextureManager::GetInstance()->ReleaseIntermediateResources();
@@ -354,8 +359,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     delete object3d2;
     delete object3d;
     delete camera;
+    #ifdef USE_IMGUI
     imguiManager->Finalize();
     delete imguiManager;
+    #endif
     for (Sprite* sprite : sprites)
     {
         delete sprite;

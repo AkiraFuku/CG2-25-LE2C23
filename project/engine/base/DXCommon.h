@@ -124,7 +124,7 @@ private:
     Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
     Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
     //IMGUI初期化
-    void InitializeImGui();
+   
     //バリア
     D3D12_RESOURCE_BARRIER barrier_{};
     //フェンス値
