@@ -8,9 +8,7 @@
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
-#include"imgui.h"
-#include"imgui_impl_dx12.h"
-#include"imgui_impl_win32.h"
+
 #include "WinApp.h"
 #include "DXCommon.h"
 #include"MathFunction.h"
@@ -31,30 +29,14 @@
 #include "SrvManager.h"
 #include "ParticleManager.h"
 #include "ParicleEmitter.h"
-
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
+#include "ImGuiManager.h"
 
 
 
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
-   /* if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-    {
-        return true;
-    }*/
 
-    switch (msg) {
-        //
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
 
-    }
-    return DefWindowProc(hwnd, msg, wparam, lparam);
-}
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -126,15 +108,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     DXCommon* dxCommon = nullptr;
     dxCommon = new DXCommon();
     dxCommon->Initialize(winApp);
-    SrvManager* srvManager=nullptr;
+    SrvManager* srvManager = nullptr;
 
-    srvManager=new SrvManager();
+    srvManager = new SrvManager();
     srvManager->Initialize(dxCommon);
 
-    TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
+
+    ImGuiManager* imguiManager = nullptr;
+    imguiManager = new ImGuiManager();
+    imguiManager->Initialize(dxCommon, srvManager);
+
+    TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
-    ParticleManager::GetInstance()->Initialize(dxCommon,srvManager);
+    ParticleManager::GetInstance()->Initialize(dxCommon, srvManager);
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
@@ -156,7 +143,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     camera->SetTranslate({ 0.0f,0.0f,-5.0f });
     object3dCommon->SetDefaultCamera(camera);
 
-     ParticleManager::GetInstance()->Setcamera(camera);
+    ParticleManager::GetInstance()->Setcamera(camera);
 
 
     Audio* audio = new Audio();
@@ -167,22 +154,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
-    ParticleManager::GetInstance()->CreateParticleGroup("Test","resources/uvChecker.png");
-    std::vector<Sprite*> sprites;
-    for (uint32_t i = 0; i < 5; i++)
-    {
+    ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
+    /*   std::vector<Sprite*> sprites;
+       for (uint32_t i = 0; i < 5; i++)
+       {*/
 
-        Sprite* sprite = new Sprite();
-        // sprite->Initialize(spritecommon,"resources/monsterBall.png");
-        sprite->Initialize(spritecommon, "resources/uvChecker.png");
+    Sprite* sprite = new Sprite();
+    // sprite->Initialize(spritecommon,"resources/monsterBall.png");
+    sprite->Initialize(spritecommon, "resources/uvChecker.png");
 
-        sprite->SetPosition(Vector2{ i * 25.0f + 100.0f,100.0f });
-        // sprite->SetSize(Vector2{ 100.0f,100.0f });
-        sprites.push_back(sprite);
+    sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
+    // sprite->SetSize(Vector2{ 100.0f,100.0f });
+    //sprites.push_back(sprite);
 
-        sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
+    sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
 
-    }
+    //}
 
     /* Vector4 color= sprite->GetColor();*/
      //Vector2 size={};
@@ -205,8 +192,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
-Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
-    ParicleEmitter *emitter=new ParicleEmitter("Test",M,10,5.0f,0.0f);
+    Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    ParicleEmitter* emitter = new ParicleEmitter("Test", M, 10, 5.0f, 0.0f);
 
     //メインループ
 
@@ -218,11 +205,9 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
             break;
 
         }
-
-        /*ImGui_ImplDX12_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();*/
-
+#ifdef USE_IMGUI
+        imguiManager->Begin();
+#endif
         input->Update();
 
         emitter->Update();
@@ -255,101 +240,112 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
 
 
-       // ImGui::Begin("MaterialData");
-        //Vector3 camreaTranslate = camera->GetTranslate();
-        //camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.0f,-0.5f});
-        ////Vector3 cameraRotate = camera->GetRotate();
-        //////ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
-        //////ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
-        ////camera->SetRotate(cameraRotate);
-        //camera->SetTranslate(camreaTranslate);
-        //ImGui::ColorEdit4("Color", &(materialData->color).x); 
-        //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
-        //ImGui::Checkbox("enable", &enableLighting);
-        //materialData->enableLighting = enableLighting; // Update the original value after modification
-        //ImGui::DragFloat3("rotate",&(transform.rotate.x));
-        //ImGui::DragFloat3("traslate", &(transform.traslate.x));
-        //ImGui::Checkbox("useMonsterBall",&useMonstorBall);
 
-       /* color=sprite->GetColor();
-        ImGui::ColorEdit4("ColorSprite", &(color).x);
-        sprite->SetColor(color);*/
 
-        /* Vector2 size=sprite->GetSize();
-          size.x+=0.1f;
-          size.y+=0.1f;
-         sprite->SetSize(size);*/
+         // ImGui::Begin;
+          //Vector3 camreaTranslate = camera->GetTranslate();
+          //camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.0f,-0.5f});
+          ////Vector3 cameraRotate = camera->GetRotate();
+          //////ImGui::DragFloat3("Camera Transrate", &(camreaTranslate.x));
+          //////ImGui::DragFloat3("Camera rotateate", &(cameraRotate.x));
+          ////camera->SetRotate(cameraRotate);
+          //camera->SetTranslate(camreaTranslate);
+          //ImGui::ColorEdit4("Color", &(materialData->color).x); 
+          //bool enableLighting = materialData->enableLighting != 0; // Convert int32_t to bool
+          //ImGui::Checkbox("enable", &enableLighting);
+          //materialData->enableLighting = enableLighting; // Update the original value after modification
+          //ImGui::DragFloat3("rotate",&(transform.rotate.x));
+          //ImGui::DragFloat3("traslate", &(transform.traslate.x));
+          //ImGui::Checkbox("useMonsterBall",&useMonstorBall);
 
-         //ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
-       /*  ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x);
-         ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
-         ImGui::InputFloat("intensity",&(directionalLightData->intensity));*/
+         /* color=sprite->GetColor();
+          ImGui::ColorEdit4("ColorSprite", &(color).x);
+          sprite->SetColor(color);*/
 
-         /* ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x,0.01f,-10.0f,10.0f);
-          ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
-          ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);*/
+          /* Vector2 size=sprite->GetSize();
+            size.x+=0.1f;
+            size.y+=0.1f;
+           sprite->SetSize(size);*/
 
-          /* Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
-           Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-           Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
-           wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
-           wvpData->World=worldMatrix;
-              directionalLightData->direction= Normalize(directionalLightData->direction);*/
+           //ImGui::DragFloat3("traslateSprite",&(transformSprite.traslate.x));
+         /*  ImGui::ColorEdit4("LightColor", &(directionalLightData->color).x);
+           ImGui::DragFloat3("Light Direction", &(directionalLightData->direction.x));
+           ImGui::InputFloat("intensity",&(directionalLightData->intensity));*/
 
-              /* Matrix4x4 uvTransformMatrix=MakeScaleMatrix(uvTransformSprite.scale);
-               uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
-               uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
-               //materialDataSprite->uvTransform = uvTransformMatrix;
+           /* ImGui::DragFloat2("uvTransformSprite", &uvTransformSprite.traslate.x,0.01f,-10.0f,10.0f);
+            ImGui::DragFloat2("uvScaleSprite", &uvTransformSprite.scale.x,0.01f,-10.0f,10.0f);
+            ImGui::SliderAngle("uvRotateSprite", &uvTransformSprite.rotate.z);*/
+
+            /* Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
+             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale,transform.rotate,transform.traslate);
+             wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix,projectionMatirx));
+             wvpData->World=worldMatrix;
+                directionalLightData->direction= Normalize(directionalLightData->direction);*/
+
+                /* Matrix4x4 uvTransformMatrix=MakeScaleMatrix(uvTransformSprite.scale);
+                 uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+                 uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.traslate));*/
+                 //materialDataSprite->uvTransform = uvTransformMatrix;
         camera->Update();
         object3d->Update();
         object3d2->Update();
-       /* ImGui::Text("Sprite");
-        ImGui::Checkbox("fripX", &(fripx));
-        ImGui::Checkbox("fripy", &(fripY));*/
+        /* ImGui::Text("Sprite");
+         ImGui::Checkbox("fripX", &(fripx));
+         ImGui::Checkbox("fripy", &(fripY));*/
 
 
-        for (Sprite* sprite : sprites)
-        {
+         /*  for (Sprite* sprite : sprites)
+           {*/
 
+#ifdef USE_IMGUI
+        ImGui::Begin("Debug");
 
-            sprite->SetIsFlipX(fripx);
-            sprite->SetIsFlipY(fripY);
+        ImGui::Text("Sprite");
+        Vector2 Position =
+        sprite->GetPosition();
+        ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
+        sprite->SetPosition(Position);
 
-            //sprite->SetRotation(sprite->GetRotation() + 0.1f);
-            sprite->Update();
+        ImGui::End();
+#endif // USE_IMGUI
+        sprite->SetIsFlipX(fripx);
+        sprite->SetIsFlipY(fripY);
 
-        }
+        //sprite->SetRotation(sprite->GetRotation() + 0.1f);
+        sprite->Update();
+
+        //}
         //ImGui::End();
         /////////
         /////Update
         /////////
-
+        imguiManager->End();
         /////
         ////DRAW
         /////
-        //ImGui::Render();
+
         dxCommon->PreDraw();
         srvManager->PreDraw();
 
-        ParticleManager::GetInstance()->Draw();
-        // 3Dオブジェクトの描画
+        // ParticleManager::GetInstance()->Draw();
+         // 3Dオブジェクトの描画
         object3dCommon->Object3dCommonDraw();
         //object3d2->Draw();
-        //object3d->Draw();
+        object3d->Draw();
 
 
         ///////スプライトの描画
 
-        //for (Sprite* sprite : sprites)
-        //{
-        //    spritecommon->SpriteCommonDraw();
-        //    sprite->Draw();
-
-        //}
+       /* for (Sprite* sprite : sprites)
+        {*/
+        spritecommon->SpriteCommonDraw();
+        sprite->Draw();
+        /*}*/
 
         ///
 
-       // ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList().Get());
+        imguiManager->Draw();
         dxCommon->PostDraw();
 
         TextureManager::GetInstance()->ReleaseIntermediateResources();
@@ -363,11 +359,13 @@ Transform M={{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
     delete object3dCommon;
     delete object3d2;
     delete object3d;
-
-    for (Sprite* sprite : sprites)
-    {
-        delete sprite;
-    }
+    delete camera;
+    imguiManager->Finalize();
+    delete imguiManager;
+    /*   for (Sprite* sprite : sprites)
+       {*/
+    delete sprite;
+    // }
     delete emitter;
     delete spritecommon;
     delete srvManager;
