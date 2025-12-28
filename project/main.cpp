@@ -195,6 +195,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     ParicleEmitter* emitter = new ParicleEmitter("Test", M, 10, 5.0f, 0.0f);
 
+    
+
     //メインループ
 
     while (true) {
@@ -228,21 +230,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ///Update
         ///////
 
+        XINPUT_STATE state;
         if (input->TriggerMouseDown(Input::MouseButton::Left)){
             fripx = !fripx;
 
         }
-        if (input->TriggerMouseDown(Input::MouseButton::Right))
+        if (state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
         {
             fripY = !fripY;
         }
 
         //マウスホイールの入力取得
 
-        if (input->GetMouseMoveZ())
+        if (input->GetMouseMove().z)
         {
             Vector3 camreaTranslate = camera->GetTranslate();
-            camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(input->GetMouseMoveZ()) * 0.1f });
+            camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(input->GetMouseMove().lZ) * 0.1f });
             camera->SetTranslate(camreaTranslate);
 
         }

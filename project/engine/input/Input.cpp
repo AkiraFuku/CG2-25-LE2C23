@@ -123,41 +123,38 @@ bool Input::TriggerKeyUp(BYTE keys)
     }
     return false;
 }
-bool Input::PushMouseDown(MouseButton button) {
+bool Input::PushMouseDown(int32_t button) {
     // マウスボタンが押されているか確認
     int btnIndex = static_cast<int>(button);
     return (mouseState.rgbButtons[btnIndex] & 0x80) != 0;
 }
 
-bool Input::PushMouseUP(MouseButton button) {
+bool Input::PushMouseUP(int32_t button) {
     // マウスボタンが押されていないか確認
     int btnIndex = static_cast<int>(button);
     return (mouseState.rgbButtons[btnIndex] & 0x80) == 0;
 }
 
-bool Input::TriggerMouseDown(MouseButton button) {
+bool Input::TriggerMouseDown(int32_t button) {
     // マウスボタンがトリガーされたか確認（押した瞬間）
     int btnIndex = static_cast<int>(button);
     return ((mouseState.rgbButtons[btnIndex] & 0x80) != 0 &&
             (preMouseState.rgbButtons[btnIndex] & 0x80) == 0);
 }
 
-bool Input::TriggerMouseUP(MouseButton button) {
+bool Input::TriggerMouseUP(int32_t button) {
     // マウスボタンがトリガーされたか確認（離した瞬間）
     int btnIndex = static_cast<int>(button);
     return ((mouseState.rgbButtons[btnIndex] & 0x80) == 0 &&
             (preMouseState.rgbButtons[btnIndex] & 0x80) != 0);
 }
 
-long Input::GetMouseMoveX() {
-    return mouseState.lX;
+Input::MoveMouse Input::GetMouseMove()
+{
+    return MoveMouse(
+        mouseState.lX,
+        mouseState.lY,
+        mouseState.lZ // ホイール
+    );
 }
 
-long Input::GetMouseMoveY() {
-    return mouseState.lY;
-}
-
-long Input::GetMouseMoveZ() {
-    ///スクロールホイールの移動量を取得
-    return mouseState.lZ;
-}

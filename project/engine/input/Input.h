@@ -3,17 +3,25 @@
 #include "wrl.h"
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
-#include "engine/base/WinApp.h"
+#include <Xinput.h>
+#pragma comment(lib, "xinput.lib")
+#include "WinApp.h"
 
 class Input
 {
 public:
     template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
     // マウスのボタン定義
-    enum class MouseButton {
+    enum  MouseButton {
         Left = 0,
         Right = 1,
         Middle = 2,
+    };
+    struct MoveMouse
+    {
+        LONG x;
+        LONG y;
+        LONG z;
     };
 public:
     void Initialize(WinApp* winapp);
@@ -29,27 +37,26 @@ public:
     /// <summary>
     /// マウスボタンが押されているか
     /// </summary>
-    bool PushMouseDown(MouseButton button);
+    bool PushMouseDown(int32_t button);
     /// <summary>
     /// マウスボタンが押されないか
     /// </summary>
-    bool PushMouseUP(MouseButton button);
+    bool PushMouseUP(int32_t button);
 
     /// <summary>
     /// マウスボタンがトリガーされたか（押した瞬間）
     /// </summary>
-    bool TriggerMouseDown(MouseButton button);
+    bool TriggerMouseDown(int32_t button);
     /// <summary>
     /// マウスボタンがトリガーされたか（離した瞬間）
     /// </summary>
-    bool TriggerMouseUP(MouseButton button);
+    bool TriggerMouseUP(int32_t button);
 
     /// <summary>
     /// マウスの移動量を取得
     /// </summary>
-    long GetMouseMoveX();
-    long GetMouseMoveY();
-    long GetMouseMoveZ(); // ホイール
+    MoveMouse GetMouseMove();
+   
 
 private:
     ComPtr<IDirectInputDevice8> keyboard;
