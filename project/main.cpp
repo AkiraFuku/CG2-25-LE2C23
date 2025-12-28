@@ -8,9 +8,7 @@
 #include<dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
-//#include"imgui.h"
-//#include"imgui_impl_dx12.h"
-//#include"imgui_impl_win32.h"
+
 #include "WinApp.h"
 #include "DXCommon.h"
 #include"MathFunction.h"
@@ -38,22 +36,7 @@
 
 
 
-//LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-//
-//    /* if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-//     {
-//         return true;
-//     }*/
-//
-//    switch (msg) {
-//        //
-//    case WM_DESTROY:
-//        PostQuitMessage(0);
-//        return 0;
-//
-//    }
-//    return DefWindowProc(hwnd, msg, wparam, lparam);
-//}
+
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -254,7 +237,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          rotat+=0.1f;
          sprite->SetRotation(rotat);*/
 
-
+        ImGui::ShowDemoWindow();
 
          // ImGui::Begin("MaterialData");
           //Vector3 camreaTranslate = camera->GetTranslate();
