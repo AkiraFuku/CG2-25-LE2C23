@@ -237,9 +237,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
          rotat+=0.1f;
          sprite->SetRotation(rotat);*/
 
-        ImGui::ShowDemoWindow();
+        
 
-         // ImGui::Begin("MaterialData");
+         // ImGui::Begin;
           //Vector3 camreaTranslate = camera->GetTranslate();
           //camreaTranslate=Add(camreaTranslate,Vector3{0.0f,0.0f,-0.5f});
           ////Vector3 cameraRotate = camera->GetRotate();
