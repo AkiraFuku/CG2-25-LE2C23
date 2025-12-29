@@ -1,8 +1,9 @@
 #include "GameEngine.h"
+#include <memory>
 //winmain
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-    Framework* game = new GameEngine();
+    std::unique_ptr<Framework> game = std::make_unique<GameEngine>();
     game->Run();
-    delete game;
+
     return 0;
 }
