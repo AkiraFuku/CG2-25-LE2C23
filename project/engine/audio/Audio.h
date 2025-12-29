@@ -6,6 +6,8 @@
 #pragma comment(lib,"xaudio2.lib")
 #include<mfapi.h>
 #pragma comment(lib,"mfplat.lib")
+#include <mfreadwrite.h>
+#pragma comment(lib,"mfreadwrite.lib")
 
 #include <string>
 
@@ -42,7 +44,7 @@ struct SoundData
     ~Audio();
   
     void Initialize();
-  static  SoundData SoundLoadWave(const char* filename);
+  static  SoundData SoundLoadWave(const std::string& filename);
 
     
     void PlayAudio(const SoundData& soundData );
