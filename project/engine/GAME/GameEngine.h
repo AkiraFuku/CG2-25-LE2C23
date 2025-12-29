@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Scene.h"
 #include "TitleScene.h"
 #include "GameScene.h"
 #include "Framework.h"
@@ -17,7 +18,7 @@ public:
 
 private:
   
-    TitleScene* scene = nullptr;
+    Scene* scene = nullptr;
   
 private:
     //ログファイルパス

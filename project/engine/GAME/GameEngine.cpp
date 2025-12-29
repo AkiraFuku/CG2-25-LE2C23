@@ -5,7 +5,7 @@ void GameEngine::Initialize() {
 
    Framework::Initialize();
   
-    scene = new TitleScene();
+    scene = new GameScene();
     scene->Initialize();
 };
 void GameEngine::Finalize() {

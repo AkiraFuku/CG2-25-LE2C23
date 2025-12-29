@@ -7,13 +7,14 @@
 #include "ParicleEmitter.h"
 #include "Audio.h"
 #include "TextureManager.h"
-class GameScene
+#include "Scene.h"
+class GameScene :public Scene
 {
 public:
-    void Initialize();
-    void Finalize();
-    void Update();
-    void Draw();
+    void Initialize() override;
+    void Finalize()override;
+    void Update()override;
+    void Draw()override;
 private:
       Camera* camera;
     Sprite* sprite;

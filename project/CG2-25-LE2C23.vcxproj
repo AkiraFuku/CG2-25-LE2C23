@@ -53,6 +53,7 @@
     <ClCompile Include="engine\Tool\ParticleManager.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
     <ClCompile Include="engine\Tool\ParicleEmitter.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +121,7 @@
     <ClInclude Include="engine\GAME\Framework.h" />
     <ClInclude Include="engine\GAME\GameEngine.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
