@@ -2,6 +2,8 @@
 #include "ModelManager.h"
 #include "Input.h"
 #include "imgui.h"
+#include "GameScene.h"
+#include "SceneManager.h"
 
 void TitleScene::Initialize() {
 
@@ -67,7 +69,9 @@ void TitleScene::Update() {
 
         // Aボタンを押したときの処理
 
-
+        Scene* nextScene = new GameScene();
+        
+        GetSceneManager()->SetNextScene(nextScene);
 
     }
     if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B))

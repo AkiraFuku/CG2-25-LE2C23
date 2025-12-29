@@ -2,6 +2,8 @@
 #include "ModelManager.h"
 #include "Input.h"
 #include "imgui.h"
+#include "SceneManager.h"
+
 void GameScene::Initialize() {
 
     camera = new Camera();
@@ -76,8 +78,12 @@ void GameScene::Update() {
 
 
 
+        
         // Aボタンを押したときの処理
 
+        Scene* nextScene = new GameScene();
+        
+        GetSceneManager()->SetNextScene(nextScene);
 
 
     }

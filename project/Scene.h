@@ -12,6 +12,9 @@ public:
     virtual void SetSceneManager(SceneManager* sceneManager) {
         sceneManager_ = sceneManager;
     }
+    SceneManager*  GetSceneManager() {
+        return sceneManager_;
+    }
 private:
     SceneManager* sceneManager_ = nullptr;
 };
