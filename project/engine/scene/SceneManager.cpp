@@ -19,7 +19,6 @@ SceneManager::~SceneManager()
 {
     if (scene_) {
         scene_->Finalize();
-        delete scene_;
         scene_ = nullptr;
     }
 }
@@ -31,32 +30,31 @@ void SceneManager::Update() {
         if (scene_)
         {
             scene_->Finalize();
-            delete scene_;
             scene_ = nullptr;
 
         }
-        scene_ = nextScene_;
-        nextScene_ = nullptr;
+        scene_ = std::move(nextScene_);
+       
 
         scene_->SetSceneManager(this);
         scene_->Initialize();
 
     }
 
-    if (scene_ != nullptr) {
+    if (scene_) {
         scene_->Update();
     }
 }
 
 void SceneManager::Draw() {
-    if (scene_ != nullptr) {
+    if (scene_) {
         scene_->Draw();
     }
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName)
 {
-    assert(sceneFactory_ );
+    assert(sceneFactory_);
     assert(nextScene_ == nullptr);
     nextScene_ = sceneFactory_->CreateScene(sceneName);
 }
