@@ -64,9 +64,7 @@ void Audio::PlayAudio(const SoundData& soundData)
 
 void Audio::SoundUnload(SoundData* soundData)
 {
-    delete[] soundData->pBuffer; // バッファの解放
-    soundData->pBuffer = 0; // ポインタをnullptrに設定
-    soundData->bufferSize = 0; // バッファサイズを0に設定
+    soundData->buffer.clear(); // バッファの解放
     soundData->wfex = {}; // 波形フォーマットを初期化
 }
 
@@ -79,8 +77,8 @@ void Audio::SoundPlayWave(IXAudio2* xAudio2, const SoundData& SoundData)
 
     //音声データの再生
     XAUDIO2_BUFFER buf = {};
-    buf.pAudioData = SoundData.pBuffer; // 音声データのポインタ
-    buf.AudioBytes = SoundData.bufferSize; // 音声データのサイズ
+    buf.AudioBytes = (UINT32)SoundData.buffer.size(); // 音声データのサイズ
+    buf.pAudioData = SoundData.buffer.data(); // 音声データへのポインタ
     buf.Flags = XAUDIO2_END_OF_STREAM; // ストリームの終端を示すフラグ
 
     result = pSourceVoice->SubmitSourceBuffer(&buf);

@@ -10,7 +10,7 @@
 #pragma comment(lib,"mfreadwrite.lib")
 
 #include <string>
-
+#include <vector>
 
 class Audio
 {
@@ -36,10 +36,9 @@ struct SoundData
 {
     //波形フォーマット
     WAVEFORMATEX wfex; // 波形フォーマット
-    // バッファ先頭アドレス
-    BYTE* pBuffer;
-    // バッファサイズ
-    unsigned int bufferSize;
+    //バッファ
+    std::vector<BYTE> buffer; // 音声データバッファ
+   
 };
     ~Audio();
   
