@@ -20,7 +20,7 @@ public:
 private:
   
   
-    SceneManager* sceneManager =nullptr;
+    
   
 private:
     //ログファイルパス
