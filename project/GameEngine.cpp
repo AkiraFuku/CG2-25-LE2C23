@@ -154,12 +154,38 @@ void GameEngine::Initialize() {
 
 };
 void GameEngine::Finalize() {
+    dxCommon->Finalize();
+
+    delete audio;
+    delete input;
+    delete object3dCommon;
+    delete object3d2;
+    delete object3d;
+    delete camera;
+    imguiManager->Finalize();
+    delete imguiManager;
+    /*   for (Sprite* sprite : sprites)
+       {*/
+    delete sprite;
+    // }
+    delete emitter;
+    delete spritecommon;
+    delete srvManager;
+    delete dxCommon;
+    dxCommon = nullptr;
+    TextureManager::GetInstance()->Finalize();
+    ModelManager::GetInstance()->Finalize();
+    ParticleManager::GetInstance()->Finalize();
+
+    winApp->Finalize();
+    delete winApp;
+    winApp = nullptr;
 };
 void GameEngine::Update() {
     //メッセージがある限りGetMessageを呼び出す
     if (winApp->ProcessMessage()) {
-       endReqest_=true;
-       return;
+        endReqest_ = true;
+        return;
 
     }
 #ifdef USE_IMGUI
@@ -185,13 +211,13 @@ void GameEngine::Update() {
 
 
         // Aボタンを押したときの処理
-       
+
 
 
     }
     if (input->TriggerPadDown(0, XINPUT_GAMEPAD_B))
     {
-       
+
     }
 
     //マウスホイールの入力取得
@@ -245,4 +271,29 @@ void GameEngine::Update() {
     imguiManager->End();
 };
 void GameEngine::Draw() {
+
+    dxCommon->PreDraw();
+    srvManager->PreDraw();
+
+    // ParticleManager::GetInstance()->Draw();
+     // 3Dオブジェクトの描画
+    object3dCommon->Object3dCommonDraw();
+    //object3d2->Draw();
+    object3d->Draw();
+
+
+    ///////スプライトの描画
+
+   /* for (Sprite* sprite : sprites)
+    {*/
+    spritecommon->SpriteCommonDraw();
+    sprite->Draw();
+    /*}*/
+
+    ///
+
+    imguiManager->Draw();
+    dxCommon->PostDraw();
+
+    TextureManager::GetInstance()->ReleaseIntermediateResources();
 }

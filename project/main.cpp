@@ -272,59 +272,62 @@ gameEngine.Initialize();
         ////DRAW
         /////
 
-        dxCommon->PreDraw();
-        srvManager->PreDraw();
+       // dxCommon->PreDraw();
+       // srvManager->PreDraw();
 
-        // ParticleManager::GetInstance()->Draw();
-         // 3Dオブジェクトの描画
-        object3dCommon->Object3dCommonDraw();
-        //object3d2->Draw();
-        object3d->Draw();
+       // // ParticleManager::GetInstance()->Draw();
+       //  // 3Dオブジェクトの描画
+       // object3dCommon->Object3dCommonDraw();
+       // //object3d2->Draw();
+       // object3d->Draw();
 
 
-        ///////スプライトの描画
+       // ///////スプライトの描画
 
-       /* for (Sprite* sprite : sprites)
-        {*/
-        spritecommon->SpriteCommonDraw();
-        sprite->Draw();
-        /*}*/
+       ///* for (Sprite* sprite : sprites)
+       // {*/
+       // spritecommon->SpriteCommonDraw();
+       // sprite->Draw();
+       // /*}*/
 
-        ///
+       // ///
 
-        imguiManager->Draw();
-        dxCommon->PostDraw();
+       // imguiManager->Draw();
+       // dxCommon->PostDraw();
 
-        TextureManager::GetInstance()->ReleaseIntermediateResources();
+       // TextureManager::GetInstance()->ReleaseIntermediateResources();
 
+gameEngine.Draw();
     }
 
-    dxCommon->Finalize();
+    gameEngine.Finalize();
 
-    delete audio;
-    delete input;
-    delete object3dCommon;
-    delete object3d2;
-    delete object3d;
-    delete camera;
-    imguiManager->Finalize();
-    delete imguiManager;
-    /*   for (Sprite* sprite : sprites)
-       {*/
-    delete sprite;
-    // }
-    delete emitter;
-    delete spritecommon;
-    delete srvManager;
-    delete dxCommon;
-    dxCommon = nullptr;
-    TextureManager::GetInstance()->Finalize();
-    ModelManager::GetInstance()->Finalize();
-    ParticleManager::GetInstance()->Finalize();
+    //dxCommon->Finalize();
 
-    winApp->Finalize();
-    delete winApp;
-    winApp = nullptr;
+    //delete audio;
+    //delete input;
+    //delete object3dCommon;
+    //delete object3d2;
+    //delete object3d;
+    //delete camera;
+    //imguiManager->Finalize();
+    //delete imguiManager;
+    ///*   for (Sprite* sprite : sprites)
+    //   {*/
+    //delete sprite;
+    //// }
+    //delete emitter;
+    //delete spritecommon;
+    //delete srvManager;
+    //delete dxCommon;
+    //dxCommon = nullptr;
+    //TextureManager::GetInstance()->Finalize();
+    //ModelManager::GetInstance()->Finalize();
+    //ParticleManager::GetInstance()->Finalize();
+
+    //winApp->Finalize();
+    //delete winApp;
+    //winApp = nullptr;
 
     return 0;
 }
