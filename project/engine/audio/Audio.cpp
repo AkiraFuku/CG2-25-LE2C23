@@ -2,8 +2,13 @@
 #include <cassert>
 Audio::~Audio()
 {
+    masteringVoice_->DestroyVoice(); // マスターボイスの破棄
+
  xAudio2_.Reset();
  SoundUnload(&soundData_); // 音声データの解放
+ HRESULT result;
+ result = MFShutdown();
+ assert(SUCCEEDED(result));
 }
 void Audio::Initialize()
 {
@@ -14,6 +19,11 @@ void Audio::Initialize()
     // マスターボイスの作成
     result = xAudio2_->CreateMasteringVoice(&masteringVoice_);
     assert(SUCCEEDED(result));
+    // MFの初期化
+    result = MFStartup(MF_VERSION,MFSTARTUP_NOSOCKET);
+    assert(SUCCEEDED(result));
+
+
 }
 
 Audio:: SoundData Audio::SoundLoadWave(const char* filename)

@@ -4,6 +4,10 @@
 
 #include <xaudio2.h>
 #pragma comment(lib,"xaudio2.lib")
+#include<mfapi.h>
+#pragma comment(lib,"mfplat.lib")
+
+#include <string>
 
 
 class Audio
