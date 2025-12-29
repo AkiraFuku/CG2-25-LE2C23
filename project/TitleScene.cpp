@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include "GameScene.h"
 #include "SceneManager.h"
+#include "ParticleManager.h"//フレームワークに移植
+
 
 void TitleScene::Initialize() {
 

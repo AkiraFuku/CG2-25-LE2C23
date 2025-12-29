@@ -3,7 +3,7 @@
 #include "Input.h"
 #include "imgui.h"
 #include "SceneManager.h"
-
+#include "TitleScene.h"
 void GameScene::Initialize() {
 
     camera = new Camera();
@@ -19,7 +19,7 @@ void GameScene::Initialize() {
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
-    ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
+   // ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
     /*   std::vector<Sprite*> sprites;
        for (uint32_t i = 0; i < 5; i++)
        {*/
@@ -81,7 +81,7 @@ void GameScene::Update() {
         
         // Aボタンを押したときの処理
 
-        Scene* nextScene = new GameScene();
+        Scene* nextScene = new TitleScene();
         
         GetSceneManager()->SetNextScene(nextScene);
 

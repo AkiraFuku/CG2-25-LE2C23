@@ -1,4 +1,5 @@
 #include "Framework.h"
+#include "ParticleManager.h"//フレームワークに移植
 
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成

@@ -20,7 +20,6 @@
 #include "ModelCommon.h"//フレームワークに移植
 #include "ModelManager.h"//フレームワークに移植
 #include "SrvManager.h"//フレームワークに移植
-#include "ParticleManager.h"//フレームワークに移植
 #include "ImGuiManager.h"//フレームワークに移植
 
 class Framework
