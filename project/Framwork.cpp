@@ -108,20 +108,19 @@ void Framwork::Update()
 #endif
     input->Update();
 
-
-    imguiManager->End();
+    dxCommon->PreDraw();
+    srvManager->PreDraw();
+    // 3Dオブジェクトの描画
+    object3dCommon->Object3dCommonDraw();
+    ///////スプライトの描画
+    spritecommon->SpriteCommonDraw();
 }
 
 void Framwork::Draw()
 {
-    dxCommon->PreDraw();
-    srvManager->PreDraw();
-    // ParticleManager::GetInstance()->Draw();
-     // 3Dオブジェクトの描画
-    object3dCommon->Object3dCommonDraw();
-   
-    ///////スプライトの描画
-    spritecommon->SpriteCommonDraw();
+    imguiManager->End();;
+    imguiManager->Draw();
+    dxCommon->PostDraw();
 }
 
 void Framwork::Finalize()

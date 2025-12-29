@@ -4,6 +4,7 @@
 
 void GameEngine::Initialize() {
 
+    Framwork::Initialize();
     ////D3D12の初期化
     //CoInitializeEx(0, COINIT_MULTITHREADED);
 
@@ -116,16 +117,19 @@ void GameEngine::Initialize() {
 
 };
 void GameEngine::Finalize() {
-   /* dxCommon->Finalize();
-
-    Audio::GetInstance()->Finalize();
-    delete input;
-    delete object3dCommon;
+    Framwork::Finalize();
     delete object3d2;
     delete object3d;
     delete camera;
-    imguiManager->Finalize();
-    delete imguiManager;*/
+    /*
+   // dxCommon->Finalize();
+
+    //Audio::GetInstance()->Finalize();
+    //delete input;
+    //delete object3dCommon;
+    
+    //imguiManager->Finalize();
+    //delete imguiManager;*/
     /*   for (Sprite* sprite : sprites)
        {*/
     delete sprite;
@@ -145,6 +149,11 @@ void GameEngine::Finalize() {
 };
 void GameEngine::Update() {
    
+    /////////
+    /////Update
+    /////////
+    // 
+    Framwork::Update();
 //#ifdef USE_IMGUI
 //    imguiManager->Begin();
 //#endif
