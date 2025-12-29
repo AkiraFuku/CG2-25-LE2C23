@@ -47,7 +47,7 @@ void GameScene::Initialize() {
 
 
     ModelManager::GetInstance()->LoadModel("plane.obj");
-
+    ModelManager::GetInstance()->LoadModel("axis.obj");
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
