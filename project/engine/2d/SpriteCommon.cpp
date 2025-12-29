@@ -1,6 +1,20 @@
 #include "SpriteCommon.h"
 #include "Logger.h"
 #include <cassert>
+// 静的メンバ変数の初期化
+SpriteCommon* SpriteCommon::instance = nullptr;
+
+SpriteCommon* SpriteCommon::GetInstance() {
+    if (instance == nullptr) {
+        instance = new SpriteCommon();
+    }
+    return instance;
+}
+
+void SpriteCommon::Finalize() {
+    delete instance;
+    instance = nullptr;
+}
 void SpriteCommon::Initialize(DXCommon* dxCommon)
 {
     dxCommon_ = dxCommon;

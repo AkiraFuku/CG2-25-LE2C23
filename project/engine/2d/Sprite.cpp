@@ -2,15 +2,15 @@
 #include "SpriteCommon.h"
 #include "MathFunction.h"
 #include "TextureManager.h"
-void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
+void Sprite::Initialize(std::string textureFilePath) {
 
-    spriteCom_ = spriteCom;
+
 
     vertexResourse_ =
-        spriteCom_->GetDxCommon()->
+        SpriteCommon::GetInstance()->GetDxCommon()->
         CreateBufferResource(sizeof(VertexData) * 4);
     indexResource_ =
-        spriteCom_->GetDxCommon()->
+        SpriteCommon::GetInstance()->GetDxCommon()->
         CreateBufferResource(sizeof(uint32_t) * 6);
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
@@ -27,7 +27,7 @@ void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
 
     //
     materialResource_ =
-        spriteCom_->GetDxCommon()->
+        SpriteCommon::GetInstance()->GetDxCommon()->
         CreateBufferResource(sizeof(Material));
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
@@ -37,7 +37,7 @@ void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
     materialData_->uvTransform = Makeidetity4x4();
     //座標変換
     transformationMatrixResourse_ =
-        spriteCom_->GetDxCommon()->
+        SpriteCommon::GetInstance()->GetDxCommon()->
         CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
@@ -47,7 +47,7 @@ void Sprite::Initialize(SpriteCommon* spriteCom, std::string textureFilePath) {
     textureFilePath_ = textureFilePath;
     //テクスチャの読み込み
     textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
-    
+
     AdjustTextureSize();
 }
 void Sprite::Update() {
@@ -118,27 +118,27 @@ void Sprite::Update() {
 void Sprite::Draw()
 {
     //パイプラインステートとルートシグネチャの設定
-    spriteCom_->GetDxCommon()->
+    SpriteCommon::GetInstance()->GetDxCommon()->
         GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
     //インデックスバッファの設定
-    spriteCom_->GetDxCommon()->
+    SpriteCommon::GetInstance()->GetDxCommon()->
         GetCommandList()->IASetIndexBuffer(&indexBufferView_);
     //マテリアルの設定
-    spriteCom_->GetDxCommon()->
+    SpriteCommon::GetInstance()->GetDxCommon()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
     // SRVのディスクプリプターテーブルの先頭を設定
-    spriteCom_->GetDxCommon()->
+    SpriteCommon::GetInstance()->GetDxCommon()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(textureIndex_));
 
     //座標変換行列の設定
-    spriteCom_->GetDxCommon()->
+     SpriteCommon::GetInstance()->GetDxCommon()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_->GetGPUVirtualAddress());
 
-    spriteCom_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+     SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
@@ -149,7 +149,7 @@ void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
 void Sprite::AdjustTextureSize()
 {
     //メタデータの取得
-    const DirectX::TexMetadata& metadata= TextureManager::GetInstance()->GetMetaData(textureFilePath_);
+    const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
     textureSize.x = static_cast<float>(metadata.width);
     textureSize.y = static_cast<float>(metadata.height);

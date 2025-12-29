@@ -48,7 +48,6 @@ private:
     DXCommon* dxCommon;
     SrvManager* srvManager;
     ImGuiManager* imguiManager;
-    SpriteCommon* spritecommon;
     Object3dCommon* object3dCommon;
     Camera* camera;
     Sprite* sprite;

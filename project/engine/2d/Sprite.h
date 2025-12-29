@@ -29,7 +29,7 @@ public:
 
     };
 
-    void Initialize(SpriteCommon* spriteCom, std::string textureFilePath);
+    void Initialize( std::string textureFilePath);
     void Update();
     void Draw();
 
@@ -108,7 +108,7 @@ private:
     void AdjustTextureSize();
 
 private:
-    SpriteCommon* spriteCom_ = nullptr;
+    
 
     Vector2 postion_ = { 0.0f,0.0f };
     float rotation_ = 0.0f;

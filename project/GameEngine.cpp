@@ -89,9 +89,7 @@ void GameEngine::Initialize() {
     //ここから書く　外部入力
     Input::GetInstance()->Initialize(winApp);
 
-    spritecommon = nullptr;
-    spritecommon = new SpriteCommon;
-    spritecommon->Initialize(dxCommon);
+    SpriteCommon::GetInstance()->Initialize(dxCommon);
 
     object3dCommon = nullptr;
     object3dCommon = new Object3dCommon;
@@ -119,7 +117,7 @@ void GameEngine::Initialize() {
        {*/
     sprite = new Sprite();
     // sprite->Initialize(spritecommon,"resources/monsterBall.png");
-    sprite->Initialize(spritecommon, "resources/uvChecker.png");
+    sprite->Initialize( "resources/uvChecker.png");
 
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
     // sprite->SetSize(Vector2{ 100.0f,100.0f });
@@ -167,7 +165,7 @@ void GameEngine::Finalize() {
     delete sprite;
     // }
     delete emitter;
-    delete spritecommon;
+    SpriteCommon::GetInstance()->Finalize();
     delete srvManager;
     delete dxCommon;
     dxCommon = nullptr;
@@ -284,7 +282,7 @@ void GameEngine::Draw() {
 
    /* for (Sprite* sprite : sprites)
     {*/
-    spritecommon->SpriteCommonDraw();
+    SpriteCommon::GetInstance()->SpriteCommonDraw();
     sprite->Draw();
     /*}*/
 
