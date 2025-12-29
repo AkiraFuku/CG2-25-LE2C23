@@ -5,21 +5,21 @@
 #include<dbghelp.h>
 #pragma comment(lib,"Dbghelp.lib")
 
-#include "WinApp.h"//フレームワークに移動予定
-#include "DXCommon.h"//フレームワークに移動予定
-#include"Audio.h"//シングルトン化済　フレームワークに移動予定
+#include "WinApp.h"
+#include "DXCommon.h"
+#include"Audio.h"
 #include"Input.h"//シングルトン化予定　フレームワークに移動予定
-#include"D3DResourceLeakChecker.h"//フレームワークに移動予定
-#include"StringUtility.h"//フレームワークに移動予定
-#include"Logger.h"//フレームワークに移動予定
+#include"D3DResourceLeakChecker.h"
+#include"StringUtility.h"
+#include"Logger.h"
 #include "SpriteCommon.h"//シングルトン化予定//フレームワークに移動予定
-#include "TextureManager.h"//シングルトン化済//フレームワークに移動予定
+#include "TextureManager.h"
 #include"Object3DCommon.h"//シングルトン化予定//フレームワークに移動予定
-#include "ModelCommon.h"//シングルトン化予定//フレームワークに移動予定
-#include "ModelManager.h"//シングルトン化済//フレームワークに移動予定
-#include "SrvManager.h"//シングルトン化予定 //フレームワークに移動予定
-#include "ParticleManager.h"//シングルトン化済 //フレームワークに移動予定
-#include "ImGuiManager.h"//シングルトン化予定 //フレームワークに移動予定
+#include "ModelCommon.h"
+#include "ModelManager.h"
+#include "SrvManager.h"
+#include "ParticleManager.h"
+#include "ImGuiManager.h"
 class Framwork
 {
 public:

@@ -101,6 +101,29 @@ void Framwork::Initialize()
     Audio::GetInstance()->Initialize();
 }
 
+void Framwork::Update()
+{
+#ifdef USE_IMGUI
+    imguiManager->Begin();
+#endif
+    input->Update();
+
+
+    imguiManager->End();
+}
+
+void Framwork::Draw()
+{
+    dxCommon->PreDraw();
+    srvManager->PreDraw();
+    // ParticleManager::GetInstance()->Draw();
+     // 3Dオブジェクトの描画
+    object3dCommon->Object3dCommonDraw();
+   
+    ///////スプライトの描画
+    spritecommon->SpriteCommonDraw();
+}
+
 void Framwork::Finalize()
 {
     dxCommon->Finalize();

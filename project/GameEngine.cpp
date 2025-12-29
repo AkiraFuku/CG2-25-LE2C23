@@ -144,16 +144,11 @@ void GameEngine::Finalize() {
     winApp = nullptr;*/
 };
 void GameEngine::Update() {
-    //メッセージがある限りGetMessageを呼び出す
-    if (winApp->ProcessMessage()) {
-        endReqest_ = true;
-        return;
-
-    }
-#ifdef USE_IMGUI
-    imguiManager->Begin();
-#endif
-    input->Update();
+   
+//#ifdef USE_IMGUI
+//    imguiManager->Begin();
+//#endif
+//    input->Update();
 
     emitter->Update();
     ParticleManager::GetInstance()->Update();
@@ -230,16 +225,16 @@ void GameEngine::Update() {
     /////////
     /////Update
     /////////
-    imguiManager->End();
+    //imguiManager->End();
 };
 void GameEngine::Draw() {
 
-    dxCommon->PreDraw();
-    srvManager->PreDraw();
+    //dxCommon->PreDraw();
+    //srvManager->PreDraw();
 
-    // ParticleManager::GetInstance()->Draw();
-     // 3Dオブジェクトの描画
-    object3dCommon->Object3dCommonDraw();
+    //// ParticleManager::GetInstance()->Draw();
+    // // 3Dオブジェクトの描画
+    //object3dCommon->Object3dCommonDraw();
     //object3d2->Draw();
     object3d->Draw();
 
@@ -248,14 +243,14 @@ void GameEngine::Draw() {
 
    /* for (Sprite* sprite : sprites)
     {*/
-    spritecommon->SpriteCommonDraw();
+  /*  spritecommon->SpriteCommonDraw();*/
     sprite->Draw();
     /*}*/
 
     ///
 
-    imguiManager->Draw();
-    dxCommon->PostDraw();
+    /*imguiManager->Draw();
+    dxCommon->PostDraw();*/
 
     TextureManager::GetInstance()->ReleaseIntermediateResources();
 }
