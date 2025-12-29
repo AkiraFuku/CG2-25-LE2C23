@@ -38,6 +38,10 @@ public:
     void Update();
 
     void Draw();
+
+    bool IsEnd() {
+        return endReqest_;
+    }
 private:
     D3DResourceLeakChecker LeakCheck;
     WinApp* winApp;
@@ -53,5 +57,12 @@ private:
     Object3d* object3d2;
     Object3d* object3d;
     ParicleEmitter* emitter;
+    Audio::SoundData soundData1;
+private:
+    //ログファイルパス
+    const std::filesystem::path logFilePath = "D3DResourceLeakLog.txt";
+    //終了フラグ
+    bool endReqest_ = false;
+
 };
 

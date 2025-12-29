@@ -109,7 +109,7 @@ void GameEngine::Initialize() {
 
     audio = new Audio();
     audio->Initialize();
-    Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.mp3");
+    soundData1 = Audio::SoundLoadWave("resources/fanfare.mp3");
 
     audio->PlayAudio(soundData1);
 
@@ -148,7 +148,7 @@ void GameEngine::Initialize() {
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-     emitter = new ParicleEmitter("Test", M, 10, 5.0f, 0.0f);
+    emitter = new ParicleEmitter("Test", M, 10, 5.0f, 0.0f);
 
 
 
@@ -156,6 +156,93 @@ void GameEngine::Initialize() {
 void GameEngine::Finalize() {
 };
 void GameEngine::Update() {
+    //メッセージがある限りGetMessageを呼び出す
+    if (winApp->ProcessMessage()) {
+       endReqest_=true;
+       return;
+
+    }
+#ifdef USE_IMGUI
+    imguiManager->Begin();
+#endif
+    input->Update();
+
+    emitter->Update();
+    ParticleManager::GetInstance()->Update();
+
+    XINPUT_STATE state;
+
+    // 現在のジョイスティックを取得
+
+
+
+    input->GetJoyStick(0, state);
+
+    // Aボタンを押していたら
+
+    if (input->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
+
+
+
+        // Aボタンを押したときの処理
+       
+
+
+    }
+    if (input->TriggerPadDown(0, XINPUT_GAMEPAD_B))
+    {
+       
+    }
+
+    //マウスホイールの入力取得
+
+    if (input->GetMouseMove().z)
+    {
+        Vector3 camreaTranslate = camera->GetTranslate();
+        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(input->GetMouseMove().z) * 0.1f });
+        camera->SetTranslate(camreaTranslate);
+
+    }
+    if (input->GetJoyStick(0, state))
+    {
+        // 左スティックの値を取得
+        float x = (float)state.Gamepad.sThumbLX;
+        float y = (float)state.Gamepad.sThumbLY;
+
+        // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+        float normalizedX = x / 32767.0f;
+        float normalizedY = y / 32767.0f;
+        Vector3 camreaTranslate = camera->GetTranslate();
+        camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+        camera->SetTranslate(camreaTranslate);
+    }
+
+    camera->Update();
+    object3d->Update();
+    object3d2->Update();
+
+
+#ifdef USE_IMGUI
+    ImGui::Begin("Debug");
+
+    ImGui::Text("Sprite");
+    Vector2 Position =
+        sprite->GetPosition();
+    ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
+    sprite->SetPosition(Position);
+
+    ImGui::End();
+#endif // USE_IMGUI
+
+    //sprite->SetRotation(sprite->GetRotation() + 0.1f);
+    sprite->Update();
+
+    //}
+    //ImGui::End();
+    /////////
+    /////Update
+    /////////
+    imguiManager->End();
 };
 void GameEngine::Draw() {
 }
