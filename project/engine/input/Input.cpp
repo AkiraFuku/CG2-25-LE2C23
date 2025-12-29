@@ -5,7 +5,19 @@
 #include <memory>
 
 
+// 静的メンバ変数の初期化
+Input* Input::instance = nullptr;
 
+Input* Input::GetInstance() {
+    if (instance == nullptr) {
+        instance = new Input();
+    }
+    return instance;
+}
+void Input::Finalize() {
+    delete instance;
+    instance = nullptr;
+}
 void Input::Initialize(WinApp* winapp) {
     winApp_ = winapp;
     // DirectInputの初期化
@@ -51,10 +63,9 @@ void Input::Initialize(WinApp* winapp) {
         ZeroMemory(&preState_[i], sizeof(XINPUT_STATE));
     }
 
-    keyboard->GetDeviceState(sizeof(preKey), preKey);
-    mouse->GetDeviceState(sizeof(DIMOUSESTATE), &preMouseState);
+    if (keyboard) keyboard->GetDeviceState(sizeof(preKey), preKey);
+    if (mouse) mouse->GetDeviceState(sizeof(DIMOUSESTATE), &preMouseState);
 }
-
 void Input::Update()
 {
     // 例:
@@ -68,10 +79,10 @@ void Input::Update()
     // --- マウス更新  ---
     // 前回の状態を保存
     preMouseState = mouseState;
-    
+
     // デバイス取得権限の要求
     mouse->Acquire();
-    
+
     // 現在の状態を取得
     mouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseState);
 
@@ -160,14 +171,14 @@ bool Input::TriggerMouseDown(int32_t button) {
     // マウスボタンがトリガーされたか確認（押した瞬間）
     int btnIndex = static_cast<int>(button);
     return ((mouseState.rgbButtons[btnIndex] & 0x80) != 0 &&
-            (preMouseState.rgbButtons[btnIndex] & 0x80) == 0);
+        (preMouseState.rgbButtons[btnIndex] & 0x80) == 0);
 }
 
 bool Input::TriggerMouseUP(int32_t button) {
     // マウスボタンがトリガーされたか確認（離した瞬間）
     int btnIndex = static_cast<int>(button);
     return ((mouseState.rgbButtons[btnIndex] & 0x80) == 0 &&
-            (preMouseState.rgbButtons[btnIndex] & 0x80) != 0);
+        (preMouseState.rgbButtons[btnIndex] & 0x80) != 0);
 }
 
 Input::MoveMouse Input::GetMouseMove()
@@ -181,8 +192,8 @@ Input::MoveMouse Input::GetMouseMove()
 
 bool Input::GetJoyStick(int32_t stickNo, XINPUT_STATE& out) const
 {
-  
- if (stickNo < 0 || stickNo >= XUSER_MAX_COUNT) return false;
+
+    if (stickNo < 0 || stickNo >= XUSER_MAX_COUNT) return false;
 
     // メンバ変数に保存されている最新の状態をコピー
     out = state_[stickNo];
@@ -206,11 +217,11 @@ bool Input::GetJoyStick(int32_t stickNo, XINPUT_STATE& out) const
 bool Input::GetPreJoyStick(int32_t stickNo, XINPUT_STATE& out) const
 {
     if (stickNo < 0 || stickNo >= XUSER_MAX_COUNT) return false;
-    
+
     out = preState_[stickNo];
-    
+
     if (out.dwPacketNumber == 0) return false;
-    
+
     return true;
 }
 
@@ -224,7 +235,7 @@ void Input::SetDeadZone(int32_t stickNo, int32_t deadZoneL, int32_t deadZoneR)
 
 size_t Input::GetConnectedStickNum()
 {
-  size_t count = 0;
+    size_t count = 0;
     for (int i = 0; i < XUSER_MAX_COUNT; ++i) {
         if (state_[i].dwPacketNumber != 0) {
             count++;
@@ -264,8 +275,8 @@ bool Input::TriggerPadDown(int32_t stickNo, WORD button) const
     if (stickNo < 0 || stickNo >= XUSER_MAX_COUNT) return false;
 
     // 「現在は押されている」かつ「前は押されていなかった」
-    return ((state_[stickNo].Gamepad.wButtons & button) != 0) && 
-           ((preState_[stickNo].Gamepad.wButtons & button) == 0);
+    return ((state_[stickNo].Gamepad.wButtons & button) != 0) &&
+        ((preState_[stickNo].Gamepad.wButtons & button) == 0);
 }
 
 // -----------------------------------------------------------
@@ -276,8 +287,8 @@ bool Input::TriggerPadUP(int32_t stickNo, WORD button) const
     if (stickNo < 0 || stickNo >= XUSER_MAX_COUNT) return false;
 
     // 「現在は押されていない」かつ「前は押されていた」
-    return ((state_[stickNo].Gamepad.wButtons & button) == 0) && 
-           ((preState_[stickNo].Gamepad.wButtons & button) != 0);
+    return ((state_[stickNo].Gamepad.wButtons & button) == 0) &&
+        ((preState_[stickNo].Gamepad.wButtons & button) != 0);
 }
 
 

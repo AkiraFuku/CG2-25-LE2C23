@@ -87,9 +87,7 @@ void GameEngine::Initialize() {
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
     //ここから書く　外部入力
-    input = nullptr;
-    input = new Input();
-    input->Initialize(winApp);
+    Input::GetInstance()->Initialize(winApp);
 
     spritecommon = nullptr;
     spritecommon = new SpriteCommon;
@@ -157,7 +155,7 @@ void GameEngine::Finalize() {
     dxCommon->Finalize();
 
     Audio::GetInstance()->Finalize();
-    delete input;
+    Input::GetInstance()->Finalize();
     delete object3dCommon;
     delete object3d2;
     delete object3d;
@@ -191,7 +189,7 @@ void GameEngine::Update() {
 #ifdef USE_IMGUI
     imguiManager->Begin();
 #endif
-    input->Update();
+    Input::GetInstance()->Update();
 
     emitter->Update();
     ParticleManager::GetInstance()->Update();
@@ -202,11 +200,11 @@ void GameEngine::Update() {
 
 
 
-    input->GetJoyStick(0, state);
+    Input::GetInstance()->GetJoyStick(0, state);
 
     // Aボタンを押していたら
 
-    if (input->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
 
 
 
@@ -215,21 +213,21 @@ void GameEngine::Update() {
 
 
     }
-    if (input->TriggerPadDown(0, XINPUT_GAMEPAD_B))
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B))
     {
 
     }
 
     //マウスホイールの入力取得
 
-    if (input->GetMouseMove().z)
+    if (Input::GetInstance()->GetMouseMove().z)
     {
         Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(input->GetMouseMove().z) * 0.1f });
+        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(Input::GetInstance()->GetMouseMove().z) * 0.1f });
         camera->SetTranslate(camreaTranslate);
 
     }
-    if (input->GetJoyStick(0, state))
+    if (Input::GetInstance()->GetJoyStick(0, state))
     {
         // 左スティックの値を取得
         float x = (float)state.Gamepad.sThumbLX;

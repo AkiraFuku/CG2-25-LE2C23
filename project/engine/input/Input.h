@@ -11,6 +11,11 @@ class Input
 {
 public:
     template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+    
+    // シングルトン化に伴う追記
+    static Input* GetInstance();
+    void Finalize();
+
     // マウスのボタン定義
     enum  MouseButton {
         Left = 0,
@@ -86,6 +91,14 @@ public:
     /// </summary>
     bool TriggerPadUP(int32_t stickNo, WORD button) const;
 private:
+
+    // シングルトンパターン: コンストラクタ等を隠蔽
+    static Input* instance;
+    Input() = default;
+    ~Input() = default;
+    Input(const Input&) = delete;
+    Input& operator=(const Input&) = delete;
+
     ComPtr<IDirectInputDevice8> keyboard;
     ComPtr<IDirectInputDevice8> mouse;
     BYTE preKey[256] = {};
