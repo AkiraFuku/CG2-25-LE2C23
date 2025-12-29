@@ -4,10 +4,6 @@
 
 #include <xaudio2.h>
 #pragma comment(lib,"xaudio2.lib")
-#include<mfapi.h>
-#pragma comment(lib,"mfplat.lib")
-#include <mfreadwrite.h>
-#pragma comment(lib,"mfreadwrite.lib")
 
 #include <string>
 #include <vector>

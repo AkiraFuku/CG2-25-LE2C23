@@ -1,6 +1,17 @@
 #include "Audio.h"
 #include <cassert>
 #include "StringUtility.h"
+#include <windows.h>
+#include <mfapi.h>
+#include <mfidl.h>
+
+#pragma comment(lib, "mf.lib")
+#pragma comment(lib, "mfplat.lib")
+#pragma comment(lib, "mfuuid.lib") 
+
+#include <mfreadwrite.h>
+#pragma comment(lib, "mfreadwrite.lib")
+
 using namespace Microsoft::WRL;
 Audio::~Audio()
 {
@@ -69,7 +80,21 @@ Audio::SoundData Audio::SoundLoadWave(const  std::string& filename)
             &pSample);
         // ストリームの終端に達した場合はループを抜ける
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) break;
-
+        if (pSample)
+        {
+            ComPtr<IMFMediaBuffer> pBuffer;
+            // サンプルからメディアバッファを取得
+            result = pSample->ConvertToContiguousBuffer(&pBuffer);
+            assert(SUCCEEDED(result));
+            // バッファのロック
+            BYTE* pData = nullptr;
+            DWORD maxLength = 0, currentLength = 0;
+            result = pBuffer->Lock(&pData, &maxLength, &currentLength);
+            assert(SUCCEEDED(result));
+            // 音声データをSoundDataのバッファにコピー
+            soundData.buffer.insert(soundData.buffer.end(), pData, pData + currentLength);
+            pBuffer->Unlock(); // バッファのアンロック
+        }
 
 
     }
