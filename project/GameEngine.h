@@ -7,27 +7,27 @@
 #pragma comment(lib,"dxguid.lib")
 
 
-#include "WinApp.h"
-#include "DXCommon.h"
+#include "WinApp.h"//フレームワークに移動予定
+#include "DXCommon.h"//フレームワークに移動予定
 #include"MathFunction.h"
-#include"Audio.h"
-#include"Input.h"
-#include"D3DResourceLeakChecker.h"
-#include"StringUtility.h"
-#include"Logger.h"
+#include"Audio.h"//シングルトン化済　フレームワークに移動予定
+#include"Input.h"//シングルトン化予定　フレームワークに移動予定
+#include"D3DResourceLeakChecker.h"//フレームワークに移動予定
+#include"StringUtility.h"//フレームワークに移動予定
+#include"Logger.h"//フレームワークに移動予定
 #include "Sprite.h"
-#include "SpriteCommon.h"
-#include "TextureManager.h"
-#include"Object3DCommon.h"
+#include "SpriteCommon.h"//シングルトン化予定//フレームワークに移動予定
+#include "TextureManager.h"//シングルトン化済//フレームワークに移動予定
+#include"Object3DCommon.h"//シングルトン化予定//フレームワークに移動予定
 #include"Object3D.h"
-#include "ModelCommon.h"
+#include "ModelCommon.h"//シングルトン化予定//フレームワークに移動予定
 #include "Model.h"
-#include "ModelManager.h"
+#include "ModelManager.h"//シングルトン化済//フレームワークに移動予定
 #include "Camera.h"
-#include "SrvManager.h"
-#include "ParticleManager.h"
+#include "SrvManager.h"//シングルトン化予定 //フレームワークに移動予定
+#include "ParticleManager.h"//シングルトン化済 //フレームワークに移動予定
 #include "ParicleEmitter.h"
-#include "ImGuiManager.h"
+#include "ImGuiManager.h"//シングルトン化予定 //フレームワークに移動予定
 class GameEngine
 {
 public:
