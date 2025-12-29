@@ -163,7 +163,7 @@
       <Filter>engine\scene</Filter>
     </ClCompile>
     <ClCompile Include="TitleScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>engine\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -290,7 +290,7 @@
       <Filter>engine\scene</Filter>
     </ClInclude>
     <ClInclude Include="TitleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>engine\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
