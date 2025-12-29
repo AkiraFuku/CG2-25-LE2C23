@@ -9,12 +9,11 @@
 
 void TitleScene::Initialize() {
 
-    camera = new Camera();
+    camera = std::make_unique<Camera>();
     camera->SetRotate({ 0.0f,0.0f,0.0f });
     camera->SetTranslate({ 0.0f,0.0f,-5.0f });
-    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-
-    ParticleManager::GetInstance()->Setcamera(camera);
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
+    ParticleManager::GetInstance()->Setcamera(camera.get());
 
     soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
 
@@ -26,7 +25,7 @@ void TitleScene::Initialize() {
     /*   std::vector<Sprite*> sprites;
        for (uint32_t i = 0; i < 5; i++)
        {*/
-    sprite = new Sprite();
+    sprite = std::make_unique<Sprite>();
     // sprite->Initialize(spritecommon,"resources/monsterBall.png");
     sprite->Initialize("resources/monsterBall.png");
 
@@ -45,16 +44,14 @@ void TitleScene::Initialize() {
 
     ModelManager::GetInstance()->LoadModel("plane.obj");
 
-   
+
 }
 void TitleScene::Finalize() {
-    
+
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
-    delete camera;
-    delete sprite;
 }
 void TitleScene::Update() {
-    
+
 
     XINPUT_STATE state;
 
@@ -72,8 +69,8 @@ void TitleScene::Update() {
 
         // Aボタンを押したときの処理
 
-      
-        
+
+
         GetSceneManager()->ChangeScene("GameScene");
 
     }
@@ -124,7 +121,7 @@ void TitleScene::Update() {
     sprite->Update();
 }
 void TitleScene::Draw() {
-   
+
     ParticleManager::GetInstance()->Draw();
     ///////スプライトの描画
     sprite->Draw();

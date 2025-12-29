@@ -9,18 +9,19 @@
 #include "TextureManager.h"
 
 #include "Scene.h"
+#include <memory>
 class TitleScene :public Scene
 {
-    public:
+public:
     void Initialize()override;
     void Finalize()override;
     void Update()override;
     void Draw()override;
 private:
-      Camera* camera;
-    Sprite* sprite;
-   
-  
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<Sprite> sprite;
+
+
     Audio::SoundData soundData1;
 };
 
