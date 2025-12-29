@@ -34,7 +34,7 @@
     <ClCompile Include="engine\Tool\Logger.cpp" />
     <ClCompile Include="engine\GAME\Framework.cpp" />
     <ClCompile Include="engine\GAME\GameEngine.cpp" />
-    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="engine\scene\GameScene.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -53,9 +53,9 @@
     <ClCompile Include="engine\Tool\ParticleManager.cpp" />
     <ClCompile Include="engine\base\SrvManager.cpp" />
     <ClCompile Include="engine\Tool\ParicleEmitter.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="engine\scene\Scene.cpp" />
+    <ClCompile Include="engine\scene\SceneManager.cpp" />
+    <ClCompile Include="engine\scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -121,10 +121,10 @@
     <ClInclude Include="engine\Tool\ParicleEmitter.h" />
     <ClInclude Include="engine\GAME\Framework.h" />
     <ClInclude Include="engine\GAME\GameEngine.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="engine\scene\GameScene.h" />
+    <ClInclude Include="engine\scene\Scene.h" />
+    <ClInclude Include="engine\scene\SceneManager.h" />
+    <ClInclude Include="engine\scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

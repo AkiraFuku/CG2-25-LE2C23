@@ -159,17 +159,17 @@
     <ClCompile Include="engine\GAME\GameEngine.cpp">
       <Filter>engine\GAME</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
+    <ClCompile Include="engine\scene\GameScene.cpp">
       <Filter>engine\scene</Filter>
     </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
+    <ClCompile Include="engine\scene\TitleScene.cpp">
       <Filter>engine\scene</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="engine\scene\Scene.cpp">
       <Filter>engine\scene</Filter>
     </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\scene\SceneManager.cpp">
+      <Filter>engine\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -292,16 +292,16 @@
     <ClInclude Include="engine\GAME\Framework.h">
       <Filter>engine\GAME</Filter>
     </ClInclude>
-    <ClInclude Include="GameScene.h">
+    <ClInclude Include="engine\scene\GameScene.h">
       <Filter>engine\scene</Filter>
     </ClInclude>
-    <ClInclude Include="TitleScene.h">
+    <ClInclude Include="engine\scene\TitleScene.h">
       <Filter>engine\scene</Filter>
     </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="engine\scene\Scene.h">
+      <Filter>engine\scene</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
+    <ClInclude Include="engine\scene\SceneManager.h">
       <Filter>engine\scene</Filter>
     </ClInclude>
   </ItemGroup>
