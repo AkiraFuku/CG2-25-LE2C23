@@ -168,11 +168,11 @@ void GameEngine::Update() {
 
 
 
-    input->GetJoyStick(0, state);
+    Input::GetInstance()->GetJoyStick(0, state);
 
     // Aボタンを押していたら
 
-    if (input->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
 
 
 
@@ -181,21 +181,21 @@ void GameEngine::Update() {
 
 
     }
-    if (input->TriggerPadDown(0, XINPUT_GAMEPAD_B))
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B))
     {
 
     }
 
     //マウスホイールの入力取得
 
-    if (input->GetMouseMove().z)
+    if (Input::GetInstance()->GetMouseMove().z)
     {
         Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(input->GetMouseMove().z) * 0.1f });
+        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(Input::GetInstance()->GetMouseMove().z) * 0.1f });
         camera->SetTranslate(camreaTranslate);
 
     }
-    if (input->GetJoyStick(0, state))
+    if (Input::GetInstance()->GetJoyStick(0, state))
     {
         // 左スティックの値を取得
         float x = (float)state.Gamepad.sThumbLX;

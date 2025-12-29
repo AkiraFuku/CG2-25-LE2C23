@@ -84,9 +84,7 @@ void Framwork::Initialize()
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
     //ここから書く　外部入力
-    input = nullptr;
-    input = new Input();
-    input->Initialize(winApp);
+    Input::GetInstance()->Initialize(winApp);
 
     spritecommon = nullptr;
     spritecommon = new SpriteCommon;
@@ -127,7 +125,7 @@ void Framwork::Finalize()
 {
     dxCommon->Finalize();
     Audio::GetInstance()->Finalize();
-    delete input;
+    input->Finalize();
     delete object3dCommon;
     imguiManager->Finalize();
     delete imguiManager;
