@@ -32,8 +32,8 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\Tool\Logger.cpp" />
-    <ClCompile Include="Framework.cpp" />
-    <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="engine\GAME\Framework.cpp" />
+    <ClCompile Include="engine\GAME\GameEngine.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -115,8 +115,8 @@
     <ClInclude Include="engine\Tool\ParticleManager.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
     <ClInclude Include="engine\Tool\ParicleEmitter.h" />
-    <ClInclude Include="Framework.h" />
-    <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="engine\GAME\Framework.h" />
+    <ClInclude Include="engine\GAME\GameEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

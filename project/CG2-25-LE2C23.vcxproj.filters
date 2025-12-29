@@ -150,14 +150,14 @@
     <ClCompile Include="engine\Tool\ParticleManager.cpp">
       <Filter>engine\Tool</Filter>
     </ClCompile>
-    <ClCompile Include="GameEngine.cpp">
+    <ClCompile Include="engine\GAME\GameEngine.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Framework.cpp">
+    <ClCompile Include="engine\GAME\Framework.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\Tool\ImGuiManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>engine\Tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -271,14 +271,14 @@
     <ClInclude Include="engine\Tool\ParticleManager.h">
       <Filter>engine\Tool</Filter>
     </ClInclude>
-    <ClInclude Include="GameEngine.h">
+    <ClInclude Include="engine\GAME\GameEngine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Framework.h">
+    <ClInclude Include="engine\GAME\Framework.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\Tool\ImGuiManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>engine\Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
