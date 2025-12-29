@@ -6,12 +6,11 @@
 #include "TitleScene.h"
 void GameScene::Initialize() {
 
-    camera = new Camera();
+    camera = std::make_unique<Camera>();
     camera->SetRotate({ 0.0f,0.0f,0.0f });
     camera->SetTranslate({ 0.0f,0.0f,-5.0f });
-    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
-
-    ParticleManager::GetInstance()->Setcamera(camera);
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
+    ParticleManager::GetInstance()->Setcamera(camera.get());
 
     soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
 
@@ -23,7 +22,7 @@ void GameScene::Initialize() {
     /*   std::vector<Sprite*> sprites;
        for (uint32_t i = 0; i < 5; i++)
        {*/
-    sprite = new Sprite();
+    sprite = std::make_unique<Sprite>();
     // sprite->Initialize(spritecommon,"resources/monsterBall.png");
     sprite->Initialize("resources/uvChecker.png");
 
@@ -38,13 +37,12 @@ void GameScene::Initialize() {
 
 
 
-    object3d2 = nullptr;
-    object3d2 = new Object3d();
+   // object3d の初期化
+    object3d2 = std::make_unique<Object3d>();
     object3d2->Initialize();
-    object3d = nullptr;
-    object3d = new Object3d();
+    
+    object3d = std::make_unique<Object3d>();
     object3d->Initialize();
-
 
     ModelManager::GetInstance()->LoadModel("plane.obj");
     ModelManager::GetInstance()->LoadModel("axis.obj");
@@ -52,16 +50,11 @@ void GameScene::Initialize() {
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    emitter = new ParicleEmitter("Test", M, 10, 5.0f, 0.0f);
+   emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }
 void GameScene::Finalize() {
 
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
-    delete object3d2;
-    delete object3d;
-    delete camera;
-    delete sprite;
-    delete emitter;
 }
 void GameScene::Update() {
     emitter->Update();
@@ -80,11 +73,11 @@ void GameScene::Update() {
 
 
 
-        
+
         // Aボタンを押したときの処理
 
-      
-        
+
+
         GetSceneManager()->ChangeScene("TitleScene");
 
 
