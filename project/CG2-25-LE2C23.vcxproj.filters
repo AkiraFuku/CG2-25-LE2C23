@@ -304,6 +304,9 @@
     <ClInclude Include="engine\scene\SceneManager.h">
       <Filter>engine\scene</Filter>
     </ClInclude>
+    <ClInclude Include="AbstractSceneFactory.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
