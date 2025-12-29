@@ -1,5 +1,14 @@
 #include "SceneManager.h"
 
+SceneManager::~SceneManager()
+{
+    if (scene_) {
+        scene_->Finalize();
+        delete scene_;
+        scene_ = nullptr;
+    }
+}
+
 void SceneManager::Update() {
     // シーン切り替え処理
     if (nextScene_){

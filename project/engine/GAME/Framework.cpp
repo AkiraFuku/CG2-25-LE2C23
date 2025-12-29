@@ -128,7 +128,8 @@ void Framework::Update()
     imguiManager->Begin();
 #endif
     Input::GetInstance()->Update();
-    ParticleManager::GetInstance()->Update();
+   
+    
     dxCommon->PreDraw();
     srvManager->PreDraw();
    // SpriteCommon::GetInstance()->SpriteCommonDraw();

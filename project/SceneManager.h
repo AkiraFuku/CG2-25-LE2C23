@@ -5,6 +5,7 @@
 class SceneManager
 {
 public:
+    ~ SceneManager();
     void SetNextScene(Scene* nextScene) {
         nextScene_ = nextScene;
     }

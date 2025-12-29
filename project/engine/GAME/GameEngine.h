@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "TitleScene.h"
 #include "GameScene.h"
+#include "SceneManager.h"
 #include "Framework.h"
 class GameEngine : public Framework
 {
@@ -18,7 +19,8 @@ public:
 
 private:
   
-    Scene* scene = nullptr;
+  
+    SceneManager* sceneManager =nullptr;
   
 private:
     //ログファイルパス

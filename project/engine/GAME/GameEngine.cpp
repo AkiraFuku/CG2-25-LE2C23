@@ -5,27 +5,32 @@ void GameEngine::Initialize() {
 
    Framework::Initialize();
   
-    scene = new GameScene();
-    scene->Initialize();
+   
+   sceneManager = new SceneManager();
+   Scene* firstScene = new TitleScene();
+   sceneManager->SetNextScene(firstScene);
+
+   
+
 };
 void GameEngine::Finalize() {
   
-    scene->Finalize();
+    delete sceneManager;
    
     Framework::Finalize();
 };
 void GameEngine::Update() {
     Framework::Update();
    
-    scene->Update();
-
+    sceneManager->Update();
+    ParticleManager::GetInstance()->Update();
  
 };
 void GameEngine::Draw() {
 
    
   
-    scene->Draw();
+    sceneManager->Draw();
 
     Framework::Draw();
     ///
