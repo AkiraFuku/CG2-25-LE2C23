@@ -5,6 +5,7 @@
 #include<dbghelp.h>
 #pragma comment(lib,"Dbghelp.lib")
 #pragma comment(lib,"dxguid.lib")
+#include <memory>
 
 
 #include "WinApp.h"//フレームワークに移植
@@ -39,19 +40,19 @@ public:
         endReqest_ = true;
     }
 
-     AbstractSceneFactory* GetSceneFactory() {
-         return sceneFactory;
-     }
+    AbstractSceneFactory* GetSceneFactory() {
+        return sceneFactory;
+    }
 
 private:
     bool endReqest_ = false;
 
     D3DResourceLeakChecker LeakCheck;
-    WinApp* winApp;
-    DXCommon* dxCommon;
-    SrvManager* srvManager;
-    ImGuiManager* imguiManager;
+    std::unique_ptr<WinApp> winApp;
+    std::unique_ptr<DXCommon> dxCommon;
+    std::unique_ptr<SrvManager> srvManager;
+    std::unique_ptr<ImGuiManager> imguiManager;
 
-    AbstractSceneFactory* sceneFactory=nullptr;
+    AbstractSceneFactory* sceneFactory = nullptr;
 };
 

@@ -62,39 +62,31 @@ void Framework::Initialize()
     //ファイルへの書き込み
     std::ofstream logStream(logFilePath);
 
-    winApp = nullptr;
-
-    winApp = new WinApp();
+    winApp = std::make_unique<WinApp>();
     winApp->Initialize();
 
-    dxCommon = nullptr;
-    dxCommon = new DXCommon();
-    dxCommon->Initialize(winApp);
-    srvManager = nullptr;
-    srvManager = new SrvManager();
-    srvManager->Initialize(dxCommon);
+    dxCommon = std::make_unique<DXCommon>();
+    // 引数には生のポインタが必要なので .get() を使用
+    dxCommon->Initialize(winApp.get());
+    srvManager = std::make_unique<SrvManager>();
+    srvManager->Initialize(dxCommon.get());
 
 
-    imguiManager = nullptr;
-    imguiManager = new ImGuiManager();
-    imguiManager->Initialize(dxCommon, srvManager);
-
-    TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
-    ModelManager::GetInstance()->Initialize(dxCommon);
-
-    ParticleManager::GetInstance()->Initialize(dxCommon, srvManager);
-
+    imguiManager = std::make_unique<ImGuiManager>();
+    imguiManager->Initialize(dxCommon.get(), srvManager.get());
+    TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
+    ModelManager::GetInstance()->Initialize(dxCommon.get());
+    ParticleManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
-    //ここから書く　外部入力
-    Input::GetInstance()->Initialize(winApp);
+    // 外部入力
+    Input::GetInstance()->Initialize(winApp.get());
 
-    SpriteCommon::GetInstance()->Initialize(dxCommon);
-
-    Object3dCommon::GetInstance()->Initialize(dxCommon);
+    SpriteCommon::GetInstance()->Initialize(dxCommon.get());
+    Object3dCommon::GetInstance()->Initialize(dxCommon.get());
     Audio::GetInstance()->Initialize();
 
-    
+
 }
 
 void Framework::Finalize()
@@ -106,37 +98,32 @@ void Framework::Finalize()
     Object3dCommon::GetInstance()->Finalize();
 
     imguiManager->Finalize();
-    delete imguiManager;
+   
     SpriteCommon::GetInstance()->Finalize();
-    delete srvManager;
-    delete dxCommon;
-    dxCommon = nullptr;
     TextureManager::GetInstance()->Finalize();
     ModelManager::GetInstance()->Finalize();
     ParticleManager::GetInstance()->Finalize();
 
     winApp->Finalize();
-    delete winApp;
-    winApp = nullptr;
 }
 void Framework::Update()
 {
     //メッセージがある限りGetMessageを呼び出す
     if (winApp->ProcessMessage()) {
         endReqest_ = true;
-      
+
 
     }
 #ifdef USE_IMGUI
     imguiManager->Begin();
 #endif
     Input::GetInstance()->Update();
-   
-    
+
+
     dxCommon->PreDraw();
     srvManager->PreDraw();
-   // SpriteCommon::GetInstance()->SpriteCommonDraw();
-   // Object3dCommon::GetInstance()->Object3dCommonDraw();
+    // SpriteCommon::GetInstance()->SpriteCommonDraw();
+    // Object3dCommon::GetInstance()->Object3dCommonDraw();
 }
 
 void Framework::Draw()
