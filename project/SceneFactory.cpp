@@ -1,20 +1,19 @@
 #include "SceneFactory.h"
 #include "GameScene.h"
 #include "TitleScene.h"
-Scene* SceneFactory::CreateScene(const std::string& sceneName)
+std::unique_ptr<Scene> SceneFactory::CreateScene(const std::string& sceneName)
 {
-    Scene* scene = nullptr;
+    std::unique_ptr<Scene> scene = nullptr;
+
     if (sceneName == "TitleScene") {
-         scene = new TitleScene();
+         scene = std::make_unique<TitleScene>();
     }
     else if (sceneName == "GameScene") {
-         scene = new GameScene();
+         scene = std::make_unique<GameScene>();
     }
     else if (sceneName == "ResultScene") {
-     
-        // scene = new ResultScene();
+        // scene = std::make_unique<ResultScene>();
     }
 
     return scene;
-
 }

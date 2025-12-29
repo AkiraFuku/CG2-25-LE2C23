@@ -3,7 +3,7 @@
 class SceneFactory :public AbstractSceneFactory
 {
 
-    public:
-        Scene* CreateScene(const std::string& sceneName) override;
+public:
+    std::unique_ptr<Scene> CreateScene(const std::string& sceneName) override;
 };
 
