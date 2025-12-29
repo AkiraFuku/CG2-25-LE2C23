@@ -1,6 +1,7 @@
 #include "Audio.h"
 #include <cassert>
 #include "StringUtility.h"
+using namespace Microsoft::WRL;
 Audio::~Audio()
 {
     masteringVoice_->DestroyVoice(); // マスターボイスの破棄
@@ -32,18 +33,18 @@ Audio::SoundData Audio::SoundLoadWave(const  std::string& filename)
     std::wstring filePathW = StringUtility::ConvertString(filename);
     HRESULT result;
     // MFソースリーダーの作成
-    Microsoft::WRL::ComPtr<IMFSourceReader> pReader;
+   ComPtr<IMFSourceReader> pReader;
     result = MFCreateSourceReaderFromURL(filePathW.c_str(), nullptr, &pReader);
     assert(SUCCEEDED(result));
     // PCM形式での出力を指定   
-    Microsoft::WRL::ComPtr<IMFMediaType> pPCMType;
+    ComPtr<IMFMediaType> pPCMType;
     MFCreateMediaType(&pPCMType);
     pPCMType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
     pPCMType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
     result = pReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pPCMType.Get());
     assert(SUCCEEDED(result));
     //　セットされたメディアタイプの情報を取得
-    Microsoft::WRL::ComPtr<IMFMediaType> pOutType;
+    ComPtr<IMFMediaType> pOutType;
     pReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pOutType);
     // 波形フォーマットの取得
     WAVEFORMATEX* waveFormat = nullptr;
@@ -52,7 +53,26 @@ Audio::SoundData Audio::SoundLoadWave(const  std::string& filename)
     SoundData soundData = {};
     soundData.wfex = *waveFormat;
     CoTaskMemFree(waveFormat); // 波形フォーマット情報の解放
+    // PMCデータのバッファ構築
+    while (true)
+    {
+        ComPtr<IMFSample> pSample;
+        DWORD streamIndex=0, flags=0;
+        LONGLONG llTimeStamp = 0;
+        // サンプルの読み込み
+        result = pReader->ReadSample(
+            (DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM,
+            0,
+            &streamIndex,
+            &flags,
+            &llTimeStamp,
+            &pSample);
+        // ストリームの終端に達した場合はループを抜ける
+        if (flags & MF_SOURCE_READERF_ENDOFSTREAM) break;
 
+
+
+    }
     return soundData;
 }
 
