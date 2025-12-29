@@ -121,7 +121,7 @@ void Framework::Update()
     //メッセージがある限りGetMessageを呼び出す
     if (winApp->ProcessMessage()) {
         endReqest_ = true;
-        return;
+      
 
     }
 #ifdef USE_IMGUI
