@@ -1,32 +1,4 @@
-#include<Windows.h>
-#include<filesystem>
-#include<strsafe.h>
-#include<dbghelp.h>
-#pragma comment(lib,"Dbghelp.lib")
-#pragma comment(lib,"dxguid.lib")
-
-
-#include "WinApp.h"
-#include "DXCommon.h"
-//#include"MathFunction.h"
-#include"Audio.h"
-#include"Input.h"
-#include"D3DResourceLeakChecker.h"
-#include"StringUtility.h"
-#include"Logger.h"
-#include "Sprite.h"
-#include "SpriteCommon.h"
-#include "TextureManager.h"
-#include"Object3DCommon.h"
-#include"Object3D.h"
-#include "ModelCommon.h"
-#include "Model.h"
-#include "ModelManager.h"
-#include "Camera.h"
-#include "SrvManager.h"
-#include "ParticleManager.h"
-#include "ParicleEmitter.h"
-#include "ImGuiManager.h"
+#include "GameEngine.h"
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
