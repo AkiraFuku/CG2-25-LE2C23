@@ -8,15 +8,15 @@
 #include "ModelManager.h"
 
 
-void Object3d::Initialize(Object3dCommon* object3dCommon)
+void Object3d::Initialize()
 {
-    object3dCom_ = object3dCommon;
+    
     //WVP行列リソースの作成
     CreateWVPResource();
     //平行光源リソースの作成
     CreateDirectionalLightResource();
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-    camera_=object3dCom_->GetDefaultCamera();
+    camera_=Object3dCommon::GetInstance()->GetDefaultCamera();
 }
 void Object3d::Update()
 {
@@ -38,9 +38,9 @@ void Object3d::Update()
 void Object3d::Draw()
 {
     //WVP行列リソースの設定
-    object3dCom_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
+    Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
     //light
-    object3dCom_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse_.Get()->GetGPUVirtualAddress());
+    Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse_.Get()->GetGPUVirtualAddress());
 
     if (model_){
         model_->Draw();
@@ -56,7 +56,7 @@ void Object3d::CreateWVPResource()
 {
     //座標変換
     transformationMatrixResourse_ =
-        object3dCom_->GetDxCommon()->
+        Object3dCommon::GetInstance()->GetDxCommon()->
         CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&wvpResource_));
@@ -68,7 +68,7 @@ void Object3d::CreateWVPResource()
 void Object3d::CreateDirectionalLightResource()
 {
     directionalLightResourse_ =
-        object3dCom_->GetDxCommon()->
+        Object3dCommon::GetInstance()->GetDxCommon()->
         CreateBufferResource(sizeof(DirectionalLight));
     directionalLightResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));

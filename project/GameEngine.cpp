@@ -91,14 +91,12 @@ void GameEngine::Initialize() {
 
     SpriteCommon::GetInstance()->Initialize(dxCommon);
 
-    object3dCommon = nullptr;
-    object3dCommon = new Object3dCommon;
-    object3dCommon->Initialize(dxCommon);
+   Object3dCommon::GetInstance()->Initialize(dxCommon);
 
     camera = new Camera();
     camera->SetRotate({ 0.0f,0.0f,0.0f });
     camera->SetTranslate({ 0.0f,0.0f,-5.0f });
-    object3dCommon->SetDefaultCamera(camera);
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera);
 
     ParticleManager::GetInstance()->Setcamera(camera);
 
@@ -132,10 +130,10 @@ void GameEngine::Initialize() {
 
     object3d2 = nullptr;
     object3d2 = new Object3d();
-    object3d2->Initialize(object3dCommon);
+    object3d2->Initialize();
     object3d = nullptr;
     object3d = new Object3d();
-    object3d->Initialize(object3dCommon);
+    object3d->Initialize();
 
 
     ModelManager::GetInstance()->LoadModel("plane.obj");
@@ -154,7 +152,7 @@ void GameEngine::Finalize() {
 
     Audio::GetInstance()->Finalize();
     Input::GetInstance()->Finalize();
-    delete object3dCommon;
+    Object3dCommon::GetInstance()->Finalize();
     delete object3d2;
     delete object3d;
     delete camera;
@@ -273,7 +271,7 @@ void GameEngine::Draw() {
 
     // ParticleManager::GetInstance()->Draw();
      // 3Dオブジェクトの描画
-    object3dCommon->Object3dCommonDraw();
+    Object3dCommon::GetInstance()->Object3dCommonDraw();
     //object3d2->Draw();
     object3d->Draw();
 

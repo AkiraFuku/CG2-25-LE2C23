@@ -26,7 +26,7 @@ public:
 
     };
 
-    void Initialize(Object3dCommon* object3dCommon);
+    void Initialize();
     void Update();
     void Draw();
     void SetModel(const std::string& filePath); 
@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    Object3dCommon* object3dCom_ = nullptr;
+    
 
     Model* model_ = nullptr;
     //WVP行列リソース
