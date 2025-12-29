@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector4.h"
-#include "WinApp.h"
+
+class WinApp;
 class Camera
 {
 public:

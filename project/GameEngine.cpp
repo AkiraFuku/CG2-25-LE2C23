@@ -1,103 +1,66 @@
 #include "GameEngine.h"
-static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
-    //ダンプファイルの作成
-    SYSTEMTIME time;
-    GetLocalTime(&time);
-    wchar_t filePath[MAX_PATH] = { 0 };
-    CreateDirectory(L"./Dumps", nullptr);
-    StringCchPrintfW(filePath, MAX_PATH,
-        L"./Dumps/%04d-%02d%02d-%02d%02d.dmp",
-        time.wYear, time.wMonth, time.wDay,
-        time.wHour, time.wMinute);
-    HANDLE dumpFileHandle = CreateFile(
-        filePath,
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_WRITE | FILE_SHARE_READ,
-        0, CREATE_ALWAYS, 0, 0
-    );
-    //プロセスIDとクラッシュが発生したスレッドIDを取得
-    DWORD procesessId = GetCurrentProcessId();
-    DWORD threadId = GetCurrentThreadId();
-    //設定情報入力
-    MINIDUMP_EXCEPTION_INFORMATION minidumpInformation{ 0 };
-    minidumpInformation.ThreadId = threadId;
-    minidumpInformation.ExceptionPointers = exception;
-    minidumpInformation.ClientPointers = TRUE;
-    //ダンプの出力
-    MiniDumpWriteDump(
-        GetCurrentProcess(),
-        procesessId,
-        dumpFileHandle,
-        MiniDumpNormal,
-        &minidumpInformation,
-        nullptr,
-        nullptr
-    );
-    return EXCEPTION_EXECUTE_HANDLER;
-}
 
-std::wstring wstr = L"Hello,DirectX!";
 
 
 void GameEngine::Initialize() {
 
-    //D3D12の初期化
-    CoInitializeEx(0, COINIT_MULTITHREADED);
+    ////D3D12の初期化
+    //CoInitializeEx(0, COINIT_MULTITHREADED);
 
-    SetUnhandledExceptionFilter(ExportDump);
-    //ログ出力用のディレクトリを作成
-    std::filesystem::create_directory("logs");
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
-        nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
-    std::chrono::zoned_time localTime{
-        std::chrono::current_zone(),
-        nowSeconds
-    };
-    std::string dataString = std::format(
-        "{:%Y%m%d_%H%M%S}",
-        localTime
-    );
-    std::string logFilePath = std::string("logs/") + dataString + ".log";
-    //ファイルへの書き込み
-    std::ofstream logStream(logFilePath);
+    //SetUnhandledExceptionFilter(ExportDump);
+    ////ログ出力用のディレクトリを作成
+    //std::filesystem::create_directory("logs");
+    //std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    //std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>
+    //    nowSeconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    //std::chrono::zoned_time localTime{
+    //    std::chrono::current_zone(),
+    //    nowSeconds
+    //};
+    //std::string dataString = std::format(
+    //    "{:%Y%m%d_%H%M%S}",
+    //    localTime
+    //);
+    //std::string logFilePath = std::string("logs/") + dataString + ".log";
+    ////ファイルへの書き込み
+    //std::ofstream logStream(logFilePath);
 
-    winApp = nullptr;
+    //winApp = nullptr;
 
-    winApp = new WinApp();
-    winApp->Initialize();
+    //winApp = new WinApp();
+    //winApp->Initialize();
 
-    dxCommon = nullptr;
-    dxCommon = new DXCommon();
-    dxCommon->Initialize(winApp);
-    srvManager = nullptr;
-    srvManager = new SrvManager();
-    srvManager->Initialize(dxCommon);
+    //dxCommon = nullptr;
+    //dxCommon = new DXCommon();
+    //dxCommon->Initialize(winApp);
+    //srvManager = nullptr;
+    //srvManager = new SrvManager();
+    //srvManager->Initialize(dxCommon);
 
 
-    imguiManager = nullptr;
-    imguiManager = new ImGuiManager();
-    imguiManager->Initialize(dxCommon, srvManager);
+    //imguiManager = nullptr;
+    //imguiManager = new ImGuiManager();
+    //imguiManager->Initialize(dxCommon, srvManager);
 
-    TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
+  /*  TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
     ParticleManager::GetInstance()->Initialize(dxCommon, srvManager);
 
-    Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
+    Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));*/
 
-    //ここから書く　外部入力
-    input = nullptr;
-    input = new Input();
-    input->Initialize(winApp);
+    ////ここから書く　外部入力
+    //input = nullptr;
+    //input = new Input();
+    //input->Initialize(winApp);
 
-    spritecommon = nullptr;
-    spritecommon = new SpriteCommon;
-    spritecommon->Initialize(dxCommon);
+    //spritecommon = nullptr;
+    //spritecommon = new SpriteCommon;
+    //spritecommon->Initialize(dxCommon);
 
-    object3dCommon = nullptr;
-    object3dCommon = new Object3dCommon;
-    object3dCommon->Initialize(dxCommon);
+    //object3dCommon = nullptr;
+    //object3dCommon = new Object3dCommon;
+    //object3dCommon->Initialize(dxCommon);
 
     camera = new Camera();
     camera->SetRotate({ 0.0f,0.0f,0.0f });
@@ -107,7 +70,7 @@ void GameEngine::Initialize() {
     ParticleManager::GetInstance()->Setcamera(camera);
 
 
-    Audio::GetInstance()->Initialize();
+   // Audio::GetInstance()->Initialize();*/
 
     soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
 
@@ -142,7 +105,6 @@ void GameEngine::Initialize() {
     object3d->Initialize(object3dCommon);
 
 
-    ModelManager::GetInstance()->LoadModel("plane.obj");
 
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
