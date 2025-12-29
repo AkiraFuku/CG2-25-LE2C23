@@ -52,7 +52,6 @@ private:
     SpriteCommon* spritecommon;
     Object3dCommon* object3dCommon;
     Camera* camera;
-    Audio* audio;
     Sprite* sprite;
     Object3d* object3d2;
     Object3d* object3d;

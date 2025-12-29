@@ -107,11 +107,11 @@ void GameEngine::Initialize() {
     ParticleManager::GetInstance()->Setcamera(camera);
 
 
-    audio = new Audio();
-    audio->Initialize();
-    soundData1 = Audio::SoundLoadWave("resources/fanfare.mp3");
+    Audio::GetInstance()->Initialize();
 
-    audio->PlayAudio(soundData1);
+    soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
+
+     Audio::GetInstance()->PlayAudio(soundData1);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -156,7 +156,7 @@ void GameEngine::Initialize() {
 void GameEngine::Finalize() {
     dxCommon->Finalize();
 
-    delete audio;
+    Audio::GetInstance()->Finalize();
     delete input;
     delete object3dCommon;
     delete object3d2;
