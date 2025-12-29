@@ -1,25 +1,21 @@
 #include "GameEngine.h"
 
-
 void GameEngine::Initialize() {
 
    Framework::Initialize();
   
    
   
-   sceneFactory_ = new SceneFactory();
+   sceneFactory_ = std::make_unique< SceneFactory>();
 
    
-   SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+   SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
    
    SceneManager::GetInstance()->ChangeScene("TitleScene");
 
 };
-void GameEngine::Finalize() {
-
-    delete sceneFactory_;
-  
+void GameEngine::Finalize() {  
     SceneManager::GetInstance()->Finalize();
    
     Framework::Finalize();

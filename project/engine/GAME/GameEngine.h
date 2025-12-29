@@ -6,6 +6,7 @@
 #include "SceneManager.h"
 #include "Framework.h"
 #include "SceneFactory.h"
+#include <memory>
 class GameEngine : public Framework
 {
 public:
@@ -19,14 +20,14 @@ public:
 
 
 private:
-  
-  
-    SceneFactory* sceneFactory_;
-  
+
+
+    std::unique_ptr <SceneFactory> sceneFactory_;
+
 private:
     //ログファイルパス
     const std::filesystem::path logFilePath = "D3DResourceLeakLog.txt";
-   
+
 
 
 };
