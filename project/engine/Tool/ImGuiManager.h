@@ -14,6 +14,7 @@ class SrvManager;
 class ImGuiManager
 {
 public:
+
     void Initialize( DXCommon* dxCommon, SrvManager* srv);
     void Finalize();
     void Begin();
