@@ -31,6 +31,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\Tool\Logger.cpp" />
+    <ClCompile Include="Framwork.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="ImGuiManager.cpp" />
     <ClCompile Include="main.cpp">
@@ -113,6 +114,7 @@
     <ClInclude Include="engine\Tool\ParticleManager.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
     <ClInclude Include="engine\Tool\ParicleEmitter.h" />
+    <ClInclude Include="Framwork.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="ImGuiManager.h" />
   </ItemGroup>
