@@ -28,20 +28,19 @@
 #include "Model.h"
 #include "Camera.h"
 #include "ParicleEmitter.h"
-class GameEngine
+#include "Franework.h"
+class GameEngine : public Franework
 {
 public:
-    void Initialize();
+    void Initialize() override;
 
-    void Finalize();
+    void Finalize()override;
 
-    void Update();
+    void Update()override;
 
-    void Draw();
+    void Draw()override;
 
-    bool IsEnd() {
-        return endReqest_;
-    }
+
 private:
     D3DResourceLeakChecker LeakCheck;
     WinApp* winApp;
@@ -57,8 +56,8 @@ private:
 private:
     //ログファイルパス
     const std::filesystem::path logFilePath = "D3DResourceLeakLog.txt";
-    //終了フラグ
     bool endReqest_ = false;
+
 
 };
 
