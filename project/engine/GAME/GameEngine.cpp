@@ -11,11 +11,7 @@ void GameEngine::Initialize() {
 void GameEngine::Finalize() {
   
     scene->Finalize();
-    //delete object3d2;
-    //delete object3d;
-    //delete camera;
-    //delete sprite;
-    //delete emitter;
+   
     Framework::Finalize();
 };
 void GameEngine::Update() {
@@ -27,12 +23,7 @@ void GameEngine::Update() {
 };
 void GameEngine::Draw() {
 
-    //object3d->Draw();
-
-
-    /////////スプライトの描画
-
-    //sprite->Draw();
+   
   
     scene->Draw();
 
