@@ -6,22 +6,6 @@
 #pragma comment(lib,"Dbghelp.lib")
 #pragma comment(lib,"dxguid.lib")
 
-
-//#include "WinApp.h"//フレームワークに移植
-//#include "DXCommon.h"//フレームワークに移植
-//#include"Audio.h"//フレームワークに移植
-//#include"Input.h"//フレームワークに移植
-//#include"D3DResourceLeakChecker.h"//フレームワークに移植
-//#include"StringUtility.h"//フレームワークに移植
-//#include"Logger.h"//フレームワークに移植
-//#include "SpriteCommon.h"//フレームワークに移植
-//#include "TextureManager.h"//フレームワークに移植
-//#include"Object3DCommon.h"//フレームワークに移植
-//#include "ModelCommon.h"//フレームワークに移植
-//#include "ModelManager.h"//フレームワークに移植
-//#include "SrvManager.h"//フレームワークに移植
-//#include "ParticleManager.h"//フレームワークに移植
-//#include "ImGuiManager.h"//フレームワークに移植
 #include"MathFunction.h"
 #include "Sprite.h"
 #include"Object3D.h"
