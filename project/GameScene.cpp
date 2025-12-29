@@ -19,7 +19,7 @@ void GameScene::Initialize() {
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
-   // ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
+    ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
     /*   std::vector<Sprite*> sprites;
        for (uint32_t i = 0; i < 5; i++)
        {*/
@@ -55,6 +55,8 @@ void GameScene::Initialize() {
     emitter = new ParicleEmitter("Test", M, 10, 5.0f, 0.0f);
 }
 void GameScene::Finalize() {
+
+    ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
     delete object3d2;
     delete object3d;
     delete camera;

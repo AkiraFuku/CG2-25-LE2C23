@@ -73,6 +73,7 @@ public:
     void Setcamera(Camera* camera) {
         camera_ = camera;
     }
+    void ReleaseParticleGroup(const std::string name) ;
 private:
 
     ParticleManager() = default;

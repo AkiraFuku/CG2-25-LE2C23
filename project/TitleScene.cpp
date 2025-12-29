@@ -22,7 +22,7 @@ void TitleScene::Initialize() {
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
-   // ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
+    ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
     /*   std::vector<Sprite*> sprites;
        for (uint32_t i = 0; i < 5; i++)
        {*/
@@ -49,6 +49,7 @@ void TitleScene::Initialize() {
 }
 void TitleScene::Finalize() {
     
+    ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
     delete camera;
     delete sprite;
 }
