@@ -5,7 +5,7 @@
 #include <sstream> // 追加: istringstreamのため
 #include "MathFunction.h"
 #include "TextureManager.h"
-#include "ModelManager.h"
+
 
 
 void Object3d::Initialize()

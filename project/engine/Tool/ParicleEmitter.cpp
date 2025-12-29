@@ -1,6 +1,6 @@
 #include "ParicleEmitter.h"
 #include "DXCommon.h"
-#include "ParticleManager.h"
+
 ParicleEmitter::ParicleEmitter(const  std::string name, Transform transfom, uint32_t count, float frequency, float frequencyTime) {
     transfom_ = transfom;
     count_ = count;

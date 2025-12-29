@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector4.h"
+#include "ParticleManager.h"
 class ParicleEmitter
 {
 public:

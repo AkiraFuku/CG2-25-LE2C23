@@ -22,6 +22,7 @@
 #include "SrvManager.h"//フレームワークに移植
 #include "ParticleManager.h"//フレームワークに移植
 #include "ImGuiManager.h"//フレームワークに移植
+#include "Model.h"
 
 class Framework
 {
