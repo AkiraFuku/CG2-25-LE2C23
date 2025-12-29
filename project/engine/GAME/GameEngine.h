@@ -1,5 +1,6 @@
 #pragma once
 
+#include "TitleScene.h"
 #include "GameScene.h"
 #include "Framework.h"
 class GameEngine : public Framework
@@ -16,7 +17,7 @@ public:
 
 private:
   
-    GameScene* scene = nullptr;
+    TitleScene* scene = nullptr;
   
 private:
     //ログファイルパス
