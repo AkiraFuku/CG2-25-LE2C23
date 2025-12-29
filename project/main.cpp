@@ -138,7 +138,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     Audio* audio = new Audio();
     audio->Initialize();
-    Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.wav");
+    Audio::SoundData soundData1 = Audio::SoundLoadWave("resources/fanfare.mp3");
 
     audio->PlayAudio(soundData1);
 
