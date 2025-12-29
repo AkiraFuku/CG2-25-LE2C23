@@ -38,7 +38,7 @@ static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
 
 void Framwork::Initialize()
 {
-      //D3D12の初期化
+    //D3D12の初期化
     CoInitializeEx(0, COINIT_MULTITHREADED);
 
     SetUnhandledExceptionFilter(ExportDump);
@@ -76,14 +76,14 @@ void Framwork::Initialize()
     imguiManager = new ImGuiManager();
     imguiManager->Initialize(dxCommon, srvManager);
 
-    
+
     TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
     ModelManager::GetInstance()->Initialize(dxCommon);
 
     ParticleManager::GetInstance()->Initialize(dxCommon, srvManager);
 
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
-     //ここから書く　外部入力
+    //ここから書く　外部入力
     input = nullptr;
     input = new Input();
     input->Initialize(winApp);
@@ -101,6 +101,27 @@ void Framwork::Initialize()
     Audio::GetInstance()->Initialize();
 }
 
+void Framwork::Finalize()
+{
+    dxCommon->Finalize();
+    Audio::GetInstance()->Finalize();
+    delete input;
+    delete object3dCommon;
+    imguiManager->Finalize();
+    delete imguiManager;
+
+    delete spritecommon;
+    delete srvManager;
+    delete dxCommon;
+    dxCommon = nullptr;
+    TextureManager::GetInstance()->Finalize();
+    ModelManager::GetInstance()->Finalize();
+    ParticleManager::GetInstance()->Finalize();
+
+    winApp->Finalize();
+    delete winApp;
+    winApp = nullptr;
+}
 std::wstring wstr = L"Hello,DirectX!";
 void Framwork::Run()
 {

@@ -116,7 +116,7 @@ void GameEngine::Initialize() {
 
 };
 void GameEngine::Finalize() {
-    dxCommon->Finalize();
+   /* dxCommon->Finalize();
 
     Audio::GetInstance()->Finalize();
     delete input;
@@ -125,13 +125,13 @@ void GameEngine::Finalize() {
     delete object3d;
     delete camera;
     imguiManager->Finalize();
-    delete imguiManager;
+    delete imguiManager;*/
     /*   for (Sprite* sprite : sprites)
        {*/
     delete sprite;
     // }
     delete emitter;
-    delete spritecommon;
+  /*  delete spritecommon;
     delete srvManager;
     delete dxCommon;
     dxCommon = nullptr;
@@ -141,7 +141,7 @@ void GameEngine::Finalize() {
 
     winApp->Finalize();
     delete winApp;
-    winApp = nullptr;
+    winApp = nullptr;*/
 };
 void GameEngine::Update() {
     //メッセージがある限りGetMessageを呼び出す
