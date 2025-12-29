@@ -1,17 +1,6 @@
 #pragma once
-#include<Windows.h>
-#include<filesystem>
-#include<strsafe.h>
-#include<dbghelp.h>
-#pragma comment(lib,"Dbghelp.lib")
-#pragma comment(lib,"dxguid.lib")
 
-#include"MathFunction.h"
-#include "Sprite.h"
-#include"Object3D.h"
-#include "Model.h"
-#include "Camera.h"
-#include "ParicleEmitter.h"
+#include "GameScene.h"
 #include "Framework.h"
 class GameEngine : public Framework
 {
@@ -27,12 +16,8 @@ public:
 
 private:
   
-    Camera* camera;
-    Sprite* sprite;
-    Object3d* object3d2;
-    Object3d* object3d;
-    ParicleEmitter* emitter;
-    Audio::SoundData soundData1;
+    GameScene* scene = nullptr;
+  
 private:
     //ログファイルパス
     const std::filesystem::path logFilePath = "D3DResourceLeakLog.txt";

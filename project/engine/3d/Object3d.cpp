@@ -37,6 +37,7 @@ void Object3d::Update()
 
 void Object3d::Draw()
 {
+    Object3dCommon::GetInstance()->Object3dCommonDraw();
     //WVP行列リソースの設定
     Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
     //light

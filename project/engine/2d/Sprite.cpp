@@ -117,6 +117,7 @@ void Sprite::Update() {
 
 void Sprite::Draw()
 {
+    SpriteCommon::GetInstance()->SpriteCommonDraw();
     //パイプラインステートとルートシグネチャの設定
     SpriteCommon::GetInstance()->GetDxCommon()->
         GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);

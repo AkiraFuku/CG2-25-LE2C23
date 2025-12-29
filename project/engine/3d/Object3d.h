@@ -7,7 +7,7 @@
 #include <vector>
 #include "Model.h"
 #include "Camera.h"
-class Object3dCommon;
+#include "Object3dCommon.h"
 class Object3d
 {
 

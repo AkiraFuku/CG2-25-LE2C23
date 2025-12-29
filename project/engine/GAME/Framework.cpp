@@ -131,8 +131,8 @@ void Framework::Update()
     ParticleManager::GetInstance()->Update();
     dxCommon->PreDraw();
     srvManager->PreDraw();
-    SpriteCommon::GetInstance()->SpriteCommonDraw();
-    Object3dCommon::GetInstance()->Object3dCommonDraw();
+   // SpriteCommon::GetInstance()->SpriteCommonDraw();
+   // Object3dCommon::GetInstance()->Object3dCommonDraw();
 }
 
 void Framework::Draw()
