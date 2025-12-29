@@ -52,6 +52,9 @@
     <Filter Include="engine\Tool">
       <UniqueIdentifier>{09a81933-e639-445e-ba5c-ba2600fd0dfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="engine\GAME">
+      <UniqueIdentifier>{e4f50392-c482-4e20-a9b7-c9293b09b7d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -147,8 +150,11 @@
     <ClCompile Include="engine\Tool\ParticleManager.cpp">
       <Filter>engine\Tool</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiManager.cpp">
+    <ClCompile Include="GameEngine.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiManager.cpp">
+      <Filter>engine\Tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -262,8 +268,11 @@
     <ClInclude Include="engine\Tool\ParticleManager.h">
       <Filter>engine\Tool</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiManager.h">
+    <ClInclude Include="GameEngine.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiManager.h">
+      <Filter>engine\Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
