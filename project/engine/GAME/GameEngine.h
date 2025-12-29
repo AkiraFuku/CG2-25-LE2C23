@@ -5,6 +5,7 @@
 #include "GameScene.h"
 #include "SceneManager.h"
 #include "Framework.h"
+#include "SceneFactory.h"
 class GameEngine : public Framework
 {
 public:
@@ -20,7 +21,7 @@ public:
 private:
   
   
-    
+    SceneFactory* sceneFactory_;
   
 private:
     //ログファイルパス

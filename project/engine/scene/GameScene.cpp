@@ -83,9 +83,9 @@ void GameScene::Update() {
         
         // Aボタンを押したときの処理
 
-        Scene* nextScene = new TitleScene();
+      
         
-        GetSceneManager()->SetNextScene(nextScene);
+        GetSceneManager()->ChangeScene("TitleScene");
 
 
     }

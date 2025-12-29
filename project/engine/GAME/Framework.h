@@ -21,7 +21,7 @@
 #include "ModelManager.h"//フレームワークに移植
 #include "SrvManager.h"//フレームワークに移植
 #include "ImGuiManager.h"//フレームワークに移植
-
+#include "AbstractSceneFactory.h"
 class Framework
 {
 public:
@@ -38,6 +38,11 @@ public:
     void RequestEnd() {
         endReqest_ = true;
     }
+
+     AbstractSceneFactory* GetSceneFactory() {
+         return sceneFactory;
+     }
+
 private:
     bool endReqest_ = false;
 
@@ -47,5 +52,6 @@ private:
     SrvManager* srvManager;
     ImGuiManager* imguiManager;
 
+    AbstractSceneFactory* sceneFactory=nullptr;
 };
 

@@ -93,6 +93,8 @@ void Framework::Initialize()
 
     Object3dCommon::GetInstance()->Initialize(dxCommon);
     Audio::GetInstance()->Initialize();
+
+    
 }
 
 void Framework::Finalize()

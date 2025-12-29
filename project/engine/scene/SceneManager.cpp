@@ -1,5 +1,5 @@
 #include "SceneManager.h"
-
+#include <cassert>
 // 静的メンバ変数の実体
 SceneManager* SceneManager::instance = nullptr;
 
@@ -52,4 +52,11 @@ void SceneManager::Draw() {
     if (scene_ != nullptr) {
         scene_->Draw();
     }
+}
+
+void SceneManager::ChangeScene(const std::string& sceneName)
+{
+    assert(sceneFactory_ );
+    assert(nextScene_ == nullptr);
+    nextScene_ = sceneFactory_->CreateScene(sceneName);
 }

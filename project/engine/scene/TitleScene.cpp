@@ -72,9 +72,9 @@ void TitleScene::Update() {
 
         // Aボタンを押したときの処理
 
-        Scene* nextScene = new GameScene();
+      
         
-        GetSceneManager()->SetNextScene(nextScene);
+        GetSceneManager()->ChangeScene("GameScene");
 
     }
     if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B))

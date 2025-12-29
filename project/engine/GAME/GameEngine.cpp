@@ -7,13 +7,18 @@ void GameEngine::Initialize() {
   
    
   
-   Scene* firstScene = new TitleScene();
-   SceneManager::GetInstance()->SetNextScene(firstScene);
+   sceneFactory_ = new SceneFactory();
 
    
+   SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+
+   
+   SceneManager::GetInstance()->ChangeScene("TitleScene");
 
 };
 void GameEngine::Finalize() {
+
+    delete sceneFactory_;
   
     SceneManager::GetInstance()->Finalize();
    
