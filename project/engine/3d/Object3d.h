@@ -30,7 +30,7 @@ public:
     void Update();
     void Draw();
     void SetModel(const std::string& filePath); 
-
+    void SetModel(std::shared_ptr<Model> model) { model_ = model; }
     //トランスフォームセッター
     void SetScale(const Vector3& scale) {
         transform_.scale = scale;
@@ -59,7 +59,7 @@ public:
 private:
     
 
-    Model* model_ = nullptr;
+    std::shared_ptr<Model> model_ = nullptr;
     //WVP行列リソース
     Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
     TransformationMatrix* wvpResource_ = nullptr;

@@ -53,6 +53,7 @@ void Object3d::SetModel(const std::string& filePath)
     model_=ModelManager::GetInstance()->findModel(filePath);
 }
 
+
 void Object3d::CreateWVPResource()
 {
     //座標変換
