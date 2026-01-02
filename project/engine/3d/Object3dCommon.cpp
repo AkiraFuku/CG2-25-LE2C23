@@ -2,18 +2,17 @@
 #include "Logger.h"
 
 // 静的メンバ変数の初期化
-Object3dCommon* Object3dCommon::instance = nullptr;
-
+std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
 Object3dCommon* Object3dCommon::GetInstance() {
-    if (instance == nullptr) {
-        instance = new Object3dCommon();
+   if (instance == nullptr) {
+        // privateコンストラクタのため reset(new ...) を使用
+        instance.reset(new Object3dCommon());
     }
-    return instance;
+    return instance.get();
 }
 
 void Object3dCommon::Finalize() {
-    delete instance;
-    instance = nullptr;
+  instance.reset(); // 解放
 }
 void Object3dCommon::Initialize(DXCommon* dxCommon)
 {
