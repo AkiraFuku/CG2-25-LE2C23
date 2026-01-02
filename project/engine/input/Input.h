@@ -90,10 +90,12 @@ public:
     /// padのボタンが離されたか（離した瞬間 / Release trigger）
     /// </summary>
     bool TriggerPadUP(int32_t stickNo, WORD button) const;
+
+      static std::unique_ptr<Input> instance;
 private:
 
     // シングルトンパターン: コンストラクタ等を隠蔽
-    static std::unique_ptr<Input> instance;
+  
     Input() = default;
     ~Input() = default;
     Input(const Input&) = delete;

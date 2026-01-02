@@ -51,15 +51,13 @@ public:
 
 
 
-    struct ParticleGroup
-    {
+    struct ParticleGroup {
         MaterialData materialData;
         std::list<Particle> particles;
-        uint32_t instancingSRVIndex;
+        uint32_t instancingSrvIndex;
         Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource;
-        uint32_t numInstance;
-        ParticleForGPU* instancingData;
-
+        ParticleForGPU* instancingData = nullptr;
+        uint32_t kNumInstance;
     };
 
 
@@ -73,14 +71,16 @@ public:
     void Setcamera(Camera* camera) {
         camera_ = camera;
     }
-    void ReleaseParticleGroup(const std::string name) ;
+    void ReleaseParticleGroup(const std::string name);
+    std::unordered_map<std::string, ParticleGroup> particleGroups;
+
 private:
 
     ParticleManager() = default;
     ~ParticleManager() = default;
     ParticleManager(ParticleManager&) = delete;
     ParticleManager& operator=(ParticleManager&) = delete;
-    static ParticleManager* instance;
+    static std::unique_ptr<ParticleManager> instance;
     static uint32_t kMaxNumInstance;
     DXCommon* dxCommon_ = nullptr;
     SrvManager* srvManager_ = nullptr;
@@ -105,7 +105,6 @@ private:
     void CreateMaterialBuffer();
     void CreatePSO();
 
-    std::unordered_map<std::string, ParticleGroup> particleGroups;
 
 
 

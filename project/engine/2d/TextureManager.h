@@ -23,19 +23,20 @@ private:
         Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource;
     };
 
-   static std::unique_ptr<TextureManager> instance;
     TextureManager() = default;
     ~TextureManager() = default;
     TextureManager(TextureManager&) = delete;
     TextureManager& operator=(TextureManager&) = delete;
-    std::unordered_map<std::string,TextureData> textureDatas;
+    std::unordered_map<std::string, TextureData> textureDatas;
 
-    DXCommon* dxCommon_=nullptr;
-    SrvManager* srvManager_=nullptr;
+    DXCommon* dxCommon_ = nullptr;
+    SrvManager* srvManager_ = nullptr;
 
     static uint32_t kSRVIndexTop;
 public:
-    void Initialize( DXCommon* dxCommon, SrvManager* srvManager);
+    static std::unique_ptr<TextureManager> instance;
+
+    void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
     static TextureManager* GetInstance();
     void Finalize();
     //テクスチャロード

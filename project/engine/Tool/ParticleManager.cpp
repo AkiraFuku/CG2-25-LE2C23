@@ -5,7 +5,7 @@
 #include "MathFunction.h"
 #include <numbers>
 #pragma once
-ParticleManager* ParticleManager::instance = nullptr;
+static std::unique_ptr<ParticleManager> instance;
 uint32_t ParticleManager::kMaxNumInstance = 1024;
 void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
     //DXCommonとSRVマネージャーの受け取り
@@ -25,15 +25,16 @@ void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
 ParticleManager* ParticleManager::GetInstance() {
     if (instance == nullptr)
     {
-        instance = new ParticleManager;
+        // privateコンストラクタのため reset(new ...) を使用
+        instance.reset(new ParticleManager());
     }
-    return instance;
+    return instance.get();
 
 };
 void ParticleManager::Finalize() {
 
-    delete instance;
-    instance = nullptr;
+  // インスタンスの破棄
+    instance.reset();
 }
 
 void ParticleManager::ReleaseParticleGroup(const std::string name)
@@ -100,7 +101,7 @@ void ParticleManager::Update() {
             ++particleIterator;
 
         }
-        particleGroup.numInstance = numInstance;
+        particleGroup.kNumInstance = numInstance;
     }
 }
 void ParticleManager::Draw() {
@@ -113,19 +114,19 @@ void ParticleManager::Draw() {
     dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
     for (auto& [key, particleGroup] : particleGroups) {
-        if (particleGroup.numInstance > 0) {
+        if (particleGroup.kNumInstance > 0) {
 
             // とりあえずコードの意図を汲んで修正すると：
             dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
 
             // [1] Descriptor Table (Instancing Data): インスタンシング用SRV
-            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.instancingSRVIndex));
+            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.instancingSrvIndex));
 
             // [2] Descriptor Table (Texture): テクスチャ用SRV
             dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
             // DrawCall
             // 後述するトポロジーの修正に合わせて頂点数を変更 (6 -> 4)
-            dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.numInstance, 0, 0);
+            dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.kNumInstance, 0, 0);
         }
     }
 }
@@ -136,21 +137,21 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
     //
     ParticleGroup& newParticle = particleGroups[name];
     newParticle.materialData.textureFilePath = textureFilepath;
-    newParticle.numInstance = kMaxNumInstance;
+    newParticle.kNumInstance = kMaxNumInstance;
     newParticle.materialData.textureIndex = newParticle.materialData.textureIndex =
         TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilepath);
-    newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.numInstance);
+    newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.kNumInstance);
 
-    newParticle.instancingSRVIndex = srvManager_->AllocateSRV();
+    newParticle.instancingSrvIndex = srvManager_->AllocateSRV();
 
     srvManager_->CreateSRVforStructuredBuffer(
-        newParticle.instancingSRVIndex,
+        newParticle.instancingSrvIndex,
         newParticle.instancingResource.Get(),
-        newParticle.numInstance,
+        newParticle.kNumInstance,
         sizeof(ParticleForGPU)
     );
     newParticle.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newParticle.instancingData));
-    for (uint32_t i = 0; i < newParticle.numInstance; ++i) {
+    for (uint32_t i = 0; i < newParticle.kNumInstance; ++i) {
         newParticle.instancingData[i].WVP = Makeidetity4x4(); // 単位行列などで埋める
         newParticle.instancingData[i].color = { 1.0f, 1.0f, 1.0f, 0.0f };
     }

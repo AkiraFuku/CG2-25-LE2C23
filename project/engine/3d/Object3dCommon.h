@@ -13,7 +13,9 @@ public:
     void Finalize();
 
     void Initialize(DXCommon* dxCommon);
-    DXCommon* GetDxCommon()const {return dxCommon_;}
+    DXCommon* GetDxCommon()const {
+        return dxCommon_;
+    }
     void Object3dCommonDraw();
     void SetDefaultCamera(Camera* camera) {
         defaultCamera_ = camera;
@@ -21,11 +23,11 @@ public:
     Camera* GetDefaultCamera()const {
         return defaultCamera_;
     }
+    static std::unique_ptr<Object3dCommon> instance;
 
 private:
 
     // シングルトンパターン
-    static std::unique_ptr<Object3dCommon> instance;
     Object3dCommon() = default;
     ~Object3dCommon() = default;
     Object3dCommon(const Object3dCommon&) = delete;
@@ -33,7 +35,7 @@ private:
 
     HRESULT hr_;
 
-    DXCommon* dxCommon_=nullptr;
+    DXCommon* dxCommon_ = nullptr;
 
     //ルートシグネチャ
     Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;

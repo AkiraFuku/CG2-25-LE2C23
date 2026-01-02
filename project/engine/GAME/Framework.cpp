@@ -1,6 +1,6 @@
 #include "Framework.h"
 #include "ParticleManager.h"//フレームワークに移植
-
+#include "SceneManager.h"
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -91,6 +91,7 @@ void Framework::Initialize()
 
 void Framework::Finalize()
 {
+    SceneManager::GetInstance()->Finalize();
     dxCommon->Finalize();
 
     Audio::GetInstance()->Finalize();

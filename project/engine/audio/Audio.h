@@ -48,9 +48,9 @@ public:
 
     // 音声再生
     void PlayAudio(const SoundData& soundData);
+   static std::unique_ptr<Audio> instance;
 
 private:
-   static std::unique_ptr<Audio> instance;
     // コンストラクタ・デストラクタをprivateにする（外部からの生成禁止）
     Audio() = default;
     ~Audio()=default;
