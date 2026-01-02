@@ -14,16 +14,16 @@
 
 using namespace Microsoft::WRL;
 
-Audio* Audio::instance = nullptr;
-// シングルトンインスタンスの取得
+std::unique_ptr<Audio> Audio::instance = nullptr;// シングルトンインスタンスの取得
 Audio* Audio::GetInstance()
 {
    
    if (instance == nullptr)
     {
-        instance = new Audio;
+        // privateコンストラクタなので reset(new ...) を使用
+        instance.reset(new Audio());
     }
-    return instance;
+    return instance.get();
 }
 
 

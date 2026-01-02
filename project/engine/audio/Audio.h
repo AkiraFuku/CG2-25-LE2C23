@@ -50,7 +50,7 @@ public:
     void PlayAudio(const SoundData& soundData);
 
 private:
-    static Audio* instance;
+   static std::unique_ptr<Audio> instance;
     // コンストラクタ・デストラクタをprivateにする（外部からの生成禁止）
     Audio() = default;
     ~Audio()=default;
