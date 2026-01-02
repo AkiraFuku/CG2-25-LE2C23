@@ -2,8 +2,7 @@
 #include "DXCommon.h"
 #include "StringUtility.h"
 #include "SrvManager.h"
-TextureManager* TextureManager::instance = nullptr;
-
+std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
 
 void TextureManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
@@ -16,16 +15,15 @@ void TextureManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
 TextureManager* TextureManager::GetInstance() {
     if (instance == nullptr)
     {
-        instance = new TextureManager;
+        // コンストラクタがprivateなので reset(new ...) を使用
+        instance.reset(new TextureManager());
     }
-    return instance;
-
+    return instance.get();
 };
 
 void TextureManager::Finalize() {
 
-    delete instance;
-    instance = nullptr;
+  instance.reset();
 }
 void TextureManager::LoadTexture(const std::string& filePath) {
 

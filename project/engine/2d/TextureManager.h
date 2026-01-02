@@ -23,7 +23,7 @@ private:
         Microsoft::WRL::ComPtr<ID3D12Resource>intermediateResource;
     };
 
-    static TextureManager* instance;
+   static std::unique_ptr<TextureManager> instance;
     TextureManager() = default;
     ~TextureManager() = default;
     TextureManager(TextureManager&) = delete;
