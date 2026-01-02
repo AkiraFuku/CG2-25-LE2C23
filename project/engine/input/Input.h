@@ -6,12 +6,12 @@
 #include <Xinput.h>
 #pragma comment(lib, "xinput.lib")
 #include "WinApp.h"
-
+#include <memory>
 class Input
 {
 public:
     template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-    
+
     // シングルトン化に伴う追記
     static Input* GetInstance();
     void Finalize();
@@ -93,7 +93,7 @@ public:
 private:
 
     // シングルトンパターン: コンストラクタ等を隠蔽
-    static Input* instance;
+    static std::unique_ptr<Input> instance;
     Input() = default;
     ~Input() = default;
     Input(const Input&) = delete;
@@ -115,7 +115,7 @@ private:
     // メンバ変数として保持する
     int deadZoneL_[XUSER_MAX_COUNT];
     int deadZoneR_[XUSER_MAX_COUNT];
-    
+
     XINPUT_STATE state_[XUSER_MAX_COUNT];    // 現在の状態
     XINPUT_STATE preState_[XUSER_MAX_COUNT]; // 1フレーム前の状態
 };

@@ -6,17 +6,18 @@
 
 
 // 静的メンバ変数の初期化
-Input* Input::instance = nullptr;
+std::unique_ptr<Input> Input::instance = nullptr;
 
 Input* Input::GetInstance() {
     if (instance == nullptr) {
-        instance = new Input();
+        // コンストラクタがprivateなので make_unique は使えない
+        // クラス内部からは new できるので reset でセットする
+        instance.reset(new Input());
     }
-    return instance;
+    return instance.get();
 }
 void Input::Finalize() {
-    delete instance;
-    instance = nullptr;
+   instance.reset();
 }
 void Input::Initialize(WinApp* winapp) {
     winApp_ = winapp;
