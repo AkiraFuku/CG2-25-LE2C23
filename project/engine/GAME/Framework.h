@@ -50,7 +50,7 @@ private:
     
     std::unique_ptr<DXCommon> dxCommon;
     std::unique_ptr<SrvManager> srvManager;
-    std::unique_ptr<ImGuiManager> imguiManager;
+    /*std::unique_ptr<ImGuiManager> imguiManager;*/
 
     AbstractSceneFactory* sceneFactory = nullptr;
 };

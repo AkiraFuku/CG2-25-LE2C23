@@ -74,8 +74,8 @@ void Framework::Initialize()
     srvManager->Initialize(dxCommon.get());
 
 
-    imguiManager = std::make_unique<ImGuiManager>();
-    imguiManager->Initialize(dxCommon.get(), srvManager.get());
+   /* imguiManager = std::make_unique<ImGuiManager>();*/
+    ImGuiManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
     TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
     ModelManager::GetInstance()->Initialize(dxCommon.get());
     ParticleManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
@@ -100,7 +100,7 @@ void Framework::Finalize()
     Input::GetInstance()->Finalize();
     Object3dCommon::GetInstance()->Finalize();
 
-    imguiManager->Finalize();
+    ImGuiManager::GetInstance()->Finalize();
    
     SpriteCommon::GetInstance()->Finalize();
     TextureManager::GetInstance()->Finalize();
@@ -118,7 +118,7 @@ void Framework::Update()
 
     }
 #ifdef USE_IMGUI
-    imguiManager->Begin();
+    ImGuiManager::GetInstance()->Begin();
 #endif
     Input::GetInstance()->Update();
 
@@ -131,8 +131,8 @@ void Framework::Update()
 
 void Framework::Draw()
 {
-    imguiManager->End();
-    imguiManager->Draw();
+    ImGuiManager::GetInstance()->End();
+    ImGuiManager::GetInstance()->Draw();
     dxCommon->PostDraw();
     TextureManager::GetInstance()->ReleaseIntermediateResources();
 

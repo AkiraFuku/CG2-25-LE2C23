@@ -2,6 +2,18 @@
 #include "SrvManager.h"
 #include "WinApp.h"
 #include "DXCommon.h"
+
+// 静的メンバ変数の実体
+std::unique_ptr<ImGuiManager> ImGuiManager::instance = nullptr;
+
+ImGuiManager* ImGuiManager::GetInstance() {
+    if (instance == nullptr) {
+        // コンストラクタがprivateなので reset(new ...) を使用
+        instance.reset(new ImGuiManager());
+    }
+    return instance.get();
+}
+
 void ImGuiManager::Initialize([[maybe_unused]] DXCommon* dxCommon, [[maybe_unused]]SrvManager* srv) {
     #ifdef USE_IMGUI
 
