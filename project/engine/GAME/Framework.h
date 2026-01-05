@@ -8,7 +8,6 @@
 #include <memory>
 
 
-#include "WinApp.h"//フレームワークに移植
 #include "DXCommon.h"//フレームワークに移植
 #include"Audio.h"//フレームワークに移植
 #include"Input.h"//フレームワークに移植
@@ -48,7 +47,7 @@ private:
     bool endReqest_ = false;
 
     D3DResourceLeakChecker LeakCheck;
-    std::unique_ptr<WinApp> winApp;
+    
     std::unique_ptr<DXCommon> dxCommon;
     std::unique_ptr<SrvManager> srvManager;
     std::unique_ptr<ImGuiManager> imguiManager;

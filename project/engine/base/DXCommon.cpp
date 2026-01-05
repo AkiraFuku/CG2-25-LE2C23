@@ -11,12 +11,8 @@
 
 const float DXCommon::kDeltaTime=1.0f/60.0f;
 
-void DXCommon::Initialize(WinApp* winApp)
+void DXCommon::Initialize()
 {
-
-    assert(winApp);
-    winApp_ = winApp;
-
     InitializeFixFPS();
     CreateDevice();
     CreateCommand();
@@ -453,7 +449,7 @@ void DXCommon::CreateSwapChain()
     // コマンドキュー,ウィンドウハンドル、設定して生成
     hr_ = dxgiFactory_->CreateSwapChainForHwnd(
         commandQueue_.Get(),
-        winApp_->GetHwnd(),
+        WinApp::GetInstance()->GetHwnd(),
         &swapChainDesc_,
         nullptr,
         nullptr,
@@ -466,8 +462,8 @@ void DXCommon::CreateSwapChain()
 
 void DXCommon::CreateDepthStencilTextureResource() {
     D3D12_RESOURCE_DESC resourceDesc{};
-    resourceDesc.Width = winApp_->kClientWidth;//幅
-    resourceDesc.Height = winApp_->kClientHeight;//高さ
+    resourceDesc.Width = WinApp::GetInstance()->kClientWidth;//幅
+    resourceDesc.Height = WinApp::GetInstance()->kClientHeight;//高さ
     resourceDesc.MipLevels = 1;//ミップマップの数
     resourceDesc.DepthOrArraySize = 1;//配列の数
     resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット

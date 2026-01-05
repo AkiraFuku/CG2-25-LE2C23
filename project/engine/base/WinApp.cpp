@@ -6,6 +6,18 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif // USE_IMGUI
 
+
+// 静的メンバ変数の定義
+std::unique_ptr<WinApp> WinApp::instance = nullptr;
+
+WinApp* WinApp::GetInstance() {
+    if (instance == nullptr) {
+        // std::make_uniqueはプライベートコンストラクタにアクセスできないため、newを使用
+        instance.reset(new WinApp);
+    }
+    return instance.get();
+}
+
 LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 #ifdef USE_IMGUI

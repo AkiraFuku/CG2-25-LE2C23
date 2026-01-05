@@ -1,6 +1,8 @@
 #include "Framework.h"
 #include "ParticleManager.h"//フレームワークに移植
 #include "SceneManager.h"
+#include "WinApp.h"//フレームワークに移植
+
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -62,12 +64,12 @@ void Framework::Initialize()
     //ファイルへの書き込み
     std::ofstream logStream(logFilePath);
 
-    winApp = std::make_unique<WinApp>();
-    winApp->Initialize();
+    
+    WinApp::GetInstance()->Initialize();
 
     dxCommon = std::make_unique<DXCommon>();
     // 引数には生のポインタが必要なので .get() を使用
-    dxCommon->Initialize(winApp.get());
+    dxCommon->Initialize();
     srvManager = std::make_unique<SrvManager>();
     srvManager->Initialize(dxCommon.get());
 
@@ -80,7 +82,7 @@ void Framework::Initialize()
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
     // 外部入力
-    Input::GetInstance()->Initialize(winApp.get());
+    Input::GetInstance()->Initialize(WinApp::GetInstance());
 
     SpriteCommon::GetInstance()->Initialize(dxCommon.get());
     Object3dCommon::GetInstance()->Initialize(dxCommon.get());
@@ -105,12 +107,12 @@ void Framework::Finalize()
     ModelManager::GetInstance()->Finalize();
     ParticleManager::GetInstance()->Finalize();
 
-    winApp->Finalize();
+    WinApp::GetInstance()->Finalize();
 }
 void Framework::Update()
 {
     //メッセージがある限りGetMessageを呼び出す
-    if (winApp->ProcessMessage()) {
+    if (WinApp::GetInstance()->ProcessMessage()) {
         endReqest_ = true;
 
 

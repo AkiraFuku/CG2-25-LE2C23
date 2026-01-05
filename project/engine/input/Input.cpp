@@ -25,7 +25,7 @@ void Input::Initialize(WinApp* winapp) {
     HRESULT hr;
     Microsoft::WRL::ComPtr<IDirectInput8> directInput = nullptr;
     hr = DirectInput8Create(
-        winApp_->GetInstance(),
+        winApp_->GetInstanceHandle(),
         DIRECTINPUT_VERSION,
         IID_IDirectInput8,
         (void**)&directInput,

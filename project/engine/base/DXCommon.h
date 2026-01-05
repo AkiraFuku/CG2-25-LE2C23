@@ -15,7 +15,11 @@
 class DXCommon
 {
 public:
-    void Initialize(WinApp* winApp);
+
+
+
+
+    void Initialize();
     void Finalize();
 
     //描画開始前処理
@@ -49,7 +53,7 @@ public:
     }
 
     WinApp* GetWinApp() const {
-        return winApp_;
+        return WinApp::GetInstance();
     }
     static const float kDeltaTime;
 
@@ -84,7 +88,7 @@ private:
     Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 
-    WinApp* winApp_ = nullptr;
+    /*WinApp* winApp_ = nullptr;*/
     //深度バッファ
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
     void CreateDepthStencilTextureResource();
