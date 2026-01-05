@@ -14,6 +14,7 @@ public:
 
     // シングルトン化に伴う追記
     static Input* GetInstance();
+    friend struct std::default_delete<Input>;
     void Finalize();
 
     // マウスのボタン定義

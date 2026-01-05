@@ -53,7 +53,7 @@ void Audio::Finalize()
     SoundUnload(&soundData_); // 音声データの解放
     
     MFShutdown();
-    delete GetInstance();
+
 }
 
 Audio::SoundData Audio::SoundLoadWave(const std::string& filename)

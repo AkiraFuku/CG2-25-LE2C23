@@ -19,6 +19,7 @@ public:
     void SpriteCommonDraw();
 
     static std::unique_ptr<SpriteCommon> instance;
+      friend struct std::default_delete<SpriteCommon>;
 private:
     // シングルトンパターン
     SpriteCommon() = default;

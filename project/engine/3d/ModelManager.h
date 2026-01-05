@@ -15,6 +15,7 @@ public:
     //Model検索
     std::shared_ptr<Model> findModel(const std::string& filePath);
     static std::unique_ptr<ModelManager> instance;
+         friend struct std::default_delete<ModelManager>;
 
 private:
     std::unique_ptr<ModelCommon> modelCommon_;

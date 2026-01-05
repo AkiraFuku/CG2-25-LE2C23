@@ -5,7 +5,7 @@
 #include "MathFunction.h"
 #include <numbers>
 #pragma once
-static std::unique_ptr<ParticleManager> instance;
+ std::unique_ptr<ParticleManager>  ParticleManager::instance;
 uint32_t ParticleManager::kMaxNumInstance = 1024;
 void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
     //DXCommonとSRVマネージャーの受け取り

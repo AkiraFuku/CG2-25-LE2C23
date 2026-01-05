@@ -35,6 +35,7 @@ private:
     static uint32_t kSRVIndexTop;
 public:
     static std::unique_ptr<TextureManager> instance;
+    friend struct std::default_delete<TextureManager>;
 
     void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
     static TextureManager* GetInstance();

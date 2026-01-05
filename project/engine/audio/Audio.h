@@ -49,6 +49,7 @@ public:
     // 音声再生
     void PlayAudio(const SoundData& soundData);
    static std::unique_ptr<Audio> instance;
+   friend struct std::default_delete<Audio>;
 
 private:
     // コンストラクタ・デストラクタをprivateにする（外部からの生成禁止）

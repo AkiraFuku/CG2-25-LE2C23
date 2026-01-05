@@ -24,7 +24,7 @@ public:
         return defaultCamera_;
     }
     static std::unique_ptr<Object3dCommon> instance;
-
+     friend struct std::default_delete<Object3dCommon>;
 private:
 
     // シングルトンパターン

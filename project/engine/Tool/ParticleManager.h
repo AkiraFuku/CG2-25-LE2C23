@@ -73,14 +73,15 @@ public:
     }
     void ReleaseParticleGroup(const std::string name);
     std::unordered_map<std::string, ParticleGroup> particleGroups;
-
+    friend struct std::default_delete<ParticleManager>;
+  static std::unique_ptr<ParticleManager> instance;
 private:
 
     ParticleManager() = default;
     ~ParticleManager() = default;
     ParticleManager(ParticleManager&) = delete;
     ParticleManager& operator=(ParticleManager&) = delete;
-    static std::unique_ptr<ParticleManager> instance;
+  
     static uint32_t kMaxNumInstance;
     DXCommon* dxCommon_ = nullptr;
     SrvManager* srvManager_ = nullptr;
