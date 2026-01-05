@@ -7,7 +7,7 @@
 #include"d3dx12.h"
 
 class DXCommon;
-class SrvManager;
+
 class TextureManager
 {
 private:
@@ -30,14 +30,14 @@ private:
     std::unordered_map<std::string, TextureData> textureDatas;
 
     DXCommon* dxCommon_ = nullptr;
-    SrvManager* srvManager_ = nullptr;
+    
 
     static uint32_t kSRVIndexTop;
 public:
     static std::unique_ptr<TextureManager> instance;
     friend struct std::default_delete<TextureManager>;
 
-    void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
+    void Initialize(DXCommon* dxCommon);
     static TextureManager* GetInstance();
     void Finalize();
     //テクスチャロード
