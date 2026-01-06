@@ -1556,6 +1556,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     bool useMonstorBall = false;
 
+
     //平行光源
     Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourse = CreateBufferResource(device, sizeof(DirectionalLight));
     DirectionalLight* directionalLightData = nullptr;
