@@ -391,15 +391,35 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const  Microsoft::WRL::ComPtr
     handleGPU.ptr += (descriptorSize * index);
     return handleGPU;
 }
+Node ReadNode(aiNode* node) {
+    Node result;
+    aiMatrix4x4 aiLocalMatrix = node->mTransformation;
+    aiLocalMatrix.Transpose();
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // Assimpの行列は [row][col] でアクセス可能
+            // 自作Matrix構造体の定義に合わせて代入 (例: result.localMatrix.m[i][j])
+            result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
+        }
+    }
+    result.name = node->mName.C_Str();
+    result.children.resize(node->mNumChildren);
+    for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
+    {
+        result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
+    }
+    return result;
+};
 ModelData LoadModelFile(const std::string& directryPath, const std::string& filename)
 {
     //1. 変数の宣言
     ModelData modelData;
     std::string filePath = directryPath + "/" + filename;
-    
+
     ////2. ファイルを開く
     Assimp::Importer importer;
-   
+
     const aiScene* scene = importer.ReadFile(filePath.c_str(),
         aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
         aiProcess_FlipUVs                // 法線がない場合、自動計算する
@@ -437,10 +457,10 @@ ModelData LoadModelFile(const std::string& directryPath, const std::string& file
         {
             aiString textureFilePath;
             material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-            modelData.material.textureFilePath=directryPath+"/"+textureFilePath.C_Str();
+            modelData.material.textureFilePath = directryPath + "/" + textureFilePath.C_Str();
         }
     }
-  
+    modelData.rootNode = ReadNode(scene->mRootNode);
     //4. モデルデータを返す
     return modelData;
 
@@ -1325,7 +1345,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
     //コマンドリストの初期化
-    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-2.5f,0.0f} };
+    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
     Microsoft::WRL::ComPtr<ID3D12Resource> transformatiomationMatrixResource = CreateBufferResource(device, sizeof(Matrix4x4));
@@ -1698,8 +1718,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             Matrix4x4 cameraMatrix = MakeAfineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.traslate);
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
-            wvpData->WVP = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatirx));
-            wvpData->World = worldMatrix;
+
+            wvpData->WVP = Multiply(Multiply(viewMatrix, projectionMatirx), Multiply(modelData.rootNode.localMatrix, worldMatrix));
+            wvpData->World = Multiply(modelData.rootNode.localMatrix, worldMatrix);
+
             wvpData->WorldInverseTranspose = Inverse(worldMatrix);
             Matrix4x4 worldMatrixSprite = MakeAfineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.traslate);
             Matrix4x4 viewMatrixSprite = Makeidetity4x4();

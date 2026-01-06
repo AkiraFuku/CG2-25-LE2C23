@@ -80,10 +80,17 @@ struct MaterialData
 {
     std::string textureFilePath;
 };
+struct Node
+{
+    Matrix4x4 localMatrix;
+    std::string name ;
+    std::vector <Node>children;
+};
+
 struct ModelData {
     std::vector<VertexData> vertices; // 頂点データの配列
     MaterialData material; // マテリアルデータ
-    Node root;
+    Node rootNode;
 };
 
 
@@ -116,10 +123,4 @@ enum LightingType
 struct CameraForGPU
 {
     Vector3 worldPosition;
-};
-struct Node
-{
-    Matrix4x4 localMatrix;
-    std::string name ;
-    std::vector <Node>children;
 };
