@@ -1,7 +1,16 @@
 #include "SrvManager.h"
 #include "DXCommon.h"
-const uint32_t SrvManager::kMaxSRVCount = 512;
 
+std::unique_ptr<SrvManager> SrvManager::instance = nullptr;
+const uint32_t SrvManager::kMaxSRVCount = 512;
+// インスタンス取得の実装
+SrvManager* SrvManager::GetInstance() {
+    if (instance == nullptr) {
+        // コンストラクタがprivateなのでmake_uniqueではなくnewしてresetする
+        instance.reset(new SrvManager());
+    }
+    return instance.get();
+}// 静的メンバ変数の初期化
 void SrvManager::Initialize(DXCommon* dxCommon) {
     dxCommon_ = dxCommon;
    
