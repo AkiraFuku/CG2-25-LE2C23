@@ -3,7 +3,16 @@
 #include "SceneManager.h"
 #include "WinApp.h"//フレームワークに移植
 #include "ImGuiManager.h"//フレームワークに移植
-
+#include"Audio.h"//フレームワークに移植
+#include"Input.h"//フレームワークに移植
+#include"StringUtility.h"//フレームワークに移植
+#include"Logger.h"//フレームワークに移植
+#include "SpriteCommon.h"//フレームワークに移植
+#include "TextureManager.h"//フレームワークに移植
+#include"Object3DCommon.h"//フレームワークに移植
+#include "ModelCommon.h"//フレームワークに移植
+#include "ModelManager.h"//フレームワークに移植
+#include "SrvManager.h"//フレームワークに移植
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -68,16 +77,16 @@ void Framework::Initialize()
     
     WinApp::GetInstance()->Initialize();
 
-    dxCommon = std::make_unique<DXCommon>();
+   /* dxCommon = std::make_unique<DXCommon>();*/
     // 引数には生のポインタが必要なので .get() を使用
-    dxCommon->Initialize();
+    DXCommon::GetInstance()->Initialize();
    /* srvManager = std::make_unique<SrvManager>();*/
-    SrvManager::GetInstance()->Initialize(dxCommon.get());
+    SrvManager::GetInstance()->Initialize();
 
 
    /* imguiManager = std::make_unique<ImGuiManager>();*/
-    ImGuiManager::GetInstance()->Initialize(dxCommon.get());
-    TextureManager::GetInstance()->Initialize(dxCommon.get());
+    ImGuiManager::GetInstance()->Initialize();
+    TextureManager::GetInstance()->Initialize();
     ModelManager::GetInstance()->Initialize(dxCommon.get());
     ParticleManager::GetInstance()->Initialize(dxCommon.get());
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
@@ -97,7 +106,7 @@ void Framework::Finalize()
 
     SrvManager::GetInstance()->Finalize();
     SceneManager::GetInstance()->Finalize();
-    dxCommon->Finalize();
+    DXCommon::GetInstance()->Finalize();
 
     Audio::GetInstance()->Finalize();
     Input::GetInstance()->Finalize();
@@ -126,7 +135,7 @@ void Framework::Update()
     Input::GetInstance()->Update();
 
 
-    dxCommon->PreDraw();
+    DXCommon::GetInstance()->PreDraw();
     SrvManager::GetInstance()->PreDraw();
     // SpriteCommon::GetInstance()->SpriteCommonDraw();
     // Object3dCommon::GetInstance()->Object3dCommonDraw();
@@ -136,7 +145,7 @@ void Framework::Draw()
 {
     ImGuiManager::GetInstance()->End();
     ImGuiManager::GetInstance()->Draw();
-    dxCommon->PostDraw();
+    DXCommon::GetInstance()->PostDraw();
     TextureManager::GetInstance()->ReleaseIntermediateResources();
 
     // 基底クラスの描画処理（純粋仮想関数として宣言されているため、必ずオーバーライドする必要があります）

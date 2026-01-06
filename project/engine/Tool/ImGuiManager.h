@@ -7,7 +7,6 @@
 #include"imgui_impl_win32.h"
 
 #endif // USE_IMGUI
-class DXCommon;
 class ImGuiManager
 {
 public:
@@ -17,7 +16,7 @@ public:
     // スマートポインタ用
     static std::unique_ptr<ImGuiManager> instance;
      friend struct std::default_delete<ImGuiManager>;
-    void Initialize( DXCommon* dxCommon);
+    void Initialize();
     void Finalize();
     void Begin();
     void End();
@@ -30,7 +29,7 @@ private:
     ImGuiManager& operator=(const ImGuiManager&) = delete;
 
     
-    DXCommon* dxCommon_ = nullptr;
+    
    
 };
 

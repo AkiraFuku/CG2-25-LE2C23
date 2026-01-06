@@ -10,7 +10,15 @@
 
 
 const float DXCommon::kDeltaTime=1.0f/60.0f;
+std::unique_ptr<DXCommon> DXCommon::instance=nullptr;
 
+DXCommon* DXCommon::GetInstance() {
+    if (instance == nullptr) {
+        // コンストラクタがprivateなのでmake_uniqueではなくnewしてresetする
+        instance.reset(new DXCommon());
+    }
+    return instance.get();
+}// 静的メンバ変数の初期化
 void DXCommon::Initialize()
 {
     InitializeFixFPS();
@@ -30,7 +38,7 @@ void DXCommon::Initialize()
 
 void DXCommon::Finalize()
 {
-   
+   instance.reset();
 }
 
 void DXCommon::PreDraw()

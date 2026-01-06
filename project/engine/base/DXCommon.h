@@ -10,13 +10,18 @@
 #include"DirectXTex.h"
 #include"d3dx12.h"
 #include <chrono>
-
+#include <memory>
 
 class DXCommon
 {
 public:
+    // シングルトンインスタンス取得
+    static DXCommon* GetInstance();
 
-
+    // コピー禁止
+    DXCommon(const DXCommon& obj) = delete;
+    DXCommon& operator=(const DXCommon& obj) = delete;
+    friend struct std::default_delete<DXCommon>;
 
 
     void Initialize();
@@ -36,7 +41,7 @@ public:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() const {
         return commandList_.Get();
     }
-     //コンパイルシェーダー
+    //コンパイルシェーダー
     Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
     //クリエイトバッファ
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
@@ -58,6 +63,12 @@ public:
     static const float kDeltaTime;
 
 private:
+    // コンストラクタ・デストラクタをprivateにして外部生成を禁止
+    DXCommon() = default;
+    ~DXCommon() = default;
+
+    static std::unique_ptr<DXCommon> instance;
+
     //FPS固定
     void InitializeFixFPS();
     //FPS更新
@@ -126,7 +137,7 @@ private:
     Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
     Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
     //IMGUI初期化
-   
+
     //バリア
     D3D12_RESOURCE_BARRIER barrier_{};
     //フェンス値

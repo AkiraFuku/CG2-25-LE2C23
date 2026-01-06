@@ -5,10 +5,9 @@
 std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
 
-void TextureManager::Initialize(DXCommon* dxCommon) {
+void TextureManager::Initialize() {
 
     textureDatas.reserve(SrvManager::kMaxSRVCount);
-    dxCommon_ = dxCommon;
    
 }
 
@@ -58,14 +57,14 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     //テクスチャデータ追加
     TextureData& textureData = textureDatas[filePath];
     textureData.metadata = mipImages.GetMetadata();//メタデータ
-    textureData.resource = dxCommon_->CreateTextureResourse(textureData.metadata);//テクスチャリソース
+    textureData.resource = DXCommon::GetInstance()->CreateTextureResourse(textureData.metadata);//テクスチャリソース
     //SRVインデックス
     textureData.srvIndex = SrvManager::GetInstance()->AllocateSRV();
     textureData.srvHandleCPU = SrvManager::GetInstance()->GetCPUDescriptorHandle(textureData.srvIndex);
     textureData.srvHandleGPU = SrvManager::GetInstance()->GetGPUDescriptorHandle(textureData.srvIndex);
   
     SrvManager::GetInstance()->CreateSRVforTexture2D(textureData.srvIndex, textureData.resource.Get(), textureData.metadata.format, UINT(textureData.metadata.mipLevels));
-    textureData.intermediateResource = dxCommon_->UploadTextureData(textureData.resource, mipImages);
+    textureData.intermediateResource = DXCommon::GetInstance()->UploadTextureData(textureData.resource, mipImages);
 
 }
 void TextureManager::ReleaseIntermediateResources()

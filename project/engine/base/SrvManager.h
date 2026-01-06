@@ -3,13 +3,12 @@
 #include<d3d12.h>
 #include<cstdint>
 #include <memory>
-class DXCommon;
 class SrvManager
 {
 public:
     //最大テクスチャ数
     static const uint32_t kMaxSRVCount;
-    void Initialize(DXCommon* dxCommon);
+    void Initialize();
     void Finalize();
     // シングルトンインスタンス取得
     static SrvManager* GetInstance();
@@ -55,7 +54,6 @@ private:
     // インスタンス保持用スマートポインタ
   static std::unique_ptr<SrvManager> instance;
 
-    DXCommon* dxCommon_ = nullptr;
     uint32_t descriptorSize_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
     uint32_t useIndex = 0;
