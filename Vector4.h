@@ -83,6 +83,7 @@ struct MaterialData
 struct ModelData {
     std::vector<VertexData> vertices; // 頂点データの配列
     MaterialData material; // マテリアルデータ
+    Node root;
 };
 
 
@@ -115,4 +116,10 @@ enum LightingType
 struct CameraForGPU
 {
     Vector3 worldPosition;
+};
+struct Node
+{
+    Matrix4x4 localMatrix;
+    std::string name ;
+    std::vector <Node>children;
 };
