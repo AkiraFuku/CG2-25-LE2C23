@@ -10,8 +10,7 @@
 #include <cstdint>
 #include "Camera.h"
 class DXCommon;
-class SrvManager;
-class TextureManager;
+
 class ParticleManager
 {
 public:
@@ -61,7 +60,7 @@ public:
     };
 
 
-    void Initialize(DXCommon* dxCommon, SrvManager* srvManager);
+    void Initialize(DXCommon* dxCommon);
     void Update();
     void Draw();
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
@@ -84,7 +83,7 @@ private:
   
     static uint32_t kMaxNumInstance;
     DXCommon* dxCommon_ = nullptr;
-    SrvManager* srvManager_ = nullptr;
+   
 
     std::random_device seedGen_;
     std::mt19937 randomEngine_;

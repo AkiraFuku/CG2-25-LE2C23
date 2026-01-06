@@ -14,33 +14,31 @@ ImGuiManager* ImGuiManager::GetInstance() {
     return instance.get();
 }
 
-void ImGuiManager::Initialize([[maybe_unused]] DXCommon* dxCommon, [[maybe_unused]]SrvManager* srv) {
+void ImGuiManager::Initialize([[maybe_unused]] DXCommon* dxCommon) {
     #ifdef USE_IMGUI
 
-    assert(srv);
-    srvManager_ = srv;
+   
     assert(dxCommon);
     dxCommon_ = dxCommon;
   
-    winApp_ = dxCommon_->GetWinApp();
 
   
 
     ImGui::CreateContext();
     ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
     ImGui::StyleColorsDark();
-    ImGui_ImplWin32_Init(winApp_->GetHwnd());
+    ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
     uint32_t fontSrvIndex =
-        srvManager_->AllocateSRV(); // フォント用SRVを確保
+        SrvManager::GetInstance()->AllocateSRV(); // フォント用SRVを確保
 
     // descriptorHeap_=;
     ImGui_ImplDX12_Init(
         dxCommon_->GetDevice().Get(),
         static_cast<int>(dxCommon_->GetSwapChainBufferCount()),
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-        srvManager_->GetDescriptorHeap().Get(),
-        srvManager_->GetCPUDescriptorHandle(fontSrvIndex),
-        srvManager_->GetGPUDescriptorHandle(fontSrvIndex)
+        SrvManager::GetInstance()->GetDescriptorHeap().Get(),
+        SrvManager::GetInstance()->GetCPUDescriptorHandle(fontSrvIndex),
+        SrvManager::GetInstance()->GetGPUDescriptorHandle(fontSrvIndex)
 
     );
 #endif // USE_IMGUI
@@ -76,7 +74,7 @@ void ImGuiManager::Draw() {
 
     ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList().Get();
 
-    ID3D12DescriptorHeap* ppHeaps[] = { srvManager_->GetDescriptorHeap().Get() };
+    ID3D12DescriptorHeap* ppHeaps[] = { SrvManager::GetInstance()->GetDescriptorHeap().Get() };
     commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 #endif // USE_IMGUI

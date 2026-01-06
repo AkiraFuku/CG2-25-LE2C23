@@ -75,10 +75,10 @@ void Framework::Initialize()
 
 
    /* imguiManager = std::make_unique<ImGuiManager>();*/
-    ImGuiManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
-    TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
+    ImGuiManager::GetInstance()->Initialize(dxCommon.get());
+    TextureManager::GetInstance()->Initialize(dxCommon.get());
     ModelManager::GetInstance()->Initialize(dxCommon.get());
-    ParticleManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
+    ParticleManager::GetInstance()->Initialize(dxCommon.get());
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
     // 外部入力
@@ -93,6 +93,8 @@ void Framework::Initialize()
 
 void Framework::Finalize()
 {
+
+    SrvManager::GetInstance()->Finalize();
     SceneManager::GetInstance()->Finalize();
     dxCommon->Finalize();
 
@@ -124,7 +126,7 @@ void Framework::Update()
 
 
     dxCommon->PreDraw();
-    srvManager->PreDraw();
+    SrvManager::GetInstance()->PreDraw();
     // SpriteCommon::GetInstance()->SpriteCommonDraw();
     // Object3dCommon::GetInstance()->Object3dCommonDraw();
 }

@@ -7,10 +7,10 @@
 #pragma once
  std::unique_ptr<ParticleManager>  ParticleManager::instance;
 uint32_t ParticleManager::kMaxNumInstance = 1024;
-void ParticleManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
+void ParticleManager::Initialize(DXCommon* dxCommon) {
     //DXCommonとSRVマネージャーの受け取り
     dxCommon_ = dxCommon;
-    srvManager_ = srvManager;
+    
     //ランダムエンジンの初期化
     randomEngine_.seed(seedGen_());
     //パイプラインステート生成
@@ -120,10 +120,10 @@ void ParticleManager::Draw() {
             dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
 
             // [1] Descriptor Table (Instancing Data): インスタンシング用SRV
-            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(particleGroup.instancingSrvIndex));
+            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(particleGroup.instancingSrvIndex));
 
             // [2] Descriptor Table (Texture): テクスチャ用SRV
-            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
+            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
             // DrawCall
             // 後述するトポロジーの修正に合わせて頂点数を変更 (6 -> 4)
             dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.kNumInstance, 0, 0);
@@ -142,9 +142,9 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
         TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilepath);
     newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.kNumInstance);
 
-    newParticle.instancingSrvIndex = srvManager_->AllocateSRV();
+    newParticle.instancingSrvIndex = SrvManager::GetInstance()->AllocateSRV();
 
-    srvManager_->CreateSRVforStructuredBuffer(
+    SrvManager::GetInstance()->CreateSRVforStructuredBuffer(
         newParticle.instancingSrvIndex,
         newParticle.instancingResource.Get(),
         newParticle.kNumInstance,

@@ -5,11 +5,11 @@
 std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
 
-void TextureManager::Initialize(DXCommon* dxCommon, SrvManager* srvManager) {
+void TextureManager::Initialize(DXCommon* dxCommon) {
 
     textureDatas.reserve(SrvManager::kMaxSRVCount);
     dxCommon_ = dxCommon;
-    srvManager_ = srvManager;
+   
 }
 
 TextureManager* TextureManager::GetInstance() {
@@ -30,7 +30,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     if (textureDatas.contains(filePath)) {
         return;
     }
-    assert(srvManager_->IsMax());
+    assert(SrvManager::GetInstance()->IsMax());
 
 
     //テクスチャの読み込み
@@ -60,11 +60,11 @@ void TextureManager::LoadTexture(const std::string& filePath) {
     textureData.metadata = mipImages.GetMetadata();//メタデータ
     textureData.resource = dxCommon_->CreateTextureResourse(textureData.metadata);//テクスチャリソース
     //SRVインデックス
-    textureData.srvIndex = srvManager_->AllocateSRV();
-    textureData.srvHandleCPU = srvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
-    textureData.srvHandleGPU = srvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
+    textureData.srvIndex = SrvManager::GetInstance()->AllocateSRV();
+    textureData.srvHandleCPU = SrvManager::GetInstance()->GetCPUDescriptorHandle(textureData.srvIndex);
+    textureData.srvHandleGPU = SrvManager::GetInstance()->GetGPUDescriptorHandle(textureData.srvIndex);
   
-    srvManager_->CreateSRVforTexture2D(textureData.srvIndex, textureData.resource.Get(), textureData.metadata.format, UINT(textureData.metadata.mipLevels));
+    SrvManager::GetInstance()->CreateSRVforTexture2D(textureData.srvIndex, textureData.resource.Get(), textureData.metadata.format, UINT(textureData.metadata.mipLevels));
     textureData.intermediateResource = dxCommon_->UploadTextureData(textureData.resource, mipImages);
 
 }
@@ -99,7 +99,7 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHundleGPU(uint32_t textureindex)
 {
     
-    return srvManager_->GetGPUDescriptorHandle(textureindex);
+    return SrvManager::GetInstance()->GetGPUDescriptorHandle(textureindex);
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
