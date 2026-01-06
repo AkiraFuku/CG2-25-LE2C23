@@ -34,7 +34,9 @@
 #include <dinput.h>
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
-
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -389,104 +391,145 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const  Microsoft::WRL::ComPtr
     handleGPU.ptr += (descriptorSize * index);
     return handleGPU;
 }
-MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
-
-    //1. 変数の宣言
-
-    MaterialData materialData;
-    std::string line;
-    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
-    //2. ファイルを開く
-    assert(file.is_open());//ファイルが開けたか確認
-    //3. ファイルからデータを読み込みマテリアルデータを作成
-    while (std::getline(file, line)) {
-        std::string identifier;
-        std::istringstream s(line);
-        s >> identifier;//行の先頭を識別子として取得
-
-        if (identifier == "map_Kd") {
-
-            std::string textureFileName;
-            s >> textureFileName;//テクスチャファイル名を読み込み
-            //テクスチャのパスを設定
-            materialData.textureFilePath = directryPath + "/" + textureFileName;
-        }
-    }
-
-    //4. マテリアルデータを返す
-    return materialData;
-}
+//MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
+//
+//    //1. 変数の宣言
+//
+//    MaterialData materialData;
+//    std::string line;
+//    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+//    //2. ファイルを開く
+//    assert(file.is_open());//ファイルが開けたか確認
+//    //3. ファイルからデータを読み込みマテリアルデータを作成
+//    while (std::getline(file, line)) {
+//        std::string identifier;
+//        std::istringstream s(line);
+//        s >> identifier;//行の先頭を識別子として取得
+//
+//        if (identifier == "map_Kd") {
+//
+//            std::string textureFileName;
+//            s >> textureFileName;//テクスチャファイル名を読み込み
+//            //テクスチャのパスを設定
+//            materialData.textureFilePath = directryPath + "/" + textureFileName;
+//        }
+//    }
+//
+//    //4. マテリアルデータを返す
+//    return materialData;
+//}
 ModelData LoadObjFile(const std::string& directryPath, const std::string& filename)
 {
     //1. 変数の宣言
     ModelData modelData;
-    std::vector<Vector4> positions;//頂点座標
-    std::vector<Vector3> normals;//法線ベクトル
-    std::vector<Vector2> texcoords;//テクスチャ座標
-    std::string line;
-    //2. ファイルを開く
-    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
-    assert(file.is_open());//ファイルが開けたか確認
-
-    //3. ファイルからデータを読み込みモデルデータを作成
-    while (std::getline(file, line)) {
-        std::string identifier;
-        std::istringstream s(line);
-        s >> identifier;//行の先頭を識別子として取得
-        ///
-        if (identifier == "v") {
-            Vector4 position;
-            s >> position.x >> position.y >> position.z;//頂点座標を読み込み
-            position.w = 1.0f; // w成分を1.0に設定
-            position.x *= -1.0f; // X軸を反転
-            positions.push_back(position);//頂点座標を追加
-        } else if (identifier == "vt") {
-            Vector2 texcoord;
-            s >> texcoord.x >> texcoord.y;//テクスチャ座標を読み込み
-            // OpenGLとDirectXでY軸の方向が異なるため、Y座標を反転
-            texcoord.y = 1.0f - texcoord.y;
-            texcoords.push_back(texcoord);//テクスチャ座標を追加
-        } else if (identifier == "vn") {
-            Vector3 normal;
-            s >> normal.x >> normal.y >> normal.z;//法線ベクトルを読み込み
-            normal.x *= -1.0f; // X軸を反転
-            normals.push_back(normal);
-
-        } else if (identifier == "f") {
-            VertexData Triangle[3];
-            //面は三角形限定
-            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-                std::string vertexDefinition;
-                s >> vertexDefinition;//頂点定義を読み込み
-                //頂点の要素へのIndexは「位置/UV/法線」の順番で格納されているので、分解して取得
-                std::istringstream v(vertexDefinition);
-                uint32_t elementIndices[3];//位置、UV、法線のインデックス
-                for (uint32_t element = 0; element < 3; ++element) {
-                    std::string index;
-                    std::getline(v, index, '/');//スラッシュで区切って取得
-                    elementIndices[element] = std::stoi(index);//文字列を整数に変換
-                }
-                // 要素のインデックスから頂点データを構築
-                Vector4 position = positions[elementIndices[0] - 1];//1から始まるので-1
-                Vector2 texcoord = texcoords[elementIndices[1] - 1];//1から始まるので-1
-                Vector3 normal = normals[elementIndices[2] - 1];//1から始まるので-1
-
-                //    VertexData vertex = { position, texcoord, normal };//頂点データを構築
-                //    modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
-                Triangle[faceVertex] = { position, texcoord, normal };//頂点データを構築
-            }
-            modelData.vertices.push_back(Triangle[2]);
-            modelData.vertices.push_back(Triangle[1]);
-            modelData.vertices.push_back(Triangle[0]);
-        } else if (identifier == "mtllib")//マテリアルライブラリの読み込み
+    std::string filePath = directryPath + "/" + filename;
+    //std::vector<Vector4> positions;//頂点座標
+    //std::vector<Vector3> normals;//法線ベクトル
+    //std::vector<Vector2> texcoords;//テクスチャ座標
+    //std::string line;
+    ////2. ファイルを開く
+    Assimp::Importer importer;
+    //std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+    //assert(file.is_open());//ファイルが開けたか確認
+    const aiScene* scene = importer.ReadFile(filePath.c_str(),
+        aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
+        aiProcess_FlipUVs                // 法線がない場合、自動計算する
+    );
+    assert(scene->HasMeshes());
+    for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
+    {
+        aiMesh* mesh = scene->mMeshes[meshIndex];
+        assert(mesh->HasNormals());
+        assert(mesh->HasTextureCoords(0));
+        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces;++faceIndex)
         {
-            std::string materialFileName;
-            s >> materialFileName;//マテリアルファイル名を読み込み
-            //マテリアルデータを読み込む
-            modelData.material = LoadMaterialTemplateFile(directryPath, materialFileName);
+            aiFace& face = mesh->mFaces[faceIndex];
+            assert(face.mNumIndices == 3);
+            for (uint32_t element = 0; element < face.mNumIndices; ++element)
+            {
+                uint32_t vertexIndex = face.mIndices[element];
+                aiVector3D& position = mesh->mVertices[vertexIndex];
+                aiVector3D& normal = mesh->mNormals[vertexIndex];
+                aiVector3D& texcode = mesh->mTextureCoords[0][vertexIndex];
+                VertexData vertex;
+                vertex.position = { position.x,position.y,position.z,1.0f };
+                vertex.normal = { normal.x,normal.y,normal.z };
+                vertex.texcoord = { texcode.x,texcode.y };
+                vertex.position.x *= -1.0f;
+                vertex.normal.x *= -1.0f;
+                modelData.vertices.push_back(vertex);
+            }
         }
-
     }
+    for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex)
+    {
+        aiMaterial* material = scene->mMaterials[materialIndex];
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
+        {
+            aiString textureFilePath;
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+            modelData.material.textureFilePath=directryPath+"/"+textureFilePath.C_Str();
+        }
+    }
+    ////3. ファイルからデータを読み込みモデルデータを作成
+    //while (std::getline(file, line)) {
+    //    std::string identifier;
+    //    std::istringstream s(line);
+    //    s >> identifier;//行の先頭を識別子として取得
+    //    ///
+    //    if (identifier == "v") {
+    //        Vector4 position;
+    //        s >> position.x >> position.y >> position.z;//頂点座標を読み込み
+    //        position.w = 1.0f; // w成分を1.0に設定
+    //        position.x *= -1.0f; // X軸を反転
+    //        positions.push_back(position);//頂点座標を追加
+    //    } else if (identifier == "vt") {
+    //        Vector2 texcoord;
+    //        s >> texcoord.x >> texcoord.y;//テクスチャ座標を読み込み
+    //        // OpenGLとDirectXでY軸の方向が異なるため、Y座標を反転
+    //        texcoord.y = 1.0f - texcoord.y;
+    //        texcoords.push_back(texcoord);//テクスチャ座標を追加
+    //    } else if (identifier == "vn") {
+    //        Vector3 normal;
+    //        s >> normal.x >> normal.y >> normal.z;//法線ベクトルを読み込み
+    //        normal.x *= -1.0f; // X軸を反転
+    //        normals.push_back(normal);
+
+    //    } else if (identifier == "f") {
+    //        VertexData Triangle[3];
+    //        //面は三角形限定
+    //        for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+    //            std::string vertexDefinition;
+    //            s >> vertexDefinition;//頂点定義を読み込み
+    //            //頂点の要素へのIndexは「位置/UV/法線」の順番で格納されているので、分解して取得
+    //            std::istringstream v(vertexDefinition);
+    //            uint32_t elementIndices[3];//位置、UV、法線のインデックス
+    //            for (uint32_t element = 0; element < 3; ++element) {
+    //                std::string index;
+    //                std::getline(v, index, '/');//スラッシュで区切って取得
+    //                elementIndices[element] = std::stoi(index);//文字列を整数に変換
+    //            }
+    //            // 要素のインデックスから頂点データを構築
+    //            Vector4 position = positions[elementIndices[0] - 1];//1から始まるので-1
+    //            Vector2 texcoord = texcoords[elementIndices[1] - 1];//1から始まるので-1
+    //            Vector3 normal = normals[elementIndices[2] - 1];//1から始まるので-1
+
+    //            //    VertexData vertex = { position, texcoord, normal };//頂点データを構築
+    //            //    modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
+    //            Triangle[faceVertex] = { position, texcoord, normal };//頂点データを構築
+    //        }
+    //        modelData.vertices.push_back(Triangle[2]);
+    //        modelData.vertices.push_back(Triangle[1]);
+    //        modelData.vertices.push_back(Triangle[0]);
+    //    } else if (identifier == "mtllib")//マテリアルライブラリの読み込み
+    //    {
+    //        std::string materialFileName;
+    //        s >> materialFileName;//マテリアルファイル名を読み込み
+    //        //マテリアルデータを読み込む
+    //        modelData.material = LoadMaterialTemplateFile(directryPath, materialFileName);
+    //    }
+
+    //}
     //4. モデルデータを返す
     return modelData;
 
@@ -906,13 +949,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換・書き込み
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャ
     //ディスクリプタの先頭を取得
-   // D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 
     //ディスクリプタ２つ用意
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
     //rtv一つ目 先頭を入れる
-    //rtvHandles[0] = rtvStartHandle;
     rtvHandles[0] = GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 0);
     device->CreateRenderTargetView(
         swapChainResources[0].Get(),
@@ -920,7 +961,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         rtvHandles[0]
     );
     //rtv二つ目 ハンドルを得る
-   // rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     rtvHandles[1] = GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, 1);
     //2つ目のRTVを作成
     device->CreateRenderTargetView(
@@ -930,7 +970,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     );
     //fenceのさくせい
     Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
-    //ID3D12Fence* fence = nullptr;
     uint64_t fenceValue = 0;
     hr = device->CreateFence(
         fenceValue,
@@ -946,9 +985,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     //DXCCompileの初期化
     Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
-    // IDxcUtils* dxcUtils = nullptr;
     Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-    // IDxcCompiler3* dxcCompiler = nullptr;
     hr = DxcCreateInstance(
         CLSID_DxcUtils,
         IID_PPV_ARGS(&dxcUtils)
@@ -962,7 +999,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     //includeに対応する為の設定
     Microsoft::WRL::ComPtr<IDxcIncludeHandler>includeHandler = nullptr;
-    // IDxcIncludeHandler* includeHandler = nullptr;
     hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
     assert(SUCCEEDED(hr));
     ///
@@ -973,6 +1009,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//テーブルの先頭からオフセットなし
     ///
+
+
 
 
 
@@ -1611,12 +1649,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     spotLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f }; // 白
     spotLightData->position = { 2.0f, 1.25f, 0.0f };    // 座標 (Y=2.0)
     spotLightData->distance = 7.0f;
-    spotLightData->direction=Normalize({-1.0f,-1.0f,0.0f});
+    spotLightData->direction = Normalize({ -1.0f,-1.0f,0.0f });
     spotLightData->intensity = 4.0f;  // 強度
     spotLightData->decay = 2.0f;
-    spotLightData->cosAngle=
-        std::cos(std::numbers::pi_v<float>/3.0f);
-    spotLightData->cosFalloffStart=1.0f;
+    spotLightData->cosAngle =
+        std::cos(std::numbers::pi_v<float> / 3.0f);
+    spotLightData->cosFalloffStart = 1.0f;
     Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource = CreateBufferResource(device, sizeof(PointLight));
 
     PointLight* pointLightData = nullptr;
@@ -1735,9 +1773,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 // 光沢度
                 ImGui::DragFloat("Shininess", &materialData->shininess, 0.1f, 1.0f, 256.0f);
             }
-          /*  ImGui::DragFloat3("traslate", &(spotLightData->position.x));
-            ImGui::DragFloat("radius", &(pointLightData->radius));
-            ImGui::DragFloat("decay", &(pointLightData->decay));*/
+            /*  ImGui::DragFloat3("traslate", &(spotLightData->position.x));
+              ImGui::DragFloat("radius", &(pointLightData->radius));
+              ImGui::DragFloat("decay", &(pointLightData->decay));*/
             ImGui::DragFloat3("traslate", &(spotLightData->position.x));
             ImGui::DragFloat("radius", &(spotLightData->distance));
             ImGui::DragFloat("decay", &(spotLightData->decay));
