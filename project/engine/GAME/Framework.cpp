@@ -94,6 +94,8 @@ void Framework::Initialize()
 
 void Framework::Finalize()
 {
+
+    SrvManager::GetInstance()->Finalize();
     SceneManager::GetInstance()->Finalize();
     dxCommon->Finalize();
 

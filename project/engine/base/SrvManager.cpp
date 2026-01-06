@@ -17,6 +17,10 @@ void SrvManager::Initialize(DXCommon* dxCommon) {
     descriptorHeap_=dxCommon_->CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
     descriptorSize_=dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
+void SrvManager::Finalize() {
+    // インスタンスを破棄（デストラクタが呼ばれ、ComPtrも解放される）
+    instance.reset();
+}
 void SrvManager::PreDraw() {
     ID3D12DescriptorHeap* descritptorHeaps[] = { descriptorHeap_.Get() };
     dxCommon_->GetCommandList()->SetDescriptorHeaps(1, descritptorHeaps);

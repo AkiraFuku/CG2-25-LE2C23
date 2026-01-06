@@ -10,6 +10,7 @@ public:
     //最大テクスチャ数
     static const uint32_t kMaxSRVCount;
     void Initialize(DXCommon* dxCommon);
+    void Finalize();
     // シングルトンインスタンス取得
     static SrvManager* GetInstance();
     friend struct std::default_delete<SrvManager>;
