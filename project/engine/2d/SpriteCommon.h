@@ -2,7 +2,7 @@
 #include "d3d12.h"
 #include <wrl/client.h>
 #include <cstdint>
-#include "DXCommon.h"
+
 #include <memory>
 class SpriteCommon
 {
@@ -11,11 +11,9 @@ public:
     static SpriteCommon* GetInstance();
     void Finalize();
 
-    void Initialize(DXCommon* dxCommon);
+    void Initialize();
 
-    DXCommon* GetDxCommon()const {
-        return dxCommon_;
-    }
+   
     void SpriteCommonDraw();
 
     static std::unique_ptr<SpriteCommon> instance;
@@ -28,7 +26,7 @@ private:
     SpriteCommon& operator=(const SpriteCommon&) = delete;
     HRESULT hr_;
 
-    DXCommon* dxCommon_=nullptr;
+    
 
     //ルートシグネチャ
     Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;

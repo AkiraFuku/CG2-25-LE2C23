@@ -14,19 +14,19 @@ Object3dCommon* Object3dCommon::GetInstance() {
 void Object3dCommon::Finalize() {
   instance.reset(); // 解放
 }
-void Object3dCommon::Initialize(DXCommon* dxCommon)
+void Object3dCommon::Initialize()
 {
-    dxCommon_ = dxCommon;
+    
     CreatePSO();
 }
 void Object3dCommon::Object3dCommonDraw()
 {
       // RootSignatureの設定
-    dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
     //  //PSOの設定
-    dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+    DXCommon::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
     //プリミティブトポロジーのセット
-    dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    DXCommon::GetInstance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 void Object3dCommon::CreateRootSignature()
 {
@@ -89,7 +89,7 @@ void Object3dCommon::CreateRootSignature()
     }
     //バイナリを元にルートシグネチャー生成
     //ID3D12RootSignature* rootSignature = nullptr;
-    hr_ = dxCommon_->GetDevice()->CreateRootSignature(
+    hr_ = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(
         0,
         signatureBlob.Get()->GetBufferPointer(),
         signatureBlob.Get()->GetBufferSize(),
@@ -132,7 +132,7 @@ void Object3dCommon::CreatePSO(){
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     //shaderのコンパイル
-    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = dxCommon_->CompileShader(
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = DXCommon::GetInstance()->CompileShader(
         L"resources/shaders/Object3d/Object3D.vs.hlsl",
         L"vs_6_0"
 
@@ -140,7 +140,7 @@ void Object3dCommon::CreatePSO(){
     );
     assert(vertexShaderBlob.Get() != nullptr);
 
-    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = dxCommon_->CompileShader(
+    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = DXCommon::GetInstance()->CompileShader(
         L"resources/shaders/Object3d/Object3D.ps.hlsl",
         L"ps_6_0"
 
@@ -181,7 +181,7 @@ void Object3dCommon::CreatePSO(){
     graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルビューのフォーマット
     ////
     //PSOの生成
-    hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(
+    hr_ = DXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
         &graphicPipelineStateDesc,
         IID_PPV_ARGS(&graphicsPipelineState_)
     );

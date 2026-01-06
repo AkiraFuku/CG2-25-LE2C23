@@ -7,7 +7,7 @@ class ModelCommon;
 class ModelManager
 {
 public:
-    void Initialize(DXCommon* dxCommon);
+    void Initialize();
     static ModelManager* GetInstance();
     void Finalize();
     //Modelロード

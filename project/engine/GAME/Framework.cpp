@@ -87,15 +87,15 @@ void Framework::Initialize()
    /* imguiManager = std::make_unique<ImGuiManager>();*/
     ImGuiManager::GetInstance()->Initialize();
     TextureManager::GetInstance()->Initialize();
-    ModelManager::GetInstance()->Initialize(dxCommon.get());
-    ParticleManager::GetInstance()->Initialize(dxCommon.get());
+    ModelManager::GetInstance()->Initialize();
+    ParticleManager::GetInstance()->Initialize();
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
 
     // 外部入力
     Input::GetInstance()->Initialize(WinApp::GetInstance());
 
-    SpriteCommon::GetInstance()->Initialize(dxCommon.get());
-    Object3dCommon::GetInstance()->Initialize(dxCommon.get());
+    SpriteCommon::GetInstance()->Initialize();
+    Object3dCommon::GetInstance()->Initialize();
     Audio::GetInstance()->Initialize();
 
 

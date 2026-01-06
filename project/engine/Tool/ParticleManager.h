@@ -9,7 +9,6 @@
 #include "d3d12.h"
 #include <cstdint>
 #include "Camera.h"
-class DXCommon;
 
 class ParticleManager
 {
@@ -60,7 +59,7 @@ public:
     };
 
 
-    void Initialize(DXCommon* dxCommon);
+    void Initialize();
     void Update();
     void Draw();
     void CreateParticleGroup(const std::string name, const std::string textureFilepath);
@@ -82,7 +81,6 @@ private:
     ParticleManager& operator=(ParticleManager&) = delete;
   
     static uint32_t kMaxNumInstance;
-    DXCommon* dxCommon_ = nullptr;
    
 
     std::random_device seedGen_;

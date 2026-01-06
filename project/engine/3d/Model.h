@@ -4,7 +4,7 @@
 #include "Vector4.h"
 #include <wrl.h>
 #include <d3d12.h>
-class ModelCommon;
+
 class Model
 {
 public:
@@ -29,7 +29,7 @@ public:
         MaterialData material; // マテリアルデータ
     };
 
-    void Initialize(ModelCommon* modelCom,const std::string& directryPath, const std::string& filename);
+    void Initialize(const std::string& directryPath, const std::string& filename);
 
     void Draw();
 
@@ -43,7 +43,6 @@ public:
 
 private:
 
-    ModelCommon* ModelCom_ = nullptr;
     ModelData modelData_;
 
     //頂点リソース

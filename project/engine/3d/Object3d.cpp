@@ -39,9 +39,9 @@ void Object3d::Draw()
 {
     Object3dCommon::GetInstance()->Object3dCommonDraw();
     //WVP行列リソースの設定
-    Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
+   DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
     //light
-    Object3dCommon::GetInstance()->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse_.Get()->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse_.Get()->GetGPUVirtualAddress());
 
     if (model_){
         model_->Draw();
@@ -58,7 +58,7 @@ void Object3d::CreateWVPResource()
 {
     //座標変換
     transformationMatrixResourse_ =
-        Object3dCommon::GetInstance()->GetDxCommon()->
+      DXCommon::GetInstance()->
         CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&wvpResource_));
@@ -70,7 +70,7 @@ void Object3d::CreateWVPResource()
 void Object3d::CreateDirectionalLightResource()
 {
     directionalLightResourse_ =
-        Object3dCommon::GetInstance()->GetDxCommon()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(DirectionalLight));
     directionalLightResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));

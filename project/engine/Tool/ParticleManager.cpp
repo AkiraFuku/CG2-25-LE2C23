@@ -7,10 +7,8 @@
 #pragma once
  std::unique_ptr<ParticleManager>  ParticleManager::instance;
 uint32_t ParticleManager::kMaxNumInstance = 1024;
-void ParticleManager::Initialize(DXCommon* dxCommon) {
+void ParticleManager::Initialize() {
     //DXCommonとSRVマネージャーの受け取り
-    dxCommon_ = dxCommon;
-    
     //ランダムエンジンの初期化
     randomEngine_.seed(seedGen_());
     //パイプラインステート生成
@@ -106,27 +104,27 @@ void ParticleManager::Update() {
 }
 void ParticleManager::Draw() {
     // RootSignatureの設定
-    dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
     //PSOの設定
-    dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
-    dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    DXCommon::GetInstance()->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+    DXCommon::GetInstance()->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     //VBVの設定
-    dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    DXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
     for (auto& [key, particleGroup] : particleGroups) {
         if (particleGroup.kNumInstance > 0) {
 
             // とりあえずコードの意図を汲んで修正すると：
-            dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
+            DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
 
             // [1] Descriptor Table (Instancing Data): インスタンシング用SRV
-            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(particleGroup.instancingSrvIndex));
+            DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(particleGroup.instancingSrvIndex));
 
             // [2] Descriptor Table (Texture): テクスチャ用SRV
-            dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
+            DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(particleGroup.materialData.textureIndex));
             // DrawCall
             // 後述するトポロジーの修正に合わせて頂点数を変更 (6 -> 4)
-            dxCommon_->GetCommandList()->DrawInstanced(4, particleGroup.kNumInstance, 0, 0);
+            DXCommon::GetInstance()->GetCommandList()->DrawInstanced(4, particleGroup.kNumInstance, 0, 0);
         }
     }
 }
@@ -140,7 +138,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
     newParticle.kNumInstance = kMaxNumInstance;
     newParticle.materialData.textureIndex = newParticle.materialData.textureIndex =
         TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilepath);
-    newParticle.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.kNumInstance);
+    newParticle.instancingResource = DXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * newParticle.kNumInstance);
 
     newParticle.instancingSrvIndex = SrvManager::GetInstance()->AllocateSRV();
 
@@ -275,7 +273,7 @@ void ParticleManager::CreateRootSignature()
 
 
 
-    hr_ = dxCommon_->GetDevice()->CreateRootSignature(
+    hr_ = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(
         0,
         signatureBlob->GetBufferPointer(),
         signatureBlob->GetBufferSize(),
@@ -328,13 +326,13 @@ void ParticleManager::CreatePSO() {
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     //shaderのコンパイル
-    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = dxCommon_->CompileShader(
+    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = DXCommon::GetInstance()->CompileShader(
         L"resources/shaders/Particle/Particle.vs.hlsl",
         L"vs_6_0"
     );
     assert(vertexShaderBlob.Get() != nullptr);
 
-    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = dxCommon_->CompileShader(
+    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = DXCommon::GetInstance()->CompileShader(
         L"resources/shaders/Particle/Particle.ps.hlsl",
         L"ps_6_0"
 
@@ -375,7 +373,7 @@ void ParticleManager::CreatePSO() {
     graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;//深度ステンシルビューのフォーマット
     ////
     //PSOの生成
-    hr_ = dxCommon_->GetDevice()->CreateGraphicsPipelineState(
+    hr_ = DXCommon::GetInstance()->GetDevice()->CreateGraphicsPipelineState(
         &graphicPipelineStateDesc,
         IID_PPV_ARGS(&graphicsPipelineState_)
     );
@@ -392,7 +390,7 @@ void ParticleManager::CreateVertexBuffer() {
     size_t sizeIB = sizeof(vertices);
     //頂点リソースの作成
     vertexResourse_ =
-        dxCommon_->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeIB);
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
@@ -411,7 +409,7 @@ void ParticleManager::CreateMaterialBuffer()
     //データの設定
 
     materialResource_ =
-        dxCommon_->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(Material));
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));

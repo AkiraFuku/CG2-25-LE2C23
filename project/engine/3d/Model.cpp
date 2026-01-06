@@ -1,14 +1,14 @@
 #include "Model.h"
 #include "TextureManager.h"
-#include "ModelCommon.h"
+#include "DXCommon.h"
 #include "MathFunction.h"
 #include <cassert>
 #include <fstream> 
 #include <sstream>
 #include <Windows.h>
-void Model::Initialize(ModelCommon* modelCom,const std::string& directryPath, const std::string& filename)
+void Model::Initialize(const std::string& directryPath, const std::string& filename)
 {
-    ModelCom_ = modelCom;
+    
 
     modelData_ = LoadObjFile( directryPath, filename);
     if (modelData_.material.textureFilePath.empty()) {
@@ -30,28 +30,28 @@ void Model::Initialize(ModelCommon* modelCom,const std::string& directryPath, co
 }
 void Model::Draw() {
     //VBVの設定
-    ModelCom_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    DXCommon::GetInstance()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
     //マテリアルリソースの設定
-    ModelCom_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_.Get()->GetGPUVirtualAddress());
     //SRVのディスクリプタテーブルの設定
-    ModelCom_->GetDxCommon()->
+    DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
     //SRVのディスクリプタテーブルの設定
-    ModelCom_->GetDxCommon()->
+  DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
     //描画コマンド
-    ModelCom_->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+   DXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
 }
 
 void Model::CreateVertexBuffer() {
     //頂点リソースの作成
     vertexResourse_ =
-        ModelCom_->GetDxCommon()->
+       DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
@@ -67,7 +67,7 @@ void Model::CreateVertexBuffer() {
 void Model::CreateMaterialResource() {
     //マテリアルリソースの作成
     materialResource_ =
-        ModelCom_->GetDxCommon()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(Material));
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));

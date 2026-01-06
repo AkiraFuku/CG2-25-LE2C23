@@ -12,10 +12,8 @@ public:
     static Object3dCommon* GetInstance();
     void Finalize();
 
-    void Initialize(DXCommon* dxCommon);
-    DXCommon* GetDxCommon()const {
-        return dxCommon_;
-    }
+    void Initialize();
+    
     void Object3dCommonDraw();
     void SetDefaultCamera(Camera* camera) {
         defaultCamera_ = camera;
@@ -35,7 +33,7 @@ private:
 
     HRESULT hr_;
 
-    DXCommon* dxCommon_ = nullptr;
+   
 
     //ルートシグネチャ
     Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;

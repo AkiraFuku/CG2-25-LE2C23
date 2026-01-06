@@ -2,15 +2,16 @@
 #include "SpriteCommon.h"
 #include "MathFunction.h"
 #include "TextureManager.h"
+#include "DXCommon.h"
 void Sprite::Initialize(std::string textureFilePath) {
 
 
 
     vertexResourse_ =
-        SpriteCommon::GetInstance()->GetDxCommon()->
+       DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * 4);
     indexResource_ =
-        SpriteCommon::GetInstance()->GetDxCommon()->
+       DXCommon::GetInstance()->
         CreateBufferResource(sizeof(uint32_t) * 6);
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
@@ -27,7 +28,7 @@ void Sprite::Initialize(std::string textureFilePath) {
 
     //
     materialResource_ =
-        SpriteCommon::GetInstance()->GetDxCommon()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(Material));
     materialResource_->
         Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
@@ -37,7 +38,7 @@ void Sprite::Initialize(std::string textureFilePath) {
     materialData_->uvTransform = Makeidetity4x4();
     //座標変換
     transformationMatrixResourse_ =
-        SpriteCommon::GetInstance()->GetDxCommon()->
+       DXCommon::GetInstance()->
         CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
@@ -119,27 +120,27 @@ void Sprite::Draw()
 {
     SpriteCommon::GetInstance()->SpriteCommonDraw();
     //パイプラインステートとルートシグネチャの設定
-    SpriteCommon::GetInstance()->GetDxCommon()->
+   DXCommon::GetInstance()->
         GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
     //インデックスバッファの設定
-    SpriteCommon::GetInstance()->GetDxCommon()->
+    DXCommon::GetInstance()->
         GetCommandList()->IASetIndexBuffer(&indexBufferView_);
     //マテリアルの設定
-    SpriteCommon::GetInstance()->GetDxCommon()->
+    DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
     // SRVのディスクプリプターテーブルの先頭を設定
-    SpriteCommon::GetInstance()->GetDxCommon()->
+    DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(textureIndex_));
 
     //座標変換行列の設定
-     SpriteCommon::GetInstance()->GetDxCommon()->
+     DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_->GetGPUVirtualAddress());
 
-     SpriteCommon::GetInstance()->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+     DXCommon::GetInstance()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Sprite::SetTextureByFilePath(const std::string& textureFilePath)
