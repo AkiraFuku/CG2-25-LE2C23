@@ -20,6 +20,7 @@
 #include "ModelCommon.h"//フレームワークに移植
 #include "ModelManager.h"//フレームワークに移植
 #include "SrvManager.h"//フレームワークに移植
+#include "ImGuiManager.h"//フレームワークに移植
 #include "AbstractSceneFactory.h"
 class Framework
 {
@@ -48,8 +49,8 @@ private:
     D3DResourceLeakChecker LeakCheck;
     
     std::unique_ptr<DXCommon> dxCommon;
- /*   std::unique_ptr<SrvManager> srvManager;*/
-  
+    std::unique_ptr<SrvManager> srvManager;
+    /*std::unique_ptr<ImGuiManager> imguiManager;*/
 
     AbstractSceneFactory* sceneFactory = nullptr;
 };

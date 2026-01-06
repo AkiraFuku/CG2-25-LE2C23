@@ -2,7 +2,6 @@
 #include "ParticleManager.h"//フレームワークに移植
 #include "SceneManager.h"
 #include "WinApp.h"//フレームワークに移植
-#include "ImGuiManager.h"//フレームワークに移植
 
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
@@ -71,8 +70,8 @@ void Framework::Initialize()
     dxCommon = std::make_unique<DXCommon>();
     // 引数には生のポインタが必要なので .get() を使用
     dxCommon->Initialize();
-   /* srvManager = std::make_unique<SrvManager>();*/
-    SrvManager::GetInstance()->Initialize(dxCommon.get());
+    srvManager = std::make_unique<SrvManager>();
+    srvManager->Initialize(dxCommon.get());
 
 
    /* imguiManager = std::make_unique<ImGuiManager>();*/
