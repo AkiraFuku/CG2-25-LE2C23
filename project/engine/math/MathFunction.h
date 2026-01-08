@@ -142,3 +142,9 @@ Matrix4x4 MakeRotateZMatrix( float radian);
     /// <param name="v">ベクトル</param>
     /// <returns></returns>
     Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+    /// <summary>
+    /// Lerp
+    /// </summary>
+    /// <param name="v">ベクトル</param>
+    /// <returns></returns>
+    Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
