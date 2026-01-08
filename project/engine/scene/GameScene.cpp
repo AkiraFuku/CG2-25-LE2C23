@@ -96,22 +96,23 @@ void GameScene::Update() {
         camera->SetTranslate(camreaTranslate);
 
     }
-    if (Input::GetInstance()->TriggerMouseDown(0))
+    /*if (Input::GetInstance()->TriggerMouseDown(0))
     {
         if (!Audio::GetInstance()->IsPlaying(handle_))
         {
             Audio::GetInstance()->PlayAudio(handle_);
         }
 
-    }
-    if (Input::GetInstance()->TriggerMouseDown(2))
+    }*/
+    if (Input::GetInstance()->TriggerMouseDown(0))
     {
-      if (!Audio::GetInstance()->IsPlaying(handle_))
+      if (Audio::GetInstance()->IsPlaying(handle_))
         {
-            Audio::GetInstance()->ResumeAudio(handle_);
+            Audio::GetInstance()->PauseAudio(handle_);
       } else
       {
-           Audio::GetInstance()->PauseAudio(handle_);
+          Audio::GetInstance()->ResumeAudio(handle_);
+       
       }
     }
     if (Input::GetInstance()->GetJoyStick(0, state))

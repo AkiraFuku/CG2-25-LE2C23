@@ -17,7 +17,7 @@ void TitleScene::Initialize() {
 
      handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(handle_);
+    Audio::GetInstance()->PlayAudio(handle_,true);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -56,7 +56,17 @@ void TitleScene::Update() {
     XINPUT_STATE state;
 
     // 現在のジョイスティックを取得
-
+    if (Input::GetInstance()->TriggerMouseDown(0))
+    {
+      if (Audio::GetInstance()->IsPlaying(handle_))
+        {
+            Audio::GetInstance()->PauseAudio(handle_);
+      } else
+      {
+          Audio::GetInstance()->ResumeAudio(handle_);
+       
+      }
+    }
 
 
     Input::GetInstance()->GetJoyStick(0, state);

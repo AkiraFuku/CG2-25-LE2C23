@@ -24,7 +24,10 @@ public:
     // 再生中のボイス構造体 
     struct Voice {
         uint32_t handle;
+        SoundHandle sourceHandle;
         IXAudio2SourceVoice* sourceVoice;
+        XAUDIO2_BUFFER buffer;           // 元バッファを保持
+        size_t bytesPlayed = 0;          // 再開用
     };
 
     static Audio* GetInstance();

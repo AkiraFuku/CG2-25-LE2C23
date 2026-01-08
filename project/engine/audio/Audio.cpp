@@ -78,8 +78,7 @@ void Audio::Update()
         {
             it->sourceVoice->DestroyVoice();
             it = activeVoices_.erase(it);
-        }
-        else
+        } else
         {
             ++it;
         }
@@ -136,7 +135,7 @@ Audio::SoundHandle Audio::LoadAudio(const std::string& filename)
             BYTE* pData = nullptr;
             DWORD currentLength = 0;
             pBuffer->Lock(&pData, nullptr, &currentLength);
-            
+
             soundData.buffer.insert(soundData.buffer.end(), pData, pData + currentLength);
             pBuffer->Unlock();
         }
@@ -145,7 +144,7 @@ Audio::SoundHandle Audio::LoadAudio(const std::string& filename)
     // 5. ハンドル発行と登録
     SoundHandle handle = nextHandle_;
     soundDatas_[handle] = soundData;
-    
+
     // 次のハンドル番号を準備
     nextHandle_++;
 
@@ -160,45 +159,41 @@ void Audio::UnloadAudio(SoundHandle soundHandle)
 
 void Audio::PlayAudio(SoundHandle soundHandle, bool loop, float volume)
 {
-    // 指定されたハンドルがマップにあるか確認
-    if (soundDatas_.find(soundHandle) == soundDatas_.end()) {
-        return; // 無効なハンドルなら何もしない
-    }
+   if (soundDatas_.find(soundHandle) == soundDatas_.end()) return;
 
-    // 参照でデータ取得（コピーしない）
     const SoundData& soundData = soundDatas_[soundHandle];
 
-    HRESULT result;
+    // --- ボイス作成 (既存コード) ---
     IXAudio2SourceVoice* pSourceVoice = nullptr;
-    result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+    HRESULT result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
     assert(SUCCEEDED(result));
 
     pSourceVoice->SetVolume(volume);
 
-    XAUDIO2_BUFFER buf = {};
+    XAUDIO2_BUFFER buf{};
     buf.AudioBytes = (UINT32)soundData.buffer.size();
     buf.pAudioData = soundData.buffer.data();
     buf.Flags = XAUDIO2_END_OF_STREAM;
-
-    if (loop) {
-        buf.LoopCount = XAUDIO2_LOOP_INFINITE;
-    }
+    if (loop) buf.LoopCount = XAUDIO2_LOOP_INFINITE;
 
     result = pSourceVoice->SubmitSourceBuffer(&buf);
     result = pSourceVoice->Start();
 
-  // Voice登録
+    // --- Voice登録 (修正箇所) ---
     Voice voice{};
     voice.handle = nextVoiceHandle_++;
+    voice.sourceHandle = soundHandle; // ★ここで親ハンドルを覚える！
     voice.sourceVoice = pSourceVoice;
+    voice.buffer = buf;
+    voice.bytesPlayed = 0;
+
     activeVoices_.push_back(voice);
 }
-
 void Audio::StopAudio(SoundHandle voiceHandle)
 {
     auto it = std::find_if(
         activeVoices_.begin(), activeVoices_.end(),
-        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
+        [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; }
     );
 
     if (it != activeVoices_.end())
@@ -212,35 +207,34 @@ void Audio::StopAudio(SoundHandle voiceHandle)
 
 void Audio::PauseAudio(SoundHandle voiceHandle)
 {
-      auto it = std::find_if(
-        activeVoices_.begin(), activeVoices_.end(),
-        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
-    );
+  auto it = std::find_if(activeVoices_.begin(), activeVoices_.end(),
+        [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; });
 
     if (it != activeVoices_.end())
     {
+        // 単に停止させる。
+        // FlushSourceBuffers() を呼ばなければ、再生位置(カーソル)は維持される。
         it->sourceVoice->Stop();
     }
 }
 
 void Audio::ResumeAudio(SoundHandle voiceHandle)
 {
-       auto it = std::find_if(
-        activeVoices_.begin(), activeVoices_.end(),
-        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
-    );
+  auto it = std::find_if(activeVoices_.begin(), activeVoices_.end(),
+        [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; });
 
     if (it != activeVoices_.end())
     {
+        // 停止した位置から再開される
         it->sourceVoice->Start();
     }
 }
 
 bool Audio::IsPlaying(SoundHandle voiceHandle)
 {
- auto it = std::find_if(
+    auto it = std::find_if(
         activeVoices_.begin(), activeVoices_.end(),
-        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
+        [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; }
     );
 
     if (it != activeVoices_.end())
@@ -250,4 +244,5 @@ bool Audio::IsPlaying(SoundHandle voiceHandle)
         return state.BuffersQueued > 0;
     }
 
-    return false;}
+    return false;
+}

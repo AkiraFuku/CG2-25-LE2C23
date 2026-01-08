@@ -79,12 +79,12 @@ void Framework::Initialize()
     
     WinApp::GetInstance()->Initialize();
 
-   /* dxCommon = std::make_unique<DXCommon>();*/
+  
     // 引数には生のポインタが必要なので .get() を使用
     DXCommon::GetInstance()->Initialize();
-   /* srvManager = std::make_unique<SrvManager>();*/
+ 
     SrvManager::GetInstance()->Initialize();
-
+    
 
    /* imguiManager = std::make_unique<ImGuiManager>();*/
     ImGuiManager::GetInstance()->Initialize();
@@ -134,7 +134,7 @@ void Framework::Update()
     ImGuiManager::GetInstance()->Begin();
 #endif
     Input::GetInstance()->Update();
-
+    Audio::GetInstance()-> Update();
 
     DXCommon::GetInstance()->PreDraw();
     SrvManager::GetInstance()->PreDraw();
