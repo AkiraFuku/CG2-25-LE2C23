@@ -1,30 +1,44 @@
 #pragma once
-#include <GameEngine.h>
-#include <Framework.h>
-#include <memory>
 #include"MathFunction.h"
 #include"Object3D.h"
 #include "Model.h"
 #include "Camera.h"
+#include <memory>
 
 
 class Player
 {
 private:
     
+    // ワールド変換データ
+    Transform transform_;
+
     // モデル
-    std::unique_ptr<Object3d> model_;
+    Object3d* model_ = nullptr;
 
     // カメラ
-    std::unique_ptr<Camera> camera_;
+    Camera* camera_ = nullptr;
+    Transform cameraTransform_;
+
+    // 行列
+    Matrix4x4 worldMatrix_;
 
     // 速度
     Vector3 velocity_ = {};
-
+ 
 public:
-    void Initialize(std::unique_ptr<Object3d>* model, std::unique_ptr<Camera>* camera, const Vector3& position);
+    // 初期化
+    void Initialize(Object3d* model, Camera* camera, const Vector3& position);
+    // 更新
     void Update();
+    // 描画
     void Draw();
-    const Vector3& GetVelocity() const { return velocity_; }
+    // 旋回
+    void Rotate();
+    // 移動
+    void Move();
+    // コンストラクタとデストラクタ
+    Player() = default;
+    ~Player();
 };
 
