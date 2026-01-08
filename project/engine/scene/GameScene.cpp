@@ -6,11 +6,17 @@
 #include "TitleScene.h"
 #include "Player.h"
 
+// コンストラクタ
+GameScene::GameScene() = default;
+
+// デストラクタ
+GameScene::~GameScene() = default;
+
 void GameScene::Initialize() {
 
     camera = std::make_unique<Camera>();
-    camera->SetRotate({ 0.0f,0.0f,0.0f });
-    camera->SetTranslate({ 0.0f,0.0f,-5.0f });
+    camera->SetRotate({ 0.3f,0.0f,0.0f });
+    camera->SetTranslate({ 0.0f,5.0f,-20.0f });
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
@@ -55,12 +61,12 @@ void GameScene::Initialize() {
    emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 
    // プレイヤーの初期化
-  /* player_ = std::make_unique<Player>();
-   player_->Initialize(&playerModel_, &camera, Vector3{ 0.0f,0.0f,0.0f });
+   player_ = std::make_unique<Player>();
    playerModel_ = std::make_unique<Object3d>();
    playerModel_->SetTranslate(Vector3{ 0.0f,0.0f,0.0f });
-   playerModel_->SetModel("axis.obj");
-   playerModel_->Initialize();*/
+   playerModel_->SetModel("cube.obj");
+   playerModel_->Initialize();
+   player_->Initialize(playerModel_.get(), camera.get(), Vector3{ 0.0f, 0.0f, 0.0f });
 }
 void GameScene::Finalize() {
 
@@ -125,7 +131,7 @@ void GameScene::Update() {
     object3d2->Update();
 
     // プレイヤーの更新処理
-    //player_->Update();
+    player_->Update();
 
 
 #ifdef USE_IMGUI
@@ -144,13 +150,13 @@ void GameScene::Update() {
     sprite->Update();
 }
 void GameScene::Draw() {
-    object3d2->Draw();
-    object3d->Draw();
-    ParticleManager::GetInstance()->Draw();
+    //object3d2->Draw();
+    //object3d->Draw();
+    //ParticleManager::GetInstance()->Draw();
 
     // プレイヤーの描画処理
-   // player_->Draw();
+    player_->Draw();
 
     ///////スプライトの描画
-    sprite->Draw();
+    //sprite->Draw();
 }
