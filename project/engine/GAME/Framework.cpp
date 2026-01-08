@@ -13,6 +13,7 @@
 #include "ModelCommon.h"//フレームワークに移植
 #include "ModelManager.h"//フレームワークに移植
 #include "SrvManager.h"//フレームワークに移植
+#include "PSOMnager.h"
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -82,7 +83,7 @@ void Framework::Initialize()
     DXCommon::GetInstance()->Initialize();
    /* srvManager = std::make_unique<SrvManager>();*/
     SrvManager::GetInstance()->Initialize();
-
+PSOMnager::GetInstance()->Initialize();
 
    /* imguiManager = std::make_unique<ImGuiManager>();*/
     ImGuiManager::GetInstance()->Initialize();
@@ -107,7 +108,7 @@ void Framework::Finalize()
     SrvManager::GetInstance()->Finalize();
     SceneManager::GetInstance()->Finalize();
     DXCommon::GetInstance()->Finalize();
-
+    PSOMnager::GetInstance()->Finalize();
     Audio::GetInstance()->Finalize();
     Input::GetInstance()->Finalize();
     Object3dCommon::GetInstance()->Finalize();
