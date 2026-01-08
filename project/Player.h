@@ -1,10 +1,20 @@
 #pragma once
 #include"MathFunction.h"
+#include "DrawFunction.h"
 #include"Object3D.h"
 #include "Model.h"
 #include "Camera.h"
 #include <memory>
 
+
+// 速さの段階
+enum class SpeedStage
+{
+    kSlow,
+    kNormal,
+    kFast,
+    kMax
+};
 
 class Player
 {
@@ -52,7 +62,14 @@ private:
 
     // 加速フラグ
     bool isAcceleration_ = false;
- 
+
+    // 現在の速度段階
+    SpeedStage currentSpeedStage_ = SpeedStage::kNormal;
+
+    // 当たり判定サイズ
+    static inline float kWidth;
+    static inline float kHeight;
+
 public:
     // 初期化
     void Initialize(Object3d* model, Camera* camera, const Vector3& position);
@@ -68,6 +85,16 @@ public:
     void MoveCamera();
     // ドリフト
     void Drift();
+    // 速度の段階を決定
+    void DetermineSpeedStage();
+    // 速度の段階を取得
+    SpeedStage GetSpeedStage() const { return currentSpeedStage_; }
+    // ワールド座標の取得
+    Vector3 GetWorldPosition();
+    // AABBを取得
+    AABB GetAABB();
+    // 衝突応答
+    void OnCollision(const Player* player);
     // コンストラクタとデストラクタ
     Player() = default;
     ~Player();

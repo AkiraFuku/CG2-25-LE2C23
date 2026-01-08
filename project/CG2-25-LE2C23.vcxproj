@@ -55,6 +55,8 @@
     <ClCompile Include="engine\scene\Scene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="ObstacleSlow.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneFactory.cpp" />
   </ItemGroup>
@@ -126,6 +128,8 @@
     <ClInclude Include="engine\scene\Scene.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
+    <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="ObstacleSlow.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SceneFactory.h" />
   </ItemGroup>
