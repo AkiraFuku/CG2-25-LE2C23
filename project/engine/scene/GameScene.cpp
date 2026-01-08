@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
+#include "Player.h"
+
 void GameScene::Initialize() {
 
     camera = std::make_unique<Camera>();
@@ -51,6 +53,14 @@ void GameScene::Initialize() {
     object3d->SetModel("plane.obj");
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
    emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
+
+   // プレイヤーの初期化
+  /* player_ = std::make_unique<Player>();
+   player_->Initialize(&playerModel_, &camera, Vector3{ 0.0f,0.0f,0.0f });
+   playerModel_ = std::make_unique<Object3d>();
+   playerModel_->SetTranslate(Vector3{ 0.0f,0.0f,0.0f });
+   playerModel_->SetModel("axis.obj");
+   playerModel_->Initialize();*/
 }
 void GameScene::Finalize() {
 
@@ -114,6 +124,9 @@ void GameScene::Update() {
     object3d->Update();
     object3d2->Update();
 
+    // プレイヤーの更新処理
+    //player_->Update();
+
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
@@ -134,6 +147,10 @@ void GameScene::Draw() {
     object3d2->Draw();
     object3d->Draw();
     ParticleManager::GetInstance()->Draw();
+
+    // プレイヤーの描画処理
+   // player_->Draw();
+
     ///////スプライトの描画
     sprite->Draw();
 }

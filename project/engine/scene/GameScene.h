@@ -9,6 +9,8 @@
 #include "TextureManager.h"
 #include "Scene.h"
 #include <memory>
+#include "Player.h"
+
 class GameScene :public Scene
 {
 public:
@@ -23,5 +25,10 @@ private:
     std::unique_ptr<Object3d> object3d;
     std::unique_ptr<ParicleEmitter> emitter;
     Audio::SoundData soundData1;
+
+    // 自キャラ
+    std::unique_ptr<Player> player_;
+    // プレイヤーのモデル
+    std::unique_ptr<Object3d> playerModel_;
 };
 
