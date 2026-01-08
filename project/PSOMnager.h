@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 
+struct IDxcBlob;
 // パイプラインの種類
 enum class PipelineType {
     Sprite,     // 2Dスプライト
@@ -30,8 +31,8 @@ struct PsoProperty {
 // ハッシュ関数
 struct PsoPropertyHasher {
     std::size_t operator()(const PsoProperty& p) const {
-        return std::hash<int>()(static_cast<int>(p.type)) ^ 
-               (std::hash<int>()(static_cast<int>(p.blendMode)) << 1);
+        return std::hash<int>()(static_cast<int>(p.type)) ^
+            (std::hash<int>()(static_cast<int>(p.blendMode)) << 1);
     }
 };
 
@@ -66,13 +67,23 @@ private:
     // ブレンド設定ヘルパー
     D3D12_BLEND_DESC CreateBlendDesc(BlendMode mode);
 
+    std::vector<D3D12_INPUT_ELEMENT_DESC> GetInputLayout(PipelineType type);
+
+    void EnsureShaders(PipelineType type, Microsoft::WRL::ComPtr<IDxcBlob>& outVS, Microsoft::WRL::ComPtr<IDxcBlob>& outPS);
+    
     static std::unique_ptr<PSOMnager> instance_;
 
     // キャッシュ
     // PSOは「タイプ×ブレンド」で管理
     std::unordered_map<PsoProperty, PsoSet, PsoPropertyHasher> psoCache_;
-    
+
     // RootSignatureは「タイプ」だけで管理（ブレンド違っても使い回すため）
     std::unordered_map<PipelineType, Microsoft::WRL::ComPtr<ID3D12RootSignature>> rootSignatureCache_;
+
+    struct ShaderSet {
+        Microsoft::WRL::ComPtr<IDxcBlob> vs;
+        Microsoft::WRL::ComPtr<IDxcBlob> ps;
+    };
+    std::unordered_map<PipelineType, ShaderSet> shaderCache_;
 };
 
