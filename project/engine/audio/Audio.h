@@ -21,9 +21,14 @@ public:
         WAVEFORMATEX wfex;
         std::vector<BYTE> buffer;
     };
+    // 再生中のボイス構造体 
+    struct Voice {
+        uint32_t handle;
+        IXAudio2SourceVoice* sourceVoice;
+    };
 
     static Audio* GetInstance();
-       friend struct std::default_delete<Audio>;
+    friend struct std::default_delete<Audio>;
     void Initialize();
     void Finalize();
 
@@ -33,13 +38,20 @@ public:
 
     // 音声データの解放
     void UnloadAudio(SoundHandle soundHandle);
-
+    void Update();
     // 音声再生
     // handle: LoadWaveで取得したハンドル
     // loop: ループ再生するか
     // volume: 音量 (0.0f ~ 1.0f以上)
     void PlayAudio(SoundHandle soundHandle, bool loop = false, float volume = 1.0f);
-
+    // 停止（Voiceを破棄します）
+    void StopAudio(SoundHandle voiceHandle);
+    // 一時停止（メモリには残ります） 
+    void PauseAudio(SoundHandle voiceHandle);
+    // 再開
+    void ResumeAudio(SoundHandle voiceHandle);
+    // 再生中かどうか判定 
+    bool IsPlaying(SoundHandle voiceHandle);
 private:
     Audio() = default;
     ~Audio() = default;
@@ -51,12 +63,12 @@ private:
 
     // ハンドルと音声データの紐づけ管理
     std::map<SoundHandle, SoundData> soundDatas_;
-    
+
     // 次に割り当てるハンドルの番号
     SoundHandle nextHandle_ = 0u;
 
-    // 再生中のVoiceリスト（リーク対策用・簡易版）
-    std::vector<IXAudio2SourceVoice*> activeVoices_;
+    std::vector<Voice> activeVoices_;
+    uint32_t nextVoiceHandle_ = 0;
 
     static std::unique_ptr<Audio> instance;
 };

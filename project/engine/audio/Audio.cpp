@@ -44,8 +44,16 @@ void Audio::Initialize()
 void Audio::Finalize()
 {
     // 再生中のボイスを破棄
-    for (auto* voice : activeVoices_) {
-        if (voice) voice->DestroyVoice();
+  // 再生中のボイスをすべて破棄
+    for (auto& voice : activeVoices_)
+    {
+        if (voice.sourceVoice)
+        {
+            voice.sourceVoice->Stop();
+            voice.sourceVoice->FlushSourceBuffers();
+            voice.sourceVoice->DestroyVoice();
+            voice.sourceVoice = nullptr;
+        }
     }
     activeVoices_.clear();
 
@@ -58,6 +66,24 @@ void Audio::Finalize()
     xAudio2_.Reset();
     soundDatas_.clear(); // データ解放
     MFShutdown();
+}
+void Audio::Update()
+{
+    for (auto it = activeVoices_.begin(); it != activeVoices_.end(); )
+    {
+        XAUDIO2_VOICE_STATE state{};
+        it->sourceVoice->GetState(&state);
+
+        if (state.BuffersQueued == 0)
+        {
+            it->sourceVoice->DestroyVoice();
+            it = activeVoices_.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 // 読み込み：ハンドルを返す形に変更
@@ -161,5 +187,67 @@ void Audio::PlayAudio(SoundHandle soundHandle, bool loop, float volume)
     result = pSourceVoice->SubmitSourceBuffer(&buf);
     result = pSourceVoice->Start();
 
-    activeVoices_.push_back(pSourceVoice);
+  // Voice登録
+    Voice voice{};
+    voice.handle = nextVoiceHandle_++;
+    voice.sourceVoice = pSourceVoice;
+    activeVoices_.push_back(voice);
 }
+
+void Audio::StopAudio(SoundHandle voiceHandle)
+{
+    auto it = std::find_if(
+        activeVoices_.begin(), activeVoices_.end(),
+        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
+    );
+
+    if (it != activeVoices_.end())
+    {
+        it->sourceVoice->Stop();
+        it->sourceVoice->FlushSourceBuffers();
+        it->sourceVoice->DestroyVoice();
+        activeVoices_.erase(it);
+    }
+}
+
+void Audio::PauseAudio(SoundHandle voiceHandle)
+{
+      auto it = std::find_if(
+        activeVoices_.begin(), activeVoices_.end(),
+        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
+    );
+
+    if (it != activeVoices_.end())
+    {
+        it->sourceVoice->Stop();
+    }
+}
+
+void Audio::ResumeAudio(SoundHandle voiceHandle)
+{
+       auto it = std::find_if(
+        activeVoices_.begin(), activeVoices_.end(),
+        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
+    );
+
+    if (it != activeVoices_.end())
+    {
+        it->sourceVoice->Start();
+    }
+}
+
+bool Audio::IsPlaying(SoundHandle voiceHandle)
+{
+ auto it = std::find_if(
+        activeVoices_.begin(), activeVoices_.end(),
+        [voiceHandle](const Voice& v) { return v.handle == voiceHandle; }
+    );
+
+    if (it != activeVoices_.end())
+    {
+        XAUDIO2_VOICE_STATE state{};
+        it->sourceVoice->GetState(&state);
+        return state.BuffersQueued > 0;
+    }
+
+    return false;}

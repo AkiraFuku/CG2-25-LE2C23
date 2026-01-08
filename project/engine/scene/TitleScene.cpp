@@ -69,7 +69,11 @@ void TitleScene::Update() {
 
         // Aボタンを押したときの処理
 
-
+        if (Audio::GetInstance()->IsPlaying(handle_))
+        {
+            
+            Audio::GetInstance()->StopAudio(handle_);
+        }
 
         GetSceneManager()->ChangeScene("GameScene");
 

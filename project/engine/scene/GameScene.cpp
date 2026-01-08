@@ -14,7 +14,7 @@ void GameScene::Initialize() {
 
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(handle_);
+    Audio::GetInstance()->PlayAudio(handle_,true);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -40,7 +40,7 @@ void GameScene::Initialize() {
    // object3d の初期化
     object3d2 = std::make_unique<Object3d>();
     object3d2->Initialize();
-    
+
     object3d = std::make_unique<Object3d>();
     object3d->Initialize();
 
@@ -50,7 +50,7 @@ void GameScene::Initialize() {
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-   emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
+    emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }
 void GameScene::Finalize() {
 
@@ -98,7 +98,21 @@ void GameScene::Update() {
     }
     if (Input::GetInstance()->TriggerMouseDown(0))
     {
-        Audio::GetInstance()->PlayAudio(handle_);
+        if (!Audio::GetInstance()->IsPlaying(handle_))
+        {
+            Audio::GetInstance()->PlayAudio(handle_);
+        }
+
+    }
+    if (Input::GetInstance()->TriggerMouseDown(2))
+    {
+      if (!Audio::GetInstance()->IsPlaying(handle_))
+        {
+            Audio::GetInstance()->ResumeAudio(handle_);
+      } else
+      {
+           Audio::GetInstance()->PauseAudio(handle_);
+      }
     }
     if (Input::GetInstance()->GetJoyStick(0, state))
     {
