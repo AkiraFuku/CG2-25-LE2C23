@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include <cassert>
 #include "DXCommon.h"
+
 // 静的メンバ変数の初期化
 std::unique_ptr<SpriteCommon> SpriteCommon::instance = nullptr;
 

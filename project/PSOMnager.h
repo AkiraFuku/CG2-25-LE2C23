@@ -44,6 +44,7 @@ class PSOMnager
 {
 public:
     static PSOMnager* GetInstance();
+    friend struct std::default_delete<PSOMnager>;
     void Initialize();
     void Finalize();
 

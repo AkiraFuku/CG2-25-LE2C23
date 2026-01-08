@@ -175,8 +175,8 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = rootSignatureCache_[property.type];
 
     // 2. シェーダーとInputLayoutの準備
-    Microsoft::WRL::ComPtr<ID3DBlob> vsBlob;
-    Microsoft::WRL::ComPtr<ID3DBlob> psBlob;
+    Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
+    Microsoft::WRL::ComPtr<IDxcBlob> psBlob;
     std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
     D3D12_RASTERIZER_DESC rasterizerDesc{};
 
