@@ -16,13 +16,6 @@ ImGuiManager* ImGuiManager::GetInstance() {
 
 void ImGuiManager::Initialize() {
     #ifdef USE_IMGUI
-
-   
-   
-  
-
-  
-
     ImGui::CreateContext();
     ImGui::GetIO().IniFilename = "externals/imgui/my_imgui_settings.ini";
     ImGui::StyleColorsDark();

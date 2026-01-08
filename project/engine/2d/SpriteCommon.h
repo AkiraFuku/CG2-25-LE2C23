@@ -2,7 +2,6 @@
 #include "d3d12.h"
 #include <wrl/client.h>
 #include <cstdint>
-
 #include <memory>
 class SpriteCommon
 {

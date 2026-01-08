@@ -4,6 +4,7 @@
 #include "SrvManager.h"
 #include "MathFunction.h"
 #include <numbers>
+#include "PSOManager.h"
 #pragma once
  std::unique_ptr<ParticleManager>  ParticleManager::instance;
 uint32_t ParticleManager::kMaxNumInstance = 1024;
