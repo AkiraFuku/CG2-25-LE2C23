@@ -5,12 +5,14 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 #include "Player.h"
+#include "ObstacleSlow.h"
 
 // コンストラクタ
 GameScene::GameScene() = default;
 
 // デストラクタ
 GameScene::~GameScene() = default;
+
 
 void GameScene::Initialize() {
 
@@ -67,6 +69,14 @@ void GameScene::Initialize() {
    playerModel_->SetModel("cube.obj");
    playerModel_->Initialize();
    player_->Initialize(playerModel_.get(), camera.get(), Vector3{ 0.0f, 0.0f, 0.0f });
+
+   // 障害物の初期化
+   obstacleSlow_ = std::make_unique<ObstacleSlow>();
+   obstacleSlowModel_ = std::make_unique<Object3d>();
+   obstacleSlowModel_->SetTranslate(Vector3{ 0.0f,0.0f, 0.0f });
+   obstacleSlowModel_->SetModel("cube.obj");
+   obstacleSlowModel_->Initialize();
+   obstacleSlow_->Initialize(obstacleSlowModel_.get(), camera.get(), Vector3{ 0.0f, 0.0f, 40.0f });
 }
 void GameScene::Finalize() {
 
@@ -133,6 +143,13 @@ void GameScene::Update() {
     // プレイヤーの更新処理
     player_->Update();
 
+    // 障害物の更新処理
+    obstacleSlow_->Update();
+
+    // 全ての当たり判定を行う
+    CheckAllCollisions();
+
+
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
@@ -157,6 +174,40 @@ void GameScene::Draw() {
     // プレイヤーの描画処理
     player_->Draw();
 
+    // 障害物の描画処理
+    obstacleSlow_->Draw();
+
     ///////スプライトの描画
     //sprite->Draw();
+}
+
+void GameScene::CheckAllCollisions()
+{
+#pragma region 自キャラと障害物(ゆっくり)の当たり判定
+    // 判定対象1と2の座標
+    AABB aabb1, aabb2;
+
+    // 自キャラの座標
+    aabb1 = player_->GetAABB();
+
+    // 障害物(ゆっくり)の座標
+    aabb2 = obstacleSlow_->GetAABB();
+
+    // 当たり判定
+    if (isCollision(aabb1, aabb2))
+    {
+        // 衝突応答
+        obstacleSlow_->OnCollision(player_.get());
+    }
+
+#pragma endregion
+}
+
+bool GameScene::isCollision(const AABB& aabb1, const AABB& aabb2)
+{
+    if (aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x && aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y && aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z) {
+        return true;
+    }
+
+    return false;
 }

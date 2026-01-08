@@ -146,6 +146,9 @@ void Player::Drift()
                 // 最大速度を越さないよう調整
                 topSpeedZ_ = kMaxSpeedZ;
             }
+
+            // 速度の段階を決定
+            DetermineSpeedStage();
         }
         else
         {
@@ -157,6 +160,46 @@ void Player::Drift()
 
     }
 
+}
+
+void Player::DetermineSpeedStage()
+{
+    if (speedZ_ < 0.2f)
+    {
+        currentSpeedStage_ = SpeedStage::kSlow;
+    }
+    else if (speedZ_ < 0.4f)
+    {
+        currentSpeedStage_ = SpeedStage::kNormal;
+    }
+    else if (speedZ_ < 0.6f)
+    {
+        currentSpeedStage_ = SpeedStage::kFast;
+    }
+    else
+    {
+        currentSpeedStage_ = SpeedStage::kMax;
+    }
+}
+
+Vector3 Player::GetWorldPosition()
+{
+    // ワールド座標を入れる変数
+    Vector3 worldPos;
+    // ワールド行列の平行移動成分を取得
+    worldPos = transform_.translate;
+    return worldPos;
+}
+
+AABB Player::GetAABB()
+{
+    Vector3 worldPos = GetWorldPosition();
+    AABB aabb;
+
+    aabb.min = { worldPos.x - kWidth / 2.0f, worldPos.y - kHeight / 2.0f, worldPos.z - kWidth / 2.0f };
+    aabb.max = { worldPos.x + kWidth / 2.0f, worldPos.y + kHeight / 2.0f, worldPos.z + kWidth / 2.0f };
+
+    return aabb;
 }
 
 Player::~Player()

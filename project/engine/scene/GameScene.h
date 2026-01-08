@@ -1,5 +1,6 @@
 #pragma once
 #include"MathFunction.h"
+#include "DrawFunction.h"
 #include "Sprite.h"
 #include"Object3D.h"
 #include "Model.h"
@@ -10,6 +11,7 @@
 #include "Scene.h"
 #include <memory>
 class Player;
+class ObstacleSlow;
 
 class GameScene :public Scene
 {
@@ -21,6 +23,12 @@ public:
     void Draw()override;
     GameScene();
     ~GameScene() override;
+
+    // 全ての当たり判定を行う
+    void CheckAllCollisions();
+    // 当たり判定
+    bool isCollision(const AABB& aabb1, const AABB& aabb2);
+
 private:
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Sprite> sprite;
@@ -33,5 +41,10 @@ private:
     std::unique_ptr<Player> player_;
     // プレイヤーのモデル
     std::unique_ptr<Object3d> playerModel_;
+
+    // 障害物
+    std::unique_ptr<ObstacleSlow> obstacleSlow_;
+    // 障害物のモデル
+    std::unique_ptr<Object3d> obstacleSlowModel_;
 };
 
