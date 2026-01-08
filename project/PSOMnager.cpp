@@ -48,11 +48,11 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
 
     HRESULT hr;
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-    
+
     // 各種設定用配列
     std::vector<D3D12_ROOT_PARAMETER> rootParameters;
     std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers;
-    
+
     // 一時保管用のDescriptorRange（ポインタ保持のためスコープ外に出す）
     D3D12_DESCRIPTOR_RANGE descRangeTexture[1]{};
 
@@ -71,7 +71,7 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     // タイプごとのパラメータ設定
     if (type == PipelineType::Sprite || type == PipelineType::Object3d) {
         // SpriteCommon.cpp / Object3dCommon.cpp の構成
-        
+
         // Descriptor Range (Texture)
         descRangeTexture[0].BaseShaderRegister = 0; // t0
         descRangeTexture[0].NumDescriptors = 1;
@@ -101,12 +101,11 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
         rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
         rootParameters[3].Descriptor.ShaderRegister = 1;
 
-    } 
-    else if (type == PipelineType::Particle) {
+    } else if (type == PipelineType::Particle) {
         // ParticleManager.cpp の構成
         // ※実装に合わせて調整してください。ここではSpriteと同じ構成と仮定するか、
         // インスタンシング用のStructuredBufferがある場合は設定を変えます。
-        
+
         // とりあえずSpriteと同じ構成で実装（必要に応じて変更可能）
         descRangeTexture[0].BaseShaderRegister = 0;
         descRangeTexture[0].NumDescriptors = 1;
@@ -147,13 +146,13 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
 
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    
+
     hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
         Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
         assert(false);
     }
-    
+
     hr = DXCommon::GetInstance()->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
     assert(SUCCEEDED(hr));
 
@@ -168,30 +167,30 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
 void PSOMnager::CreatePso(const PsoProperty& property) {
     HRESULT hr;
     auto device = DXCommon::GetInstance()->GetDevice();
-
+ std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
     // 1. RootSignatureの取得（無ければ作る）
     CreateRootSignature(property.type);
     // キャッシュから取得
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = rootSignatureCache_[property.type];
-
+    assert(rootSignature != nullptr);
     // 2. シェーダーとInputLayoutの準備
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
     Microsoft::WRL::ComPtr<IDxcBlob> psBlob;
-    std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
+   
     D3D12_RASTERIZER_DESC rasterizerDesc{};
 
     if (property.type == PipelineType::Sprite) {
         vsBlob = DXCommon::GetInstance()->CompileShader(L"resources/shaders/Object3d/Object3D.vs.hlsl", L"vs_6_0");
+        assert(vsBlob != nullptr);
         psBlob = DXCommon::GetInstance()->CompileShader(L"resources/shaders/Object3d/Object3D.ps.hlsl", L"ps_6_0");
-        
+        assert(psBlob != nullptr);
         inputElements = {
             { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
             { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
             { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         };
         rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE; // Spriteはカリングなし
-    }
-    else if (property.type == PipelineType::Object3d) {
+    } else if (property.type == PipelineType::Object3d) {
         vsBlob = DXCommon::GetInstance()->CompileShader(L"resources/shaders/Object3d/Object3D.vs.hlsl", L"vs_6_0");
         psBlob = DXCommon::GetInstance()->CompileShader(L"resources/shaders/Object3d/Object3D.ps.hlsl", L"ps_6_0");
 
@@ -201,8 +200,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
             { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         };
         rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK; // 3Dは背面カリング
-    }
-    else if (property.type == PipelineType::Particle) {
+    } else if (property.type == PipelineType::Particle) {
         vsBlob = DXCommon::GetInstance()->CompileShader(L"resources/shaders/Particle/Particle.vs.hlsl", L"vs_6_0");
         psBlob = DXCommon::GetInstance()->CompileShader(L"resources/shaders/Particle/Particle.ps.hlsl", L"ps_6_0");
 
@@ -218,7 +216,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
 
     // 3. ブレンドモード設定
     D3D12_BLEND_DESC blendDesc = CreateBlendDesc(property.blendMode);
-
+    assert()
     // 4. デプス設定
     D3D12_DEPTH_STENCIL_DESC depthDesc{};
     depthDesc.DepthEnable = true;
@@ -261,18 +259,17 @@ D3D12_BLEND_DESC PSOMnager::CreateBlendDesc(BlendMode mode) {
     D3D12_BLEND_DESC blendDesc{};
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
     blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    
+
     // 簡易実装例
-    if(mode == BlendMode::None) blendDesc.RenderTarget[0].BlendEnable = FALSE;
-    else if(mode == BlendMode::Normal){
+    if (mode == BlendMode::None) blendDesc.RenderTarget[0].BlendEnable = FALSE;
+    else if (mode == BlendMode::Normal) {
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
         blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    }
-    else if(mode == BlendMode::Add){
+    } else if (mode == BlendMode::Add) {
         blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
         blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
         blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;

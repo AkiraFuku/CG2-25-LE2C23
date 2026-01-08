@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include <cassert>
 #include "DXCommon.h"
-
+#include "PSOMnager.h"
 // 静的メンバ変数の初期化
 std::unique_ptr<SpriteCommon> SpriteCommon::instance = nullptr;
 
@@ -19,8 +19,11 @@ void SpriteCommon::Finalize() {
 }
 void SpriteCommon::Initialize()
 {
-
-    CreatePSO();
+    PsoProperty pso={PipelineType::Sprite,BlendMode::Subtract};
+    PsoSet psoSet=PSOMnager::GetInstance()->GetPsoSet(pso);
+    graphicsPipelineState_=psoSet.pipelineState;
+    rootSignature_=psoSet.rootSignature;
+    //CreatePSO();
 
 }
 
