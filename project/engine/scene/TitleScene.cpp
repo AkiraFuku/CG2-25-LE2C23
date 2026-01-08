@@ -15,9 +15,9 @@ void TitleScene::Initialize() {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
-    soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
+     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(soundData1);
+    Audio::GetInstance()->PlayAudio(handle_);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 

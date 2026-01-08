@@ -12,9 +12,9 @@ void GameScene::Initialize() {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
-    soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
+    handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(soundData1);
+    Audio::GetInstance()->PlayAudio(handle_);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -95,6 +95,10 @@ void GameScene::Update() {
         camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(Input::GetInstance()->GetMouseMove().z) * 0.1f });
         camera->SetTranslate(camreaTranslate);
 
+    }
+    if (Input::GetInstance()->TriggerMouseDown(0))
+    {
+        Audio::GetInstance()->PlayAudio(handle_);
     }
     if (Input::GetInstance()->GetJoyStick(0, state))
     {

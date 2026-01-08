@@ -1,72 +1,80 @@
 #include "Audio.h"
 #include <cassert>
-#include "StringUtility.h"
+#include "StringUtility.h" // 既存の変換クラス
 #include <windows.h>
+
+// Media Foundation 関連
 #include <mfapi.h>
 #include <mfidl.h>
-
+#include <mfreadwrite.h>
 #pragma comment(lib, "mf.lib")
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfuuid.lib") 
-
-#include <mfreadwrite.h>
 #pragma comment(lib, "mfreadwrite.lib")
 
 using namespace Microsoft::WRL;
 
-std::unique_ptr<Audio> Audio::instance = nullptr;// シングルトンインスタンスの取得
+std::unique_ptr<Audio> Audio::instance = nullptr;
+
 Audio* Audio::GetInstance()
 {
-   
-   if (instance == nullptr)
+    if (instance == nullptr)
     {
-        // privateコンストラクタなので reset(new ...) を使用
         instance.reset(new Audio());
     }
     return instance.get();
 }
 
-
 void Audio::Initialize()
 {
     HRESULT result;
-    // MFの初期化
+    // MF初期化
     result = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     assert(SUCCEEDED(result));
 
-    // XAudio2の初期化
+    // XAudio2初期化
     result = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
     assert(SUCCEEDED(result));
 
-    // マスターボイスの作成
+    // マスターボイス作成
     result = xAudio2_->CreateMasteringVoice(&masteringVoice_);
     assert(SUCCEEDED(result));
 }
+
 void Audio::Finalize()
 {
-       if (masteringVoice_) {
-        masteringVoice_->DestroyVoice(); // マスターボイスの破棄
+    // 再生中のボイスを破棄
+    for (auto* voice : activeVoices_) {
+        if (voice) voice->DestroyVoice();
+    }
+    activeVoices_.clear();
+
+    // マスターボイス破棄
+    if (masteringVoice_) {
+        masteringVoice_->DestroyVoice();
         masteringVoice_ = nullptr;
     }
 
     xAudio2_.Reset();
-    SoundUnload(&soundData_); // 音声データの解放
-    
+    soundDatas_.clear(); // データ解放
     MFShutdown();
-
 }
 
-Audio::SoundData Audio::SoundLoadWave(const std::string& filename)
+// 読み込み：ハンドルを返す形に変更
+Audio::SoundHandle Audio::LoadAudio(const std::string& filename)
 {
     std::wstring filePathW = StringUtility::ConvertString(filename);
     HRESULT result;
-    
-    // MFソースリーダーの作成
+
+    // 1. ソースリーダー作成
     ComPtr<IMFSourceReader> pReader;
     result = MFCreateSourceReaderFromURL(filePathW.c_str(), nullptr, &pReader);
-    assert(SUCCEEDED(result));
+    if (FAILED(result)) {
+        assert(false && "Failed to load audio file.");
+        return -1; // エラー時は最大値を返す等の処理
+    }
 
-    // PCM形式での出力を指定   
+    // 2. メディアタイプ設定 (PCM)
     ComPtr<IMFMediaType> pPCMType;
     MFCreateMediaType(&pPCMType);
     pPCMType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
@@ -74,84 +82,84 @@ Audio::SoundData Audio::SoundLoadWave(const std::string& filename)
     result = pReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pPCMType.Get());
     assert(SUCCEEDED(result));
 
-    // セットされたメディアタイプの情報を取得
+    // 3. フォーマット取得
     ComPtr<IMFMediaType> pOutType;
     pReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pOutType);
-
-    // 波形フォーマットの取得
     WAVEFORMATEX* waveFormat = nullptr;
     MFCreateWaveFormatExFromMFMediaType(pOutType.Get(), &waveFormat, nullptr);
 
-    // 音声データの読み込み
     SoundData soundData = {};
     soundData.wfex = *waveFormat;
-    CoTaskMemFree(waveFormat); // 波形フォーマット情報の解放
+    CoTaskMemFree(waveFormat);
 
-    // PMCデータのバッファ構築
+    // 4. データ読み込みループ
     while (true)
     {
         ComPtr<IMFSample> pSample;
-        DWORD streamIndex = 0, flags = 0;
-        LONGLONG llTimeStamp = 0;
-
-        // サンプルの読み込み
+        DWORD flags = 0;
         result = pReader->ReadSample(
             (DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM,
-            0,
-            &streamIndex,
-            &flags,
-            &llTimeStamp,
-            &pSample);
+            0, nullptr, &flags, nullptr, &pSample);
 
-        // ストリームの終端に達した場合はループを抜ける
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM) break;
 
         if (pSample)
         {
             ComPtr<IMFMediaBuffer> pBuffer;
-            // サンプルからメディアバッファを取得
-            result = pSample->ConvertToContiguousBuffer(&pBuffer);
-            assert(SUCCEEDED(result));
-
-            // バッファのロック
+            pSample->ConvertToContiguousBuffer(&pBuffer);
             BYTE* pData = nullptr;
-            DWORD maxLength = 0, currentLength = 0;
-            result = pBuffer->Lock(&pData, &maxLength, &currentLength);
-            assert(SUCCEEDED(result));
-
-            // 音声データをSoundDataのバッファにコピー
+            DWORD currentLength = 0;
+            pBuffer->Lock(&pData, nullptr, &currentLength);
+            
             soundData.buffer.insert(soundData.buffer.end(), pData, pData + currentLength);
-            pBuffer->Unlock(); // バッファのアンロック
+            pBuffer->Unlock();
         }
     }
-    return soundData;
+
+    // 5. ハンドル発行と登録
+    SoundHandle handle = nextHandle_;
+    soundDatas_[handle] = soundData;
+    
+    // 次のハンドル番号を準備
+    nextHandle_++;
+
+    return handle;
 }
 
-void Audio::PlayAudio(const SoundData& soundData)
+void Audio::UnloadAudio(SoundHandle soundHandle)
 {
-    SetSoundData(soundData); // 音声データを設定
-    SoundPlayWave(xAudio2_.Get(), soundData_); // 音声の再生
+    // マップから削除（メモリ解放される）
+    soundDatas_.erase(soundHandle);
 }
 
-void Audio::SoundUnload(SoundData* soundData)
+void Audio::PlayAudio(SoundHandle soundHandle, bool loop, float volume)
 {
-    soundData->buffer.clear(); // バッファの解放
-    soundData->wfex = {}; // 波形フォーマットを初期化
-}
+    // 指定されたハンドルがマップにあるか確認
+    if (soundDatas_.find(soundHandle) == soundDatas_.end()) {
+        return; // 無効なハンドルなら何もしない
+    }
 
-void Audio::SoundPlayWave(IXAudio2* xAudio2, const SoundData& SoundData)
-{
+    // 参照でデータ取得（コピーしない）
+    const SoundData& soundData = soundDatas_[soundHandle];
+
     HRESULT result;
     IXAudio2SourceVoice* pSourceVoice = nullptr;
-    result = xAudio2->CreateSourceVoice(&pSourceVoice, &SoundData.wfex);
+    result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
     assert(SUCCEEDED(result));
 
-    // 音声データの再生
+    pSourceVoice->SetVolume(volume);
+
     XAUDIO2_BUFFER buf = {};
-    buf.AudioBytes = (UINT32)SoundData.buffer.size(); // 音声データのサイズ
-    buf.pAudioData = SoundData.buffer.data(); // 音声データへのポインタ
-    buf.Flags = XAUDIO2_END_OF_STREAM; // ストリームの終端を示すフラグ
+    buf.AudioBytes = (UINT32)soundData.buffer.size();
+    buf.pAudioData = soundData.buffer.data();
+    buf.Flags = XAUDIO2_END_OF_STREAM;
+
+    if (loop) {
+        buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+    }
 
     result = pSourceVoice->SubmitSourceBuffer(&buf);
-    result = pSourceVoice->Start(); // 音声の再生を開始
+    result = pSourceVoice->Start();
+
+    activeVoices_.push_back(pSourceVoice);
 }
