@@ -3,6 +3,7 @@
 #include "MathFunction.h"
 #include "TextureManager.h"
 #include "DXCommon.h"
+
 void Sprite::Initialize(std::string textureFilePath) {
 
 
