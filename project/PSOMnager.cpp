@@ -78,7 +78,7 @@ void PSOMnager::EnsureShaders(PipelineType type, ComPtr<IDxcBlob>& outVS, ComPtr
 
     // キャッシュに保存
     shaderCache_[type] = { vs, ps };
-    
+
     outVS = vs;
     outPS = ps;
 }
@@ -135,7 +135,9 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     rootParameters.resize(4);
 
     // ルートパラメータインデックスの可読性のため
-    enum { kMaterial, kTransform, kTexture, kLight };
+    enum {
+        kMaterial, kTransform, kTexture, kLight
+    };
 
     // 0. Material (CBV b0, Pixel)
     rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -158,7 +160,7 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     rootParameters[kLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
     rootParameters[kLight].Descriptor.ShaderRegister = 1;
 
-    
+
     // シリアライズ
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
     descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -202,10 +204,10 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     auto inputElements = GetInputLayout(property.type);
 
     // 4. Rasterizer & Depth
-    D3D12_RASTERIZER_DESC rasterizerDesc{};
+    D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-    
-    D3D12_DEPTH_STENCIL_DESC depthDesc{};
+
+    D3D12_DEPTH_STENCIL_DESC depthDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     depthDesc.DepthEnable = true;
     depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
@@ -238,14 +240,14 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     psoDesc.RasterizerState = rasterizerDesc;
     psoDesc.NumRenderTargets = 1;
     // ★注意: ここはSwapChainの形式に合わせる必要があります
-    psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; 
+    psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.DepthStencilState = depthDesc;
     psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
     PsoSet psoSet;
-    psoSet.rootSignature = rootSignature; 
+    psoSet.rootSignature = rootSignature;
     HRESULT hr = device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&psoSet.pipelineState));
     assert(SUCCEEDED(hr));
 
@@ -253,7 +255,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
 }
 
 D3D12_BLEND_DESC PSOMnager::CreateBlendDesc(BlendMode mode) {
-    D3D12_BLEND_DESC blendDesc{};
+   D3D12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
     blendDesc.RenderTarget[0].BlendEnable = TRUE;
 
