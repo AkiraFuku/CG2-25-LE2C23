@@ -136,3 +136,9 @@ Matrix4x4 MakeRotateZMatrix( float radian);
 	/// <param name="v">ベクトル</param>
 	/// <returns>正規化数</returns>
 	Vector3 Normalize(const Vector3& v);
+    /// <summary>
+    /// TransformNormal
+    /// </summary>
+    /// <param name="v">ベクトル</param>
+    /// <returns></returns>
+    Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);

@@ -9,13 +9,18 @@
 #include "TextureManager.h"
 #include "Scene.h"
 #include <memory>
+class Player;
+
 class GameScene :public Scene
 {
 public:
+   
     void Initialize() override;
     void Finalize()override;
     void Update()override;
     void Draw()override;
+    GameScene();
+    ~GameScene() override;
 private:
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Sprite> sprite;
@@ -23,5 +28,10 @@ private:
     std::unique_ptr<Object3d> object3d;
     std::unique_ptr<ParicleEmitter> emitter;
     Audio::SoundData soundData1;
+
+    // 自キャラ
+    std::unique_ptr<Player> player_;
+    // プレイヤーのモデル
+    std::unique_ptr<Object3d> playerModel_;
 };
 
