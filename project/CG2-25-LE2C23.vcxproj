@@ -55,7 +55,6 @@
     <ClCompile Include="engine\scene\Scene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
-    <ClCompile Include="PSOManager.cpp" />
     <ClCompile Include="SceneFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -126,7 +125,6 @@
     <ClInclude Include="engine\scene\Scene.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
-    <ClInclude Include="PSOManager.h" />
     <ClInclude Include="SceneFactory.h" />
   </ItemGroup>
   <ItemGroup>
