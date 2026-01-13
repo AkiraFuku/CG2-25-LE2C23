@@ -37,7 +37,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
+#include "LightManager.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
@@ -954,7 +954,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     ///ルートパラメータの設定
-    D3D12_ROOT_PARAMETER rootParameters[7]{};
+    D3D12_ROOT_PARAMETER rootParameters[5]{};
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;//シェーダーのレジスタ番号0とバインド
@@ -971,20 +971,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
     rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダーで使う
     rootParameters[3].Descriptor.ShaderRegister = 1;
-    rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
-    rootParameters[5].Descriptor.ShaderRegister = 3;                    // register(b3)
-    rootParameters[5].Descriptor.RegisterSpace = 0;                     // space0
-    rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用
+    rootParameters[3].Descriptor.RegisterSpace = 0;
+
+    //rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;    // CBVを使う
+    //rootParameters[5].Descriptor.ShaderRegister = 3;                    // register(b3)
+    //rootParameters[5].Descriptor.RegisterSpace = 0;                     // space0
+    //rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PSのみで使用
     //
     rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
     rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
     rootParameters[4].Descriptor.RegisterSpace = 0;
     rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーのみ見える
 
-    rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // Constant Buffer View
-    rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーから見える
-    rootParameters[6].Descriptor.ShaderRegister = 4; // レジスタ番号 b4
-    rootParameters[6].Descriptor.RegisterSpace = 0;  // デフォルトスペース
+    //rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // Constant Buffer View
+    //rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーから見える
+    //rootParameters[6].Descriptor.ShaderRegister = 4; // レジスタ番号 b4
+    //rootParameters[6].Descriptor.RegisterSpace = 0;  // デフォルトスペース
     descriptionRootSignatur.pParameters = rootParameters;//ルートパラメータの設定
     descriptionRootSignatur.NumParameters = _countof(rootParameters);//ルートパラメータの数
 
@@ -1601,6 +1603,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     pointLightData->radius = 1.0f;
     pointLightData->decay = 0.1f;
 
+    std::unique_ptr<LightManager> lightManager = std::make_unique<LightManager>();
+
+// 初期化（定数バッファの生成など）
+lightManager->Initialize(device.Get());
+
 
 
     BYTE preKey[256] = {};
@@ -1640,8 +1647,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ///////
             ///Update
             ///////
-
-           // 
+           
 
             if (isPushKeyDown(key[DIK_A], preKey[DIK_A]))
             {
@@ -1655,6 +1661,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             // ImGui::ShowDemoWindow();
 
+            lightManager->SetDirectionalLight(0,*directionalLightData);
+lightManager->SetPointLight(0,*pointLightData);
+lightManager->SetSpotLight(0,*spotLightData);
 
             ImGui::Begin("MaterialData");
             ImGui::DragFloat3("Camera Transrate", &(cameraTransform.traslate.x));
@@ -1830,18 +1839,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             ///
             commandList->SetGraphicsRootDescriptorTable(2, useMonstorBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
             // 追加: 平行光源CBVをバインド
-            commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());
+           /* commandList->SetGraphicsRootConstantBufferView(3, directionalLightResourse.Get()->GetGPUVirtualAddress());*/
             //
+            lightManager->TransferBuffer();
+            lightManager->SetGraphicsRootConstantBufferView(commandList.Get(),3);
             commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
-            commandList->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
-            //描画コマンド
-          /*  commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
-            commandList->DrawIndexedInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0, 0);*/
+
+            //commandList->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+            //commandList->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
+            ////描画コマンド
+            commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
+            commandList->DrawIndexedInstanced(6 * kSubdivision * kSubdivision, 1, 0, 0, 0);
             //   commandList->DrawIndexedInstanced(6*kSubdivision*kSubdivision, 1, 0, 0,0);
             commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
             commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-            commandList->SetGraphicsRootConstantBufferView(4, spotLightResource->GetGPUVirtualAddress());
+       /*     commandList->SetGraphicsRootConstantBufferView(4, spotLightResource->GetGPUVirtualAddress());*/
             ///
             barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

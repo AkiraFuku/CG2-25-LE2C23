@@ -1,5 +1,8 @@
 #include "Object3d.hlsli"
 
+#define MAX_DIR_LIGHTS 3
+#define MAX_POINT_LIGHTS 3
+#define MAX_SPOT_LIGHTS 3
 struct Material
 {
     float4 Color;
@@ -44,12 +47,22 @@ struct Camera
 {
     float3 worldPosition;
 };
-
+struct LightGroup
+{
+    DirectionalLight dirLights[MAX_DIR_LIGHTS];
+    PointLight pointLights[MAX_POINT_LIGHTS];
+    SpotLight spotLights[MAX_SPOT_LIGHTS];
+    int numDirLights; // 有効なライト数
+    int numPointLights;
+    int numSpotLights;
+    float padding; // アライメント調整
+};
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<Material> gMaterial : register(b0);
-ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
-ConstantBuffer<PointLight> gPointLight : register(b3);
-ConstantBuffer<SpotLight> gSpotLight : register(b4);
+ConstantBuffer<LightGroup> gLights : register(b1);
+//ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
+//ConstantBuffer<PointLight> gPointLight : register(b3);
+//ConstantBuffer<SpotLight> gSpotLight : register(b4);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -121,56 +134,62 @@ PixelShaderOutput main(VertexShaderOutput input)
     // -----------------------------------------------------------
     // Directional Light の計算
     // -----------------------------------------------------------
-    float3 L_dir = normalize(-gDirectionalLight.direction); // 光源への方向
-    finalLighting += CalculateLight(N, L_dir, V, gDirectionalLight.color.rgb, gDirectionalLight.intensity);
-
+    for (int i = 0; i < gLights.numDirLights; i++)
+    {
+    
+        float3 L_dir = normalize(gLights.dirLights[i].direction); // 光源への方向
+        finalLighting += CalculateLight(N, L_dir, V, gLights.dirLights[i].color.rgb, gLights.dirLights[i].intensity);
+    }
     // -----------------------------------------------------------
     // Point Light の計算 (減衰なし)
     // -----------------------------------------------------------
     // 頂点位置からライト位置へのベクトル
-    
-    float3 directionToPointLight = gPointLight.position - input.worldPosition;
+    for (int i = 0;i < gLights.numPointLights; i++)
+    {
+        float3 directionToPointLight = gLights.pointLights[i].position - input.worldPosition;
     // 距離による減衰は計算せず、正規化して方向だけ使う
-    float3 L_point = normalize(directionToPointLight);
-    float distance = length(directionToPointLight);
-    float factor = pow(saturate(-distance/gPointLight.radius+1.0f),gPointLight.decay);
-    finalLighting += CalculateLight(N, L_point, V, gPointLight.color.rgb, gPointLight.intensity*factor);
-
+        float3 L_point = normalize(directionToPointLight);
+        float distance = length(directionToPointLight);
+        float factor = pow(saturate(-distance / gLights.pointLights[i].radius + 1.0f), gLights.pointLights[i].decay);
+        finalLighting += CalculateLight(N, L_point, V, gLights.pointLights[i].color.rgb, gLights.pointLights[i].intensity * factor);
+    }
     // -----------------------------------------------------------
     // Spot Light の計算
     // -----------------------------------------------------------
+    for (int i= 0; i < gLights.numSpotLights; i++)
+    {
     // 1. 光源への方向ベクトルと距離を計算
-    float3 directionToSpotLight =  input.worldPosition -gSpotLight.position;
-    float distanceSpot = length(directionToSpotLight);
-    float3 L_spot = normalize(directionToSpotLight); // 光源方向 (単位ベクトル)
-
+        float3 directionToSpotLight = input.worldPosition - gLights.spotLights[i].position;
+        float distanceSpot = length(directionToSpotLight);
+        float3 L_spot = normalize(directionToSpotLight); // 光源方向 (単位ベクトル)
+   
     // 2. 距離による減衰 (Falloff)
     // PointLightと同じく、指定距離(distance)で強度が0になるよう計算
-    float distFactor = pow(saturate(-distanceSpot / gSpotLight.distance + 1.0f), gSpotLight.decay);
+        float distFactor = pow(saturate(-distanceSpot / gLights.spotLights[i].distance + 1.0f), gLights.spotLights[i].decay);
 
     // 3. 角度による減衰 (Cone Falloff)
     // ライトの向き(direction)と、現在地点への方向(-L_sp
     // 表面からライトへのベクトル(L_spot) と ライトの照射方向(spotDirection) の「逆向き」の内積をとる
     // これにより、ライトの正面方向とのズレ(cosθ)が求まる
-    float cosAngle = dot(L_spot, gSpotLight.direction);
+        float cosAngle = dot(L_spot, gLights.spotLights[i].direction);
 
     // 指定された角度(cosAngle)を下回ったら0、中心(1.0)なら1になるように補間
     // (cosTheta - 閾値) / (1.0 - 閾値) で正規化して saturate
     // 1. 差分を計算
-    float cosDiff = gSpotLight.cosFalloffStart - gSpotLight.cosAngle;
+        float cosDiff = gLights.spotLights[i].cosFalloffStart - gLights.spotLights[i].cosAngle;
 
 // 2. 差分が 0.0001 未満にならないように max 関数でガードする (0除算回避)
 // これにより、値が揃ってしまっても分母は最低でも 0.0001 が保証されます
-    float range = max(cosDiff, 0.0001f);
-    float angleFactor = saturate((cosAngle - gSpotLight.cosAngle) / range);
+        float range = max(cosDiff, 0.0001f);
+        float angleFactor = saturate((cosAngle - gLights.spotLights[i].cosAngle) / range);
     
     // ※もし「境界ぼかし」なしでくっきり切りたい場合は以下を使用:
     // float angleFactor = step(gSpotLight.cosAngle, cosAngle);
 
     // 4. ライティング計算と合成
     // 距離減衰 * 角度減衰 をライト強度(intensity)に乗算して渡す
-    finalLighting += CalculateLight(N, L_spot, V, gSpotLight.color.rgb, gSpotLight.intensity * distFactor * angleFactor);
-    
+        finalLighting += CalculateLight(N, L_spot, V, gLights.spotLights[i].color.rgb, gLights.spotLights[i].intensity * distFactor * angleFactor);
+    }
     
     // -----------------------------------------------------------
     // 結果の合成

@@ -6,7 +6,6 @@ struct TransformationMatrix{
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
 
-
 //
 struct VertexShaderInput{ 
 

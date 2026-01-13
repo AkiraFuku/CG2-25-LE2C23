@@ -2,7 +2,10 @@
 #include <vector>
 #include <string>
 
-
+// ライトの最大数（HLSLと合わせる）
+const int MAX_DIR_LIGHTS = 3;
+const int MAX_POINT_LIGHTS = 3;
+const int MAX_SPOT_LIGHTS = 3;
 struct Vector4 {
     float x;
     float y;
@@ -75,6 +78,15 @@ struct SpotLight {
     float cosAngle;
     float cosFalloffStart;
     float padding;
+};
+struct LightGroupData {
+    DirectionalLight dirLights[MAX_DIR_LIGHTS];
+    PointLight pointLights[MAX_POINT_LIGHTS];
+    SpotLight spotLights[MAX_SPOT_LIGHTS];
+    int32_t numDirLights;
+    int32_t numPointLights;
+    int32_t numSpotLights;
+    float padding; // アライメント用
 };
 struct MaterialData
 {
