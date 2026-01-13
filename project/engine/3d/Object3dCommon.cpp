@@ -16,14 +16,14 @@ void Object3dCommon::Finalize() {
   instance.reset(); // 解放
 }
 void Object3dCommon::Initialize()
-{/*
+{
        PsoProperty pso={PipelineType::Object3d,BlendMode::None};
     PsoSet psoset=PSOMnager::GetInstance()->GetPsoSet(pso);
     graphicsPipelineState_=psoset.pipelineState;
-    rootSignature_=psoset.rootSignature;*/
+    rootSignature_=psoset.rootSignature;
 
     
-    CreatePSO();
+ //   CreatePSO();
 }
 void Object3dCommon::Object3dCommonDraw()
 {

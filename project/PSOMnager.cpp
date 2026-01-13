@@ -226,11 +226,11 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     // タイプごとの設定微調整
     switch (property.type) {
     case PipelineType::Sprite:
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE; // 2Dはカリングしないことが多い
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK; // 2Dはカリングしないことが多い
         depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         break;
     case PipelineType::Object3d:
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
         depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         break;
     case PipelineType::Particle:
