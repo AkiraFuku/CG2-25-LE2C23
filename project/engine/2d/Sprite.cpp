@@ -3,15 +3,16 @@
 #include "MathFunction.h"
 #include "TextureManager.h"
 #include "DXCommon.h"
+
 void Sprite::Initialize(std::string textureFilePath) {
 
 
 
     vertexResourse_ =
-       DXCommon::GetInstance()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * 4);
     indexResource_ =
-       DXCommon::GetInstance()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(uint32_t) * 6);
     vertexBufferView_.BufferLocation =
         vertexResourse_.Get()->GetGPUVirtualAddress();
@@ -38,7 +39,7 @@ void Sprite::Initialize(std::string textureFilePath) {
     materialData_->uvTransform = Makeidetity4x4();
     //座標変換
     transformationMatrixResourse_ =
-       DXCommon::GetInstance()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResourse_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
@@ -119,8 +120,14 @@ void Sprite::Update() {
 void Sprite::Draw()
 {
     SpriteCommon::GetInstance()->SpriteCommonDraw();
+    // Object3d用のパイプラインタイプと、自身のブレンドモードを指定
+    PsoProperty psoProp = { PipelineType::Sprite, blendMode_ };
+    PsoSet psoSet = PSOMnager::GetInstance()->GetPsoSet(psoProp);
+
+    // PSOをセット
+    DXCommon::GetInstance()->GetCommandList()->SetPipelineState(psoSet.pipelineState.Get());
     //パイプラインステートとルートシグネチャの設定
-   DXCommon::GetInstance()->
+    DXCommon::GetInstance()->
         GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
     //インデックスバッファの設定
     DXCommon::GetInstance()->
@@ -136,11 +143,11 @@ void Sprite::Draw()
             TextureManager::GetInstance()->GetSrvHundleGPU(textureIndex_));
 
     //座標変換行列の設定
-     DXCommon::GetInstance()->
+    DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_->GetGPUVirtualAddress());
 
-     DXCommon::GetInstance()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+    DXCommon::GetInstance()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Sprite::SetTextureByFilePath(const std::string& textureFilePath)

@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
+#include "PSOMnager.h"
 void GameScene::Initialize() {
 
     camera = std::make_unique<Camera>();
@@ -49,6 +50,7 @@ void GameScene::Initialize() {
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
+    object3d->SetBlendMode(BlendMode::Add);
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }

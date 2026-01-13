@@ -5,7 +5,7 @@
 #include "GameScene.h"
 #include "SceneManager.h"
 #include "ParticleManager.h"//フレームワークに移植
-
+#include "PSOMnager.h"
 
 void TitleScene::Initialize() {
 
@@ -32,7 +32,7 @@ void TitleScene::Initialize() {
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
     // sprite->SetSize(Vector2{ 100.0f,100.0f });
     //sprites.push_back(sprite);
-
+   // sprite->SetBlendMode(BlendMode::Add);
     sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
 
     //}

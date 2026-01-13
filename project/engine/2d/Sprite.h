@@ -5,7 +5,7 @@
 #include <d3d12.h>
 #include<string>
 
-class SpriteCommon;
+#include "PSOMnager.h"
 class Sprite
 {
 public:
@@ -100,13 +100,18 @@ public:
     void SetTextureSize(const Vector2& textureSize) {
         this->textureSize = textureSize;
     }
-
+    void SetBlendMode(BlendMode blendMode) {
+        blendMode_ = blendMode;
+    }
+    BlendMode GetBlendMode() const {
+        return blendMode_;
+    }
     //テクスチャ変更
     void SetTextureByFilePath(const std::string& textureFilePath);
 
 private:
     void AdjustTextureSize();
-
+    BlendMode blendMode_ = BlendMode::Normal;
 private:
     
 
