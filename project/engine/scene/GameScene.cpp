@@ -346,7 +346,7 @@ void GameScene::GenerateFieldObjects()
                 playerModel_->SetTranslate(pos);
                 playerModel_->SetModel("cube.obj");
                 playerModel_->Initialize();
-                player_->Initialize(playerModel_.get(), camera.get(), Vector3{ 0.0f, 0.0f, 0.0f });
+                player_->Initialize(playerModel_.get(), camera.get(), pos);
 
             }
             break;
