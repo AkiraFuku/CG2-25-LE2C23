@@ -24,8 +24,8 @@ enum class FillMode {
 // PSO取得用キー
 struct PsoProperty {
     PipelineType type;
-    BlendMode blendMode;
-    FillMode fillMode;
+    BlendMode blendMode=BlendMode::None;
+    FillMode fillMode=FillMode::kSolid;
 
     bool operator==(const PsoProperty& other) const {
         return type == other.type && blendMode == other.blendMode;

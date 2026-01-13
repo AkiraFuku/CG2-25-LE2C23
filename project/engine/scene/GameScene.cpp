@@ -51,6 +51,7 @@ void GameScene::Initialize() {
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
     object3d->SetBlendMode(BlendMode::Add);
+    object3d->SetFillMode(FillMode::kWireFrame);
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }
