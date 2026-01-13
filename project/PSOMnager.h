@@ -67,7 +67,7 @@ private:
     // ブレンド設定ヘルパー
     D3D12_BLEND_DESC CreateBlendDesc(BlendMode mode);
 
-    std::vector<D3D12_INPUT_ELEMENT_DESC> GetInputLayout(PipelineType type);
+  
 
     void EnsureShaders(PipelineType type, Microsoft::WRL::ComPtr<IDxcBlob>& outVS, Microsoft::WRL::ComPtr<IDxcBlob>& outPS);
     

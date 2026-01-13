@@ -86,19 +86,7 @@ void PSOMnager::EnsureShaders(PipelineType type, ComPtr<IDxcBlob>& outVS, ComPtr
 // -------------------------------------------------------------------------
 // InputLayout 取得
 // -------------------------------------------------------------------------
-std::vector<D3D12_INPUT_ELEMENT_DESC> PSOMnager::GetInputLayout(PipelineType type) {
-    std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements;
 
-    if (type == PipelineType::Sprite || type == PipelineType::Object3d || type == PipelineType::Particle) {
-        // 現状すべて同じレイアウトを使用している
-        inputElements = {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        };
-    }
-    return inputElements;
-}
 
 // -------------------------------------------------------------------------
 // RootSignature 生成
@@ -195,20 +183,44 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     CreateRootSignature(property.type);
     auto rootSignature = rootSignatureCache_[property.type];
 
+     //InputLayoutの設定
+    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+    inputElementDescs[0].SemanticName = "POSITION";
+    inputElementDescs[0].SemanticIndex = 0;
+    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+    //
+    inputElementDescs[1].SemanticName = "TEXCOORD";
+    inputElementDescs[1].SemanticIndex = 0;
+    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+    //
+    inputElementDescs[2].SemanticName = "NORMAL";
+    inputElementDescs[2].SemanticIndex = 0;
+    inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+    inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+      D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+    inputLayoutDesc.pInputElementDescs = inputElementDescs;
+    inputLayoutDesc.NumElements = _countof(inputElementDescs);
+
+  
     // 2. Shader (キャッシュ対応版)
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
     EnsureShaders(property.type, vsBlob, psBlob);
 
-    // 3. InputLayout
-    auto inputElements = GetInputLayout(property.type);
+   
 
     // 4. Rasterizer & Depth
     D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
-    D3D12_DEPTH_STENCIL_DESC depthDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-    depthDesc.DepthEnable = true;
+    D3D12_DEPTH_STENCIL_DESC depthDesc {};
+    depthDesc.DepthEnable = false;
+    //書き込み
+    depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    //比較関数
     depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
     // タイプごとの設定微調整
@@ -233,7 +245,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     // 6. PSO構築
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
     psoDesc.pRootSignature = rootSignature.Get();
-    psoDesc.InputLayout = { inputElements.data(), (UINT)inputElements.size() };
+    psoDesc.InputLayout = inputLayoutDesc;
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
     psoDesc.BlendState = blendDesc;
@@ -245,6 +257,10 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     psoDesc.SampleDesc.Count = 1;
     psoDesc.DepthStencilState = depthDesc;
     psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+      //カラー
+    psoDesc.SampleDesc.Count = 1;
+    psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
     PsoSet psoSet;
     psoSet.rootSignature = rootSignature;
