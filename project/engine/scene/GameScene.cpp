@@ -75,6 +75,12 @@ void GameScene::Update() {
 
 
         // Aボタンを押したときの処理
+        
+        if (Audio::GetInstance()->IsPlaying(handle_))
+        {
+            
+            Audio::GetInstance()->StopAudio(handle_);
+        }
 
 
 

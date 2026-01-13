@@ -21,13 +21,19 @@ public:
         WAVEFORMATEX wfex;
         std::vector<BYTE> buffer;
     };
+    enum class VoiceState
+{
+    Playing,
+    Paused,
+    Stopped
+};
     // 再生中のボイス構造体 
     struct Voice {
         uint32_t handle;
         SoundHandle sourceHandle;
         IXAudio2SourceVoice* sourceVoice;
-        XAUDIO2_BUFFER buffer;           // 元バッファを保持
-        size_t bytesPlayed = 0;          // 再開用
+         VoiceState state;
+
     };
 
     static Audio* GetInstance();

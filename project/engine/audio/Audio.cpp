@@ -159,7 +159,7 @@ void Audio::UnloadAudio(SoundHandle soundHandle)
 
 void Audio::PlayAudio(SoundHandle soundHandle, bool loop, float volume)
 {
-   if (soundDatas_.find(soundHandle) == soundDatas_.end()) return;
+    if (soundDatas_.find(soundHandle) == soundDatas_.end()) return;
 
     const SoundData& soundData = soundDatas_[soundHandle];
 
@@ -184,8 +184,7 @@ void Audio::PlayAudio(SoundHandle soundHandle, bool loop, float volume)
     voice.handle = nextVoiceHandle_++;
     voice.sourceHandle = soundHandle; // ★ここで親ハンドルを覚える！
     voice.sourceVoice = pSourceVoice;
-    voice.buffer = buf;
-    voice.bytesPlayed = 0;
+    voice.state=VoiceState::Playing;
 
     activeVoices_.push_back(voice);
 }
@@ -201,32 +200,35 @@ void Audio::StopAudio(SoundHandle voiceHandle)
         it->sourceVoice->Stop();
         it->sourceVoice->FlushSourceBuffers();
         it->sourceVoice->DestroyVoice();
+        it->state=VoiceState::Stopped;
         activeVoices_.erase(it);
     }
 }
 
 void Audio::PauseAudio(SoundHandle voiceHandle)
 {
-  auto it = std::find_if(activeVoices_.begin(), activeVoices_.end(),
+    auto it = std::find_if(activeVoices_.begin(), activeVoices_.end(),
         [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; });
 
     if (it != activeVoices_.end())
     {
         // 単に停止させる。
         // FlushSourceBuffers() を呼ばなければ、再生位置(カーソル)は維持される。
-        it->sourceVoice->Stop();
+        it->state=VoiceState::Paused;
+        it->sourceVoice->Stop(0);
     }
 }
 
 void Audio::ResumeAudio(SoundHandle voiceHandle)
 {
-  auto it = std::find_if(activeVoices_.begin(), activeVoices_.end(),
+    auto it = std::find_if(activeVoices_.begin(), activeVoices_.end(),
         [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; });
 
     if (it != activeVoices_.end())
     {
+        it->state=VoiceState::Playing;
         // 停止した位置から再開される
-        it->sourceVoice->Start();
+        it->sourceVoice->Start(0, XAUDIO2_COMMIT_NOW);
     }
 }
 
@@ -237,12 +239,10 @@ bool Audio::IsPlaying(SoundHandle voiceHandle)
         [voiceHandle](const Voice& v) { return v.sourceHandle == voiceHandle; }
     );
 
-    if (it != activeVoices_.end())
+    if (it == activeVoices_.end())
     {
-        XAUDIO2_VOICE_STATE state{};
-        it->sourceVoice->GetState(&state);
-        return state.BuffersQueued > 0;
+        return false;
     }
 
-    return false;
+   return it->state == VoiceState::Playing;
 }
