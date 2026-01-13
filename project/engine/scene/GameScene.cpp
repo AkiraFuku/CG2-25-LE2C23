@@ -47,11 +47,12 @@ void GameScene::Initialize() {
 
     ModelManager::GetInstance()->LoadModel("plane.obj");
     ModelManager::GetInstance()->LoadModel("axis.obj");
+    ModelManager::GetInstance()->CreateSphereModel("MySphere", 16);
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
-    object3d->SetModel("plane.obj");
+    object3d->SetModel("MySphere");
     object3d->SetBlendMode(BlendMode::Add);
-    object3d->SetFillMode(FillMode::kWireFrame);
+    object3d->SetFillMode(FillMode::kSolid);
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }
@@ -69,6 +70,8 @@ void GameScene::Update() {
 
 
     Input::GetInstance()->GetJoyStick(0, state);
+
+
 
     // Aボタンを押していたら
 
@@ -145,6 +148,10 @@ void GameScene::Update() {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
+     ImGui::Text("Sphire");
+     Vector3 pos=object3d->GetTranslate();
+       ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+       object3d->SetTranslate(pos);
 
     ImGui::Text("Sprite");
     Vector2 Position =
@@ -161,7 +168,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
     object3d2->Draw();
     object3d->Draw();
-    ParticleManager::GetInstance()->Draw();
+   // ParticleManager::GetInstance()->Draw();
     ///////スプライトの描画
     sprite->Draw();
 }

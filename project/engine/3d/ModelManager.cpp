@@ -44,3 +44,20 @@ std::shared_ptr<Model> ModelManager::findModel(const std::string& filePath)
     }
     return nullptr;
 }
+
+void ModelManager::CreateSphereModel(const std::string& modelName, uint32_t subdivision)
+{
+    // 既に同じ名前で登録されていたら何もしない（あるいは上書き）
+    if (models.contains(modelName)) {
+        return;
+    }
+
+    // 1. Modelクラスの便利関数を使って球体を生成
+    // ※Model::CreateSphereの実装が必要です（前回の回答参照）
+    // Model::CreateSphereが rawポインタ(Model*)を返す前提で shared_ptr で受け取ります
+    std::shared_ptr<Model> model(Model::CreateSphere(subdivision));
+
+    // 2. マップに登録
+    // これで "Sphere" などの名前で検索できるようになります
+    models.insert(std::make_pair(modelName, std::move(model)));
+}

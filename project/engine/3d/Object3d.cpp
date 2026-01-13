@@ -6,6 +6,7 @@
 #include "MathFunction.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
+#include <imgui.h>
 
 
 void Object3d::Initialize()
@@ -20,6 +21,7 @@ void Object3d::Initialize()
 }
 void Object3d::Update()
 {
+
     //  WVP行列の作成
     Matrix4x4 worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
   Matrix4x4 worldViewProjectionMatrix={};

@@ -38,7 +38,7 @@ public:
     //OBJファイルの読み込み
     static ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
-
+    static Model* CreateSphere(uint32_t subdivision = 16);
   
 
 private:

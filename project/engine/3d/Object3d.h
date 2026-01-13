@@ -31,7 +31,7 @@ public:
     void Update();
     void Draw();
     void SetModel(const std::string& filePath); 
-    void SetModel(std::shared_ptr<Model> model) { model_ = model; }
+   
     //トランスフォームセッター
     void SetScale(const Vector3& scale) {
         transform_.scale = scale;

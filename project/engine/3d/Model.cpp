@@ -6,11 +6,12 @@
 #include <fstream> 
 #include <sstream>
 #include <Windows.h>
+#include <numbers>
 void Model::Initialize(const std::string& directryPath, const std::string& filename)
 {
-    
 
-    modelData_ = LoadObjFile( directryPath, filename);
+
+    modelData_ = LoadObjFile(directryPath, filename);
     if (modelData_.material.textureFilePath.empty()) {
         modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
         TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
@@ -39,19 +40,19 @@ void Model::Draw() {
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
     //SRVのディスクリプタテーブルの設定
-  DXCommon::GetInstance()->
+    DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
     //描画コマンド
-   DXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+    DXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
 }
 
 void Model::CreateVertexBuffer() {
     //頂点リソースの作成
     vertexResourse_ =
-       DXCommon::GetInstance()->
+        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
@@ -112,7 +113,7 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
     std::string line;
     //2. ファイルを開く
     std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
-    
+
     assert(file.is_open());//ファイルが開けたか確認
 
     //3. ファイルからデータを読み込みモデルデータを作成
@@ -176,5 +177,94 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
     }
     //4. モデルデータを返す
     return modelData;
+}
+
+Model* Model::CreateSphere(uint32_t subdivision)
+{
+    Model* model = new Model();
+
+    // 1. メモリ確保（頂点リソース作成など既存のInitializeの一部が必要だが、
+    // ここではvertex生成に集中し、後でリソース生成関数を呼ぶ流れにします）
+    // ※TextureManagerへの依存があるため、適当な白画像などをデフォルトにする必要があります
+     
+    model->modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
+   // TextureManagerを使ってテクスチャを読み込む
+    TextureManager::GetInstance()->LoadTexture( model->modelData_.material.textureFilePath);
+
+    // 読み込んだテクスチャのSRVインデックスを取得して設定する
+    model->modelData_.material.textureIndex = 
+        TextureManager::GetInstance()->GetTextureIndexByFilePath( model->modelData_.material.textureFilePath);
+
+    // 分割数に応じた角度の刻み幅
+    const float kLonEvery = 2.0f * std::numbers::pi_v<float> / float(subdivision);
+    const float kLatEvery = std::numbers::pi_v<float> / float(subdivision);
+
+    // 緯度方向のループ
+    for (uint32_t latIndex = 0; latIndex < subdivision; ++latIndex) {
+        float lat = -std::numbers::pi_v<float> / 2.0f + kLatEvery * latIndex; // 現在の緯度 theta
+
+        // 経度方向のループ
+        for (uint32_t lonIndex = 0; lonIndex < subdivision; ++lonIndex) {
+            float lon = lonIndex * kLonEvery; // 現在の経度 phi
+
+            // 1枚の四角形を作るための4点の座標を計算
+            // a -- b
+            // |    |
+            // c -- d
+            // のような位置関係の4点を求めます
+
+            // 便利関数（ラムダ式）: 緯度・経度から頂点データを作る
+            auto makeVertex = [&](float u, float v, float latitude, float longitude) {
+                VertexData vertex;
+                // 座標計算 (半径1.0と仮定)
+                vertex.position.x = std::cos(latitude) * std::cos(longitude);
+                vertex.position.y = std::sin(latitude);
+                vertex.position.z = std::cos(latitude) * std::sin(longitude);
+                vertex.position.w = 1.0f;
+
+                // 法線（球体なので原点から座標へのベクトルと同じ向き）
+                vertex.normal.x = vertex.position.x;
+                vertex.normal.y = vertex.position.y;
+                vertex.normal.z = vertex.position.z;
+
+                // UV座標
+                vertex.texcoord = { u, 1.0f - v }; // DXはVが逆の場合があるため適宜調整
+                return vertex;
+                };
+
+            // 4点のUVと角度を算出
+            float u0 = float(lonIndex) / float(subdivision);
+            float v0 = float(latIndex) / float(subdivision);
+            float u1 = float(lonIndex + 1) / float(subdivision);
+            float v1 = float(latIndex + 1) / float(subdivision);
+
+            // 点A (左下)
+            VertexData a = makeVertex(u0, v0, lat, lon);
+            // 点B (左上) ※緯度はlat + kLatEvery
+            VertexData b = makeVertex(u0, v1, lat + kLatEvery, lon);
+            // 点C (右下) ※経度はlon + kLonEvery
+            VertexData c = makeVertex(u1, v0, lat, lon + kLonEvery);
+            // 点D (右上)
+            VertexData d = makeVertex(u1, v1, lat + kLatEvery, lon + kLonEvery);
+
+            // 頂点を追加 (Triangle List: 2つの三角形で四角形を作る)
+            // 三角形1 (A, B, C)
+            model->modelData_.vertices.push_back(a);
+            model->modelData_.vertices.push_back(b);
+            model->modelData_.vertices.push_back(c);
+
+            // 三角形2 (C, B, D)
+            model->modelData_.vertices.push_back(c);
+            model->modelData_.vertices.push_back(b);
+            model->modelData_.vertices.push_back(d);
+        }
+    }
+
+    // 既存のメソッドを利用してGPUバッファを作成
+    // ※Initialize関数の中身を分解するか、この関数内で CreateVertexBuffer() 等を呼べるようにアクセス権を調整してください
+    model->CreateVertexBuffer();
+    model->CreateMaterialResource();
+
+    return model;
 }
 
