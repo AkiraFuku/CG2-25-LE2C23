@@ -4,6 +4,7 @@
 #include "SrvManager.h"
 #include "MathFunction.h"
 #include <numbers>
+#include "PSOMnager.h"
 #pragma once
  std::unique_ptr<ParticleManager>  ParticleManager::instance;
 uint32_t ParticleManager::kMaxNumInstance = 1024;
@@ -12,7 +13,14 @@ void ParticleManager::Initialize() {
     //ランダムエンジンの初期化
     randomEngine_.seed(seedGen_());
     //パイプラインステート生成
-    CreatePSO();
+
+    
+       PsoProperty pso={PipelineType::Particle,BlendMode::Add};
+    PsoSet psoset=PSOMnager::GetInstance()->GetPsoSet(pso);
+    graphicsPipelineState_=psoset.pipelineState;
+    rootSignature_=psoset.rootSignature;
+
+  //  CreatePSO();
     //頂点データの初期化（座標等）
     //頂点リソース生成
     //頂点バッファビュー（VBV）を作成

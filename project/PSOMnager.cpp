@@ -118,36 +118,73 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     descRangeTexture[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     descRangeTexture[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    // Sprite / Object3d / Particle 共通構成と仮定
-    // 構成を変える場合は if (type == ...) で分岐
-    rootParameters.resize(4);
+ // -----------------------------------------------------------------------
+    // パーティクル用の特別な分岐
+    // -----------------------------------------------------------------------
+    if (type == PipelineType::Particle) {
+        // パーティクル用インスタンシングレンジ (VS t0)
+        // ※ staticにしないとスコープを抜けてデータが壊れる可能性があるため注意
+        //   ここでは関数内完結させるため、vector等で管理するか、static配列にする
+        static D3D12_DESCRIPTOR_RANGE descRangeInstancing[1]{};
+        descRangeInstancing[0].BaseShaderRegister = 0; // t0 (VS)
+        descRangeInstancing[0].NumDescriptors = 1;
+        descRangeInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        descRangeInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    // ルートパラメータインデックスの可読性のため
-    enum {
-        kMaterial, kTransform, kTexture, kLight
-    };
+        rootParameters.resize(4);
 
-    // 0. Material (CBV b0, Pixel)
-    rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[kMaterial].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[kMaterial].Descriptor.ShaderRegister = 0;
+        // [Param 0] Material (CBV b0, Pixel)
+        rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[0].Descriptor.ShaderRegister = 0;
 
-    // 1. Transform (CBV b0, Vertex)
-    rootParameters[kTransform].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[kTransform].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-    rootParameters[kTransform].Descriptor.ShaderRegister = 0; // b0 (Vertex用)
+        // [Param 1] Instancing Data (DescriptorTable t0, Vertex) ★ここが重要
+        rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+        rootParameters[1].DescriptorTable.pDescriptorRanges = descRangeInstancing;
+        rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
 
-    // 2. Texture (Table t0, Pixel)
-    rootParameters[kTexture].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParameters[kTexture].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[kTexture].DescriptorTable.pDescriptorRanges = descRangeTexture;
-    rootParameters[kTexture].DescriptorTable.NumDescriptorRanges = 1;
+        // [Param 2] Texture (DescriptorTable t0, Pixel)
+        rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[2].DescriptorTable.pDescriptorRanges = descRangeTexture;
+        rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
-    // 3. DirectionalLight (CBV b1, Pixel)
-    rootParameters[kLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-    rootParameters[kLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-    rootParameters[kLight].Descriptor.ShaderRegister = 1;
+        // [Param 3] DirectionalLight (CBV b1, Pixel)
+        rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[3].Descriptor.ShaderRegister = 1;
+    }
+    // -----------------------------------------------------------------------
+    // 通常のオブジェクト / スプライト
+    // -----------------------------------------------------------------------
+    else {
+        rootParameters.resize(4);
+        
+        // Enum定義 (可読性のため)
+        enum { kMaterial, kTransform, kTexture, kLight };
 
+        // 0. Material (CBV b0, Pixel)
+        rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kMaterial].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kMaterial].Descriptor.ShaderRegister = 0;
+
+        // 1. Transform (CBV b0, Vertex)
+        rootParameters[kTransform].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kTransform].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+        rootParameters[kTransform].Descriptor.ShaderRegister = 0;
+
+        // 2. Texture (Table t0, Pixel)
+        rootParameters[kTexture].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[kTexture].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kTexture].DescriptorTable.pDescriptorRanges = descRangeTexture;
+        rootParameters[kTexture].DescriptorTable.NumDescriptorRanges = 1;
+
+        // 3. DirectionalLight (CBV b1, Pixel)
+        rootParameters[kLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kLight].Descriptor.ShaderRegister = 1;
+    }
 
     // シリアライズ
     D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
