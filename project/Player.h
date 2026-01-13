@@ -6,6 +6,11 @@
 #include "Camera.h"
 #include <memory>
 
+class ObstacleSlow;
+class ObstacleNormal;
+class ObstacleFast;
+class ObstacleMax;
+class MapChipField;
 
 // 速さの段階
 enum class SpeedStage
@@ -64,11 +69,20 @@ private:
     bool isAcceleration_ = false;
 
     // 現在の速度段階
-    SpeedStage currentSpeedStage_ = SpeedStage::kNormal;
+    SpeedStage currentSpeedStage_ = SpeedStage::kSlow;
+    const float kSlowSpeedZ = 0.2f;
+    const float kNormalSpeedZ = 0.5f;
+    const float kFastSpeedZ = 0.8f;
 
     // 当たり判定サイズ
-    static inline float kWidth;
-    static inline float kHeight;
+    static inline float kWidth = 2.0f;
+    static inline float kHeight = 2.0f;
+
+    // 死亡フラグ
+    bool isDead_ = false;
+
+    // マップチップのフィールド
+    MapChipField* mapChipField_ = nullptr;
 
 public:
     // 初期化
@@ -89,12 +103,21 @@ public:
     void DetermineSpeedStage();
     // 速度の段階を取得
     SpeedStage GetSpeedStage() const { return currentSpeedStage_; }
+    // 速度Zを取得
+    float GetSpeedZ() const { return speedZ_; }
     // ワールド座標の取得
     Vector3 GetWorldPosition();
     // AABBを取得
     AABB GetAABB();
     // 衝突応答
-    void OnCollision(const Player* player);
+    void OnCollision(const ObstacleSlow* obstacleSlow);
+    void OnCollision(const ObstacleNormal* obstacleNormal);
+    void OnCollision(const ObstacleFast* obstacleFast);
+    void OnCollision(const ObstacleMax* obstacleMax);
+    // デスフラグを取得
+    bool IsDead() const { return isDead_; }
+    // マップチップフィールドのセット
+    void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
     // コンストラクタとデストラクタ
     Player() = default;
     ~Player();

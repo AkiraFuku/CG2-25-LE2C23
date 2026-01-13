@@ -27,6 +27,23 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
 
 void Player::Update()
 {
+    if (isDead_)
+    {
+        // 死亡していたら処理を抜ける
+        return;
+    }
+    else
+    {
+        // 速度が0になったら
+        if (speedZ_ <= 0.001f)
+        {
+            // 死亡させる
+            speedZ_ = 0.0f;
+            isDead_ = true;
+            return;
+        }
+    }
+
     // 方向操作
     Rotate();
 
@@ -65,6 +82,12 @@ void Player::Update()
 
 void Player::Draw()
 {
+    if (isDead_)
+    {
+        // 死亡していたら処理を抜ける
+        return;
+    }
+
     model_->Draw();
 }
 
@@ -75,10 +98,10 @@ void Player::Rotate()
 
     // 押した方向で移動ベクトルを変更
     if (Input::GetInstance()->PushedKeyDown(DIK_A)) {
-        transform_.rotate.y += kRotSpeed;
+        transform_.rotate.y -= kRotSpeed;
     }
     else if (Input::GetInstance()->PushedKeyDown(DIK_D)) {
-        transform_.rotate.y -= kRotSpeed;
+        transform_.rotate.y += kRotSpeed;
     }
 }
 
@@ -127,6 +150,8 @@ void Player::Drift()
         else
         {
             speedZ_ += kAcceleration;
+            // 速度の段階を決定
+            DetermineSpeedStage();
         }
 
     }
@@ -147,8 +172,6 @@ void Player::Drift()
                 topSpeedZ_ = kMaxSpeedZ;
             }
 
-            // 速度の段階を決定
-            DetermineSpeedStage();
         }
         else
         {
@@ -156,6 +179,9 @@ void Player::Drift()
             speedZ_ *= kSpeedDecayRate;
             // タイマーを加算
             driftTimer_ += 0.1f;
+
+            // 速度の段階を決定
+            DetermineSpeedStage();
         }
 
     }
@@ -164,15 +190,15 @@ void Player::Drift()
 
 void Player::DetermineSpeedStage()
 {
-    if (speedZ_ < 0.2f)
+    if (speedZ_ < kSlowSpeedZ)
     {
         currentSpeedStage_ = SpeedStage::kSlow;
     }
-    else if (speedZ_ < 0.4f)
+    else if (speedZ_ < kNormalSpeedZ)
     {
         currentSpeedStage_ = SpeedStage::kNormal;
     }
-    else if (speedZ_ < 0.6f)
+    else if (speedZ_ < kFastSpeedZ)
     {
         currentSpeedStage_ = SpeedStage::kFast;
     }
@@ -201,6 +227,39 @@ AABB Player::GetAABB()
 
     return aabb;
 }
+
+void Player::OnCollision(const ObstacleSlow* obstacleSlow)
+{
+    // スコア加算処理
+}
+
+void Player::OnCollision(const ObstacleNormal* obstacleNormal)
+{
+    // プレイヤーの速度が一定以下なら
+    if (currentSpeedStage_ < SpeedStage::kNormal)
+    {
+        isDead_ = true;
+    }
+}
+
+void Player::OnCollision(const ObstacleFast* obstacleFast)
+{
+    // プレイヤーの速度が一定以下なら
+    if (currentSpeedStage_ < SpeedStage::kFast)
+    {
+        isDead_ = true;
+    }
+}
+
+void Player::OnCollision(const ObstacleMax* obstacleMax)
+{
+    // プレイヤーの速度が一定以下なら
+    if (currentSpeedStage_ < SpeedStage::kMax)
+    {
+        isDead_ = true;
+    }
+}
+
 
 Player::~Player()
 {

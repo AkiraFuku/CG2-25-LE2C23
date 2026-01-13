@@ -12,6 +12,10 @@
 #include <memory>
 class Player;
 class ObstacleSlow;
+class ObstacleNormal;
+class ObstacleFast;
+class ObstacleMax;
+class MapChipField;
 
 class GameScene :public Scene
 {
@@ -29,6 +33,9 @@ public:
     // 当たり判定
     bool isCollision(const AABB& aabb1, const AABB& aabb2);
 
+    // マップチップの生成
+    void GenerateFieldObjects();
+
 private:
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Sprite> sprite;
@@ -43,8 +50,20 @@ private:
     std::unique_ptr<Object3d> playerModel_;
 
     // 障害物
-    std::unique_ptr<ObstacleSlow> obstacleSlow_;
+    std::vector<std::unique_ptr<ObstacleSlow>> obstacleSlow_;
+    std::vector<std::unique_ptr<ObstacleNormal>> obstacleNormal_;
+    std::vector<std::unique_ptr<ObstacleFast>> obstacleFast_;
+    std::vector<std::unique_ptr<ObstacleMax>> obstacleMax_;
+
     // 障害物のモデル
-    std::unique_ptr<Object3d> obstacleSlowModel_;
+    std::vector<std::unique_ptr<Object3d>> obstacleSlowModel_;
+    std::vector<std::unique_ptr<Object3d>> obstacleNormalModel_;
+    std::vector<std::unique_ptr<Object3d>> obstacleFastModel_;
+    std::vector<std::unique_ptr<Object3d>> obstacleMaxModel_;
+
+    // マップチップフィールド
+    std::unique_ptr<MapChipField> mapChipField_;
+    // ブロック用のワールドトランスフォーム
+    std::vector<std::vector<Transform*>> worldTransformObjects;
 };
 

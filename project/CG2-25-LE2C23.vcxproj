@@ -55,7 +55,11 @@
     <ClCompile Include="engine\scene\Scene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
+    <ClCompile Include="MapChipField.cpp" />
     <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="ObstacleFast.cpp" />
+    <ClCompile Include="ObstacleMax.cpp" />
+    <ClCompile Include="ObstacleNormal.cpp" />
     <ClCompile Include="ObstacleSlow.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneFactory.cpp" />
@@ -128,7 +132,11 @@
     <ClInclude Include="engine\scene\Scene.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
+    <ClInclude Include="MapChipField.h" />
     <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="ObstacleFast.h" />
+    <ClInclude Include="ObstacleMax.h" />
+    <ClInclude Include="ObstacleNormal.h" />
     <ClInclude Include="ObstacleSlow.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SceneFactory.h" />

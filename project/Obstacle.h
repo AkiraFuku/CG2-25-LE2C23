@@ -36,9 +36,9 @@ public:
     virtual void Update();
     virtual void Draw();
     // ワールド座標の取得
-    virtual Vector3 GetWorldPosition();
+    virtual Vector3 GetWorldPosition() const;
     // AABBを取得
-    virtual AABB GetAABB();
+    virtual AABB GetAABB() const;
     // 衝突応答
     virtual void OnCollision(const Player* player) = 0;
 };

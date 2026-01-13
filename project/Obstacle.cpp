@@ -14,8 +14,7 @@ void Obstacle::Update()
     // モデルの更新
     model_->SetTranslate(transform_.translate);
     model_->Update();
-    // カメラの更新
-    camera_->Update();
+   
 }
 
 void Obstacle::Draw()
@@ -28,7 +27,7 @@ void Obstacle::Draw()
     model_->Draw();
 }
 
-Vector3 Obstacle::GetWorldPosition()
+Vector3 Obstacle::GetWorldPosition() const
 {
     // ワールド座標を入れる変数
     Vector3 worldPos;
@@ -37,7 +36,7 @@ Vector3 Obstacle::GetWorldPosition()
     return worldPos;
 }
 
-AABB Obstacle::GetAABB()
+AABB Obstacle::GetAABB() const
 {
     Vector3 worldPos = GetWorldPosition();
     AABB aabb;
