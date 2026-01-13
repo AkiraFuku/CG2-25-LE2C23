@@ -217,7 +217,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     D3D12_DEPTH_STENCIL_DESC depthDesc {};
-    depthDesc.DepthEnable = false;
+    depthDesc.DepthEnable = true;
     //書き込み
     depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     //比較関数

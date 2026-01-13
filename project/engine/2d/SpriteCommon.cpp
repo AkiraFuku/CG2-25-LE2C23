@@ -19,12 +19,12 @@ void SpriteCommon::Finalize() {
 }
 void SpriteCommon::Initialize()
 {
-    PsoProperty pso={PipelineType::Sprite,BlendMode::Add};
+    PsoProperty pso={PipelineType::Sprite,BlendMode::None};
     PsoSet psoset=PSOMnager::GetInstance()->GetPsoSet(pso);
     graphicsPipelineState_=psoset.pipelineState;
     rootSignature_=psoset.rootSignature;
 
-   /* CreatePSO();*/
+    //CreatePSO();
 
 }
 
