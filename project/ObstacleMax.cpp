@@ -1,7 +1,7 @@
-#include "ObstacleSlow.h"
+#include "ObstacleMax.h"
 #include "Player.h"
 
-void ObstacleSlow::Initialize(Object3d* model, Camera* camera, const Vector3& position)
+void ObstacleMax::Initialize(Object3d* model, Camera* camera, const Vector3& position)
 {
     // nullポインタチェック
     assert(model);
@@ -17,10 +17,10 @@ void ObstacleSlow::Initialize(Object3d* model, Camera* camera, const Vector3& po
     height = 2.0f;
 }
 
-void ObstacleSlow::OnCollision(const Player* player)
+void ObstacleMax::OnCollision(const Player* player)
 {
     // プレイヤーの速度が一定以上なら破壊
-    if (player->GetSpeedStage() >= SpeedStage::kSlow)
+    if (player->GetSpeedStage() >= SpeedStage::kMax)
     {
         isDead_ = true;
     }
