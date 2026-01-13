@@ -59,6 +59,7 @@ public:
     void SetBlendMode(BlendMode blendMode) {
         blendMode_ = blendMode;
     }
+    void SetFillMode(FillMode fillMode) { fillMode_ = fillMode; }
 private:
     
 
@@ -77,6 +78,7 @@ private:
     //カメラ　
     Camera *camera_=nullptr;
     
+    FillMode fillMode_ = FillMode::kSolid;
     BlendMode blendMode_ = BlendMode::None;
 };
 

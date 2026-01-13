@@ -250,8 +250,12 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
    
 
     // 4. Rasterizer & Depth
-    D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    D3D12_RASTERIZER_DESC rasterizerDesc {};
+   if (property.fillMode == FillMode::kWireFrame) {
+    rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME; // ワイヤーフレーム
+} else {
+    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;     // 通常塗りつぶし
+}
 
     D3D12_DEPTH_STENCIL_DESC depthDesc {};
     depthDesc.DepthEnable = true;

@@ -19,7 +19,7 @@ void SpriteCommon::Finalize() {
 }
 void SpriteCommon::Initialize()
 {
-    PsoProperty pso={PipelineType::Sprite,BlendMode::None};
+    PsoProperty pso={PipelineType::Sprite,BlendMode::None,FillMode::kSolid};
     PsoSet psoset=PSOMnager::GetInstance()->GetPsoSet(pso);
     graphicsPipelineState_=psoset.pipelineState;
     rootSignature_=psoset.rootSignature;

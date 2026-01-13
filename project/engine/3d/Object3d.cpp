@@ -38,7 +38,7 @@ void Object3d::Update()
 void Object3d::Draw()
 {
     Object3dCommon::GetInstance()->Object3dCommonDraw();
-    PsoProperty psoProp = { PipelineType::Object3d, blendMode_ };
+    PsoProperty psoProp = { PipelineType::Object3d, blendMode_ ,fillMode_};
     PsoSet psoSet = PSOMnager::GetInstance()->GetPsoSet(psoProp);
 
     // PSOをセット
