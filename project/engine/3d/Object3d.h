@@ -43,6 +43,29 @@ public:
         transform_.translate = translate;
     }
 
+    void SetDirectionalLight(const DirectionalLight& light) {
+        if (directionalLightData_) {
+            // メモリコピーで値を一括更新
+            *directionalLightData_ = light;
+        }
+    }
+    // ライトのセッター
+    void SetDirectionalLightColor(const Vector4& color) {
+        if (directionalLightData_) {
+            directionalLightData_->color = color;
+        }
+    }
+    void SetDirectionalLightDirection(const Vector3& direction) {
+        if (directionalLightData_) {
+            directionalLightData_->direction = direction;
+        }
+    }
+    void SetDirectionalLightIntensity(float intensity) {
+        if (directionalLightData_) {
+            directionalLightData_->intensity = intensity;
+        }
+    }
+
     void SetCamera( Camera *camera){camera_=camera;}
     
 
@@ -55,6 +78,16 @@ public:
     }
     const Vector3& GetTranslate()const {
         return transform_.translate;
+    }
+   // ライトのゲッター
+    const Vector4& GetDirectionalLightColor() const {
+        return directionalLightData_->color;
+    }
+    const Vector3& GetDirectionalLightDirection() const {
+        return directionalLightData_->direction;
+    }
+    float GetDirectionalLightIntensity() const {
+        return directionalLightData_->intensity;
     }
     void SetBlendMode(BlendMode blendMode) {
         blendMode_ = blendMode;

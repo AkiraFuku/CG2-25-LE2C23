@@ -15,7 +15,7 @@ void GameScene::Initialize() {
 
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(handle_,true);
+    Audio::GetInstance()->PlayAudio(handle_, true);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -51,8 +51,6 @@ void GameScene::Initialize() {
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("MySphere");
-    object3d->SetBlendMode(BlendMode::Add);
-    object3d->SetFillMode(FillMode::kSolid);
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }
@@ -81,10 +79,10 @@ void GameScene::Update() {
 
 
         // Aボタンを押したときの処理
-        
+
         if (Audio::GetInstance()->IsPlaying(handle_))
         {
-            
+
             Audio::GetInstance()->StopAudio(handle_);
         }
 
@@ -118,14 +116,14 @@ void GameScene::Update() {
     }*/
     if (Input::GetInstance()->TriggerMouseDown(0))
     {
-      if (Audio::GetInstance()->IsPlaying(handle_))
+        if (Audio::GetInstance()->IsPlaying(handle_))
         {
             Audio::GetInstance()->PauseAudio(handle_);
-      } else
-      {
-          Audio::GetInstance()->ResumeAudio(handle_);
-       
-      }
+        } else
+        {
+            Audio::GetInstance()->ResumeAudio(handle_);
+
+        }
     }
     if (Input::GetInstance()->GetJoyStick(0, state))
     {
@@ -148,11 +146,26 @@ void GameScene::Update() {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
-     ImGui::Text("Sphire");
-     Vector3 pos=object3d->GetTranslate();
-       ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
-       object3d->SetTranslate(pos);
+    ImGui::Text("Sphire");
+    Vector3 pos = object3d->GetTranslate();
+    ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+    object3d->SetTranslate(pos);
 
+    Vector4 lightColor = object3d->GetDirectionalLightColor();
+
+
+    if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
+
+        object3d->SetDirectionalLightColor(lightColor);
+    }
+    Vector3 direction= object3d->GetDirectionalLightDirection();
+    if(ImGui::DragFloat3("Light Direction", &direction.x)){
+    object3d->SetDirectionalLightDirection(direction);
+    }
+    float intensity= object3d->GetDirectionalLightIntensity();
+    if(ImGui::InputFloat("intensity",&intensity)){
+     object3d->SetDirectionalLightIntensity(intensity);
+    }
     ImGui::Text("Sprite");
     Vector2 Position =
         sprite->GetPosition();
@@ -168,7 +181,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
     object3d2->Draw();
     object3d->Draw();
-   // ParticleManager::GetInstance()->Draw();
-    ///////スプライトの描画
+    // ParticleManager::GetInstance()->Draw();
+     ///////スプライトの描画
     sprite->Draw();
 }
