@@ -396,6 +396,7 @@ Node ReadNode(aiNode* node) {
     aiMatrix4x4 aiLocalMatrix = node->mTransformation;
     aiLocalMatrix.Transpose();
 
+ 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             // Assimpの行列は [row][col] でアクセス可能
@@ -422,7 +423,8 @@ ModelData LoadModelFile(const std::string& directryPath, const std::string& file
 
     const aiScene* scene = importer.ReadFile(filePath.c_str(),
         aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
-        aiProcess_FlipUVs                // 法線がない場合、自動計算する
+        aiProcess_FlipUVs        |        // 法線がない場合、自動計算する
+aiProcess_PreTransformVertices    
     );
     assert(scene->HasMeshes());
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
@@ -1719,7 +1721,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             Matrix4x4 viewMatrix = Inverse(cameraMatrix);
             Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.traslate);
 
-            wvpData->WVP = Multiply(Multiply(viewMatrix, projectionMatirx), Multiply(modelData.rootNode.localMatrix, worldMatrix));
+            wvpData->WVP = Multiply( Multiply(modelData.rootNode.localMatrix, worldMatrix),Multiply(viewMatrix, projectionMatirx));
             wvpData->World = Multiply(modelData.rootNode.localMatrix, worldMatrix);
 
             wvpData->WorldInverseTranspose = Inverse(worldMatrix);
