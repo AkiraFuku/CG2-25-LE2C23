@@ -34,7 +34,7 @@ public:
     const Vector3& GetTranslate()const{return transform_.translate;}
     const Matrix4x4& GetWorldMatrix()const{return worldMatrix;};
     const Matrix4x4& GetViewMatrix()const{return viewMatrix;};
-    const Matrix4x4& GetProjectionMatirx()const{return projectionMatirx;};
+    const Matrix4x4& GetProjectionMatrix()const{return projectionMatrix;};
     const Matrix4x4& GetViewProtectionMatrix()const{return viewProtectionMatrix;};
 
 
@@ -42,7 +42,7 @@ private:
     Transform transform_;
     Matrix4x4 worldMatrix;
     Matrix4x4 viewMatrix;
-    Matrix4x4 projectionMatirx;
+    Matrix4x4 projectionMatrix;
     Matrix4x4 viewProtectionMatrix;
     float fovY ;
     float aspect ;

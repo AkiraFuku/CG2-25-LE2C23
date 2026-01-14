@@ -57,7 +57,7 @@ void ParticleManager::Update() {
     billboardMatrix.m[3][2] = 0.0f;
     //カメラからビューとプロジェクション行列
     Matrix4x4 viewMatrix = camera_->GetViewMatrix();
-    Matrix4x4 projectionMatrix = camera_->GetProjectionMatirx();
+    Matrix4x4 projectionMatrix = camera_->GetProjectionMatrix();
     Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
     //
     for (auto& [key, particleGroup] : particleGroups)

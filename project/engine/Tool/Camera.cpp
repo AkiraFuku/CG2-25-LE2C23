@@ -8,15 +8,15 @@ Camera::Camera()
     , farCrip(100.0f)
     , worldMatrix(MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate))
     , viewMatrix(Inverse(worldMatrix))
-    , projectionMatirx(MakePerspectiveFovMatrix(fovY, aspect, nearCrip, farCrip))
-    , viewProtectionMatrix(Multiply(viewMatrix, projectionMatirx))
+    , projectionMatrix(MakePerspectiveFovMatrix(fovY, aspect, nearCrip, farCrip))
+    , viewProtectionMatrix(Multiply(viewMatrix, projectionMatrix))
 {}
 void Camera::Update() {
 
     worldMatrix = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
     viewMatrix = Inverse(worldMatrix);
-    projectionMatirx = MakePerspectiveFovMatrix(fovY, aspect, nearCrip, farCrip);
+    projectionMatrix = MakePerspectiveFovMatrix(fovY, aspect, nearCrip, farCrip);
 
-    viewProtectionMatrix = Multiply(viewMatrix, projectionMatirx);
+    viewProtectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
 }

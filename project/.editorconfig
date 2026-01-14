@@ -1,3 +1,10 @@
 [*.{cpp,h,hlsl,hlsli}]
 charset = utf-8
 indent_style = space
+spelling_error_severity = error
+spelling_chackble_types =identifiers,comments
+spelling_langueges = en-us
+
+spelling_use_defalt_exclusion_dictionary=true
+
+spelling_exclusion_path = ./exclusion.dlc

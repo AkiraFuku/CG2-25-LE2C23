@@ -80,19 +80,19 @@ void Sprite::Update() {
 
     // 左下
     vertexData_[0].position = { Left, bottom, 0.0f, 1.0f };
-    vertexData_[0].texcoord = { tex_left, tex_bottom };
+    vertexData_[0].texcord = { tex_left, tex_bottom };
     vertexData_[0].normal = { 0.0f,0.0f, -1.0f };
     // 左上
     vertexData_[1].position = { Left, top, 0.0f, 1.0f };
-    vertexData_[1].texcoord = { tex_left, tex_top };
+    vertexData_[1].texcord = { tex_left, tex_top };
     vertexData_[1].normal = { 0.0f,0.0f, -1.0f };
     // 右下
     vertexData_[2].position = { right, bottom, 0.0f, 1.0f };
-    vertexData_[2].texcoord = { tex_right, tex_bottom };
+    vertexData_[2].texcord = { tex_right, tex_bottom };
     vertexData_[2].normal = { 0.0f,0.0f, -1.0f };
     // 右上
     vertexData_[3].position = { right, top, 0.0f, 1.0f };
-    vertexData_[3].texcoord = { tex_right, tex_top };
+    vertexData_[3].texcord = { tex_right, tex_top };
     vertexData_[3].normal = { 0.0f,0.0f, -1.0f };
 
     indexData_[0] = 0;
@@ -104,7 +104,7 @@ void Sprite::Update() {
 
 
 
-    Transform transform{ {size_.x,size_.y,1.0f},{0.0f,0.0f,rotation_},{postion_.x,postion_.y,0.0f} };
+    Transform transform{ {size_.x,size_.y,1.0f},{0.0f,0.0f,rotation_},{position_.x,position_.y,0.0f} };
 
     Matrix4x4 worldMatrix = MakeAfineMatrix(transform.scale, transform.rotate, transform.translate);
     Matrix4x4 viewMatrix = Makeidetity4x4();
@@ -140,7 +140,7 @@ void Sprite::Draw()
     DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
-            TextureManager::GetInstance()->GetSrvHundleGPU(textureIndex_));
+            TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 
     //座標変換行列の設定
     DXCommon::GetInstance()->

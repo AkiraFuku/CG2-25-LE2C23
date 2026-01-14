@@ -11,7 +11,7 @@ class Sprite
 public:
     struct VertexData {
         Vector4 position; // 4D position vector
-        Vector2 texcoord; // 2D texture coordinate vector
+        Vector2 texcord; // 2D texture coordinate vector
         Vector3 normal;
     };
     struct Material
@@ -34,10 +34,10 @@ public:
     void Draw();
 
     const Vector2& GetPosition() const {
-        return postion_;
+        return position_;
     }
     void SetPosition(const Vector2& position) {
-        postion_ = position;
+        position_ = position;
     }
 
     float GetRotation() const {
@@ -57,8 +57,8 @@ public:
     Matrix4x4& GetUV()const {
         return materialData_->uvTransform;
     }
-    void SetUV(Matrix4x4& uvTransfom) {
-        materialData_->uvTransform = uvTransfom;
+    void SetUV(Matrix4x4& uvTransform) {
+        materialData_->uvTransform = uvTransform;
     }
 
     const Vector2& GetSize()const {
@@ -115,7 +115,7 @@ private:
 private:
     
 
-    Vector2 postion_ = { 0.0f,0.0f };
+    Vector2 position_ = { 0.0f,0.0f };
     float rotation_ = 0.0f;
 
     Vector2 size_ = { 10.0f,10.0f };
