@@ -1,10 +1,11 @@
 #pragma once
 ///
 #define _USE_MATH_DEFINES
-#define PI 3.14159265358979323846f
+
 #include <cmath>
 #include "../../engine/2d/Vector4.h"
 #include <assert.h>
+#include "Vector3.h"
 ///using namespace std;
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
@@ -20,7 +21,26 @@ Vector3 operator*(float scalar, const Vector3& v);
 Vector3 operator*(const Vector3& v, float scalar);
 Vector3 operator/(const Vector3& v, float scalar);
 Vector3 operator/=(Vector3& v, float scalar);
-Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& rotate, Matrix4x4& billboardMatrix, const Vector3& translate);Matrix4x4 MakeAfineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
+Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& rotate, Matrix4x4& billboardMatrix, const Vector3& translate);Matrix4x4 MakeAffineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
+
+
+//02_06のスライド24枚目のLerp関数
+Vector3 Lerp(const Vector3 &v1, const Vector3 &v2, float t);
+float Lerp(float x1, float x2, float t);
+
+
+///ラジアン変換
+float Radian(float degree);
+struct AABB {
+	Vector3 min;
+	Vector3 max;
+};
+bool IsCollision(const AABB&aabb1,const AABB&aabb2);
+
+float ToRadian(float degree);
+
+void WorldTransformUpdate(WorldTransform* worldTransform);
+
 
 
 ///
@@ -33,7 +53,7 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height,fl
 
 
 //
-Matrix4x4 MakeAfineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
+Matrix4x4 MakeAffineMatrix(const Vector3& scale,const Vector3& rotate,const Vector3& traslate);
 Matrix4x4 MakeTranslateMatrix(const Vector3& traslate);
 Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 /// <summary>
@@ -42,12 +62,15 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 /// <param name="vector"></param>
 /// <param name="matrix"></param>
 /// <returns></returns>
-Vector3  vector3Transform(const Vector3& vector, const Matrix4x4& matrix);
+Vector3  Transform(const Vector3& vector, const Matrix4x4& matrix);
 
 Matrix4x4 MakeRotateXMatrix( float radian);
 Matrix4x4 MakeRotateYMatrix( float radian);
 Matrix4x4 MakeRotateZMatrix( float radian);
 
+float EaseIn(float x1, float x2, float t);
+float EaseOut(float x1, float x2, float t);
+float EaseInOut(float s,float g ,float t);
 
 
 	/// <summary>
@@ -85,7 +108,7 @@ Matrix4x4 MakeRotateZMatrix( float radian);
 	/// 単位行列の作成
 	/// </summary>
 	/// <returns></returns>
-	Matrix4x4 Makeidetity4x4();
+	Matrix4x4 Makeidentity4x4();
 //}
 	
 	/// <summary>
@@ -117,6 +140,7 @@ Matrix4x4 MakeRotateZMatrix( float radian);
 	/// <param name="v">ベクトル</param>
 	/// <returns>ベクトル＊スカラー</returns>
 	Vector3 Multiply(float scalar,const Vector3& v);
+    Vector3 Division(const Vector3& v,float scalar);
 	/// <summary>
 	/// DOT
 	/// </summary>

@@ -9,6 +9,20 @@
 #include "TextureManager.h"
 #include "Scene.h"
 #include <memory>
+#include "HitEffect.h"
+#include "Player.h"
+#include <vector>
+#include "Skydome.h"
+#include "MapchipField.h"
+#include "CameraController.h"
+#include "Enemy.h"
+#include "DeathParticles.h"
+#include "Goal.h"
+#include "Gaid.h"
+#include "PauseMenu.h"
+#include "StageManager.h"
+#include "ResultMenu.h"
+
 class GameScene :public Scene
 {
 public:

@@ -55,8 +55,20 @@
     <ClCompile Include="engine\scene\Scene.cpp" />
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
-    <ClCompile Include="PSOMnager.cpp" />
-    <ClCompile Include="SceneFactory.cpp" />
+    <ClCompile Include="engine\base\PSOMnager.cpp" />
+    <ClCompile Include="engine\scene\SceneFactory.cpp" />
+    <ClCompile Include="source\camera\CameraController.cpp" />
+    <ClCompile Include="source\colition\MapCollider.cpp" />
+    <ClCompile Include="source\efect\DeathParticles.cpp" />
+    <ClCompile Include="source\efect\Fade.cpp" />
+    <ClCompile Include="source\efect\HitEffect.cpp" />
+    <ClCompile Include="source\enemy\Enemy.cpp" />
+    <ClCompile Include="source\other\Skydome.cpp" />
+    <ClCompile Include="source\other\StageManager.cpp" />
+    <ClCompile Include="source\other\worldT.cpp" />
+    <ClCompile Include="source\player\Player.cpp" />
+    <ClCompile Include="source\stage\Goal.cpp" />
+    <ClCompile Include="source\stage\MapchipField.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.PS.hlsl">
@@ -126,8 +138,20 @@
     <ClInclude Include="engine\scene\Scene.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
-    <ClInclude Include="PSOMnager.h" />
-    <ClInclude Include="SceneFactory.h" />
+    <ClInclude Include="engine\base\PSOMnager.h" />
+    <ClInclude Include="engine\scene\SceneFactory.h" />
+    <ClInclude Include="source\camera\CameraController.h" />
+    <ClInclude Include="source\colition\MapCollider.h" />
+    <ClInclude Include="source\efect\DeathParticles.h" />
+    <ClInclude Include="source\efect\Fade.h" />
+    <ClInclude Include="source\efect\HitEffect.h" />
+    <ClInclude Include="source\enemy\Enemy.h" />
+    <ClInclude Include="source\other\Skydome.h" />
+    <ClInclude Include="source\other\StageManager.h" />
+    <ClInclude Include="source\other\worldT.h" />
+    <ClInclude Include="source\player\Player.h" />
+    <ClInclude Include="source\stage\Goal.h" />
+    <ClInclude Include="source\stage\MapchipField.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -278,7 +302,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <TreatWarningAsError>false</TreatWarningAsError>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)source;$(ProjectDir)source\camera;$(ProjectDir)source\colition;$(ProjectDir)source\efect;$(ProjectDir)source\enemy;$(ProjectDir)source\menu;$(ProjectDir)source\other;$(ProjectDir)source\player;$(ProjectDir)source\stage</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

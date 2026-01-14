@@ -55,6 +55,30 @@
     <Filter Include="engine\GAME">
       <UniqueIdentifier>{e4f50392-c482-4e20-a9b7-c9293b09b7d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{3c5480eb-1864-4d2c-ad3b-e22766b48c67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\player">
+      <UniqueIdentifier>{4977bf30-ae32-4df1-bb21-f427bd4c103f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\camera">
+      <UniqueIdentifier>{d4198f16-12dc-49a7-9464-2b69f9cf8c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\enemy">
+      <UniqueIdentifier>{e02faa77-0575-42a3-83c0-1e3e05f49d1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\stage">
+      <UniqueIdentifier>{3acafc2a-970b-4130-bdcd-e3d33d1563b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\colition">
+      <UniqueIdentifier>{b57f2554-9ca0-4168-9e52-a3cf5705b638}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\efect">
+      <UniqueIdentifier>{d20eb01a-6c4f-448c-85b8-ac50093566ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\other">
+      <UniqueIdentifier>{2077ef8d-bed0-4b1e-8c71-bb4969b329e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -168,11 +192,47 @@
     <ClCompile Include="engine\scene\SceneManager.cpp">
       <Filter>engine\scene</Filter>
     </ClCompile>
-    <ClCompile Include="SceneFactory.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="source\camera\CameraController.cpp">
+      <Filter>source\camera</Filter>
     </ClCompile>
-    <ClCompile Include="PSOMnager.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="source\enemy\Enemy.cpp">
+      <Filter>source\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="source\colition\MapCollider.cpp">
+      <Filter>source\colition</Filter>
+    </ClCompile>
+    <ClCompile Include="source\efect\DeathParticles.cpp">
+      <Filter>source\efect</Filter>
+    </ClCompile>
+    <ClCompile Include="source\efect\Fade.cpp">
+      <Filter>source\efect</Filter>
+    </ClCompile>
+    <ClCompile Include="source\efect\HitEffect.cpp">
+      <Filter>source\efect</Filter>
+    </ClCompile>
+    <ClCompile Include="source\stage\Goal.cpp">
+      <Filter>source\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="source\stage\MapchipField.cpp">
+      <Filter>source\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="source\player\Player.cpp">
+      <Filter>source\player</Filter>
+    </ClCompile>
+    <ClCompile Include="source\other\Skydome.cpp">
+      <Filter>source\other</Filter>
+    </ClCompile>
+    <ClCompile Include="source\other\StageManager.cpp">
+      <Filter>source\other</Filter>
+    </ClCompile>
+    <ClCompile Include="source\other\worldT.cpp">
+      <Filter>source\other</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\PSOMnager.cpp">
+      <Filter>engine\base</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\SceneFactory.cpp">
+      <Filter>engine\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -304,14 +364,50 @@
     <ClInclude Include="engine\scene\SceneManager.h">
       <Filter>engine\scene</Filter>
     </ClInclude>
+    <ClInclude Include="source\camera\CameraController.h">
+      <Filter>source\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="source\enemy\Enemy.h">
+      <Filter>source\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="source\colition\MapCollider.h">
+      <Filter>source\colition</Filter>
+    </ClInclude>
+    <ClInclude Include="source\efect\DeathParticles.h">
+      <Filter>source\efect</Filter>
+    </ClInclude>
+    <ClInclude Include="source\efect\Fade.h">
+      <Filter>source\efect</Filter>
+    </ClInclude>
+    <ClInclude Include="source\efect\HitEffect.h">
+      <Filter>source\efect</Filter>
+    </ClInclude>
+    <ClInclude Include="source\stage\Goal.h">
+      <Filter>source\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="source\stage\MapchipField.h">
+      <Filter>source\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="source\player\Player.h">
+      <Filter>source\player</Filter>
+    </ClInclude>
+    <ClInclude Include="source\other\Skydome.h">
+      <Filter>source\other</Filter>
+    </ClInclude>
+    <ClInclude Include="source\other\StageManager.h">
+      <Filter>source\other</Filter>
+    </ClInclude>
+    <ClInclude Include="source\other\worldT.h">
+      <Filter>source\other</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\PSOMnager.h">
+      <Filter>engine\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\SceneFactory.h">
+      <Filter>engine\scene</Filter>
+    </ClInclude>
     <ClInclude Include="AbstractSceneFactory.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneFactory.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PSOMnager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>engine\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
