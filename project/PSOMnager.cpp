@@ -149,13 +149,13 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     break;
     case PipelineType::Object3d:
     {
-        rootParameters.resize(4);
+        rootParameters.resize(5);
 
 
 
         // Enum定義 (可読性のため)
         enum {
-            kMaterial, kTransform, kTexture, kLight
+            kMaterial, kTransform, kTexture, kLight, kCamera
         };
 
         // 0. Material (CBV b0, Pixel)
@@ -178,6 +178,11 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
         rootParameters[kLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
         rootParameters[kLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
         rootParameters[kLight].Descriptor.ShaderRegister = 1;
+        //カメラ
+        rootParameters[kCamera].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
+        rootParameters[kCamera].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
+        rootParameters[kCamera].Descriptor.RegisterSpace = 0;
+        rootParameters[kCamera].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // ピクセルシェーダーのみ見える
 
     }
     break;

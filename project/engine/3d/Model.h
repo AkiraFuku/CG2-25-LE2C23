@@ -18,7 +18,7 @@ public:
         int32_t enableLighting;
         float padding[3]; // パディングを追加してサイズを揃える
         Matrix4x4 uvTransform; // UV変換行列
-
+        float  shininess;
     };
     struct MaterialData {
         std::string textureFilePath;
@@ -39,7 +39,7 @@ public:
     static ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
 
     static Model* CreateSphere(uint32_t subdivision = 16);
-  
+
 
 private:
 

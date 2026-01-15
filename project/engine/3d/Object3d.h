@@ -26,12 +26,15 @@ public:
 
 
     };
-
+    struct CameraForGPU
+    {
+        Vector3 worldPosition;
+    };
     void Initialize();
     void Update();
     void Draw();
-    void SetModel(const std::string& filePath); 
-   
+    void SetModel(const std::string& filePath);
+
     //トランスフォームセッター
     void SetScale(const Vector3& scale) {
         transform_.scale = scale;
@@ -66,8 +69,10 @@ public:
         }
     }
 
-    void SetCamera( Camera *camera){camera_=camera;}
-    
+    void SetCamera(Camera* camera) {
+        camera_ = camera;
+    }
+
 
     //トランスフォームゲッター
     const Vector3& GetScale()const {
@@ -79,7 +84,7 @@ public:
     const Vector3& GetTranslate()const {
         return transform_.translate;
     }
-   // ライトのゲッター
+    // ライトのゲッター
     const Vector4& GetDirectionalLightColor() const {
         return directionalLightData_->color;
     }
@@ -92,25 +97,30 @@ public:
     void SetBlendMode(BlendMode blendMode) {
         blendMode_ = blendMode;
     }
-    void SetFillMode(FillMode fillMode) { fillMode_ = fillMode; }
+    void SetFillMode(FillMode fillMode) {
+        fillMode_ = fillMode;
+    }
 private:
-    
+
 
     std::shared_ptr<Model> model_ = nullptr;
     //WVP行列リソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
     TransformationMatrix* wvpResource_ = nullptr;
     void CreateWVPResource();
     //平行光源
-    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
     DirectionalLight* directionalLightData_ = nullptr;
     void CreateDirectionalLightResource();
 
+    Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+     CameraForGPU* cameraData_ = nullptr;
+     void  CreateCameraResource();
     //トランスフォーム
-    Transform transform_={};
+    Transform transform_ = {};
     //カメラ　
-    Camera *camera_=nullptr;
-    
+    Camera* camera_ = nullptr;
+
     FillMode fillMode_ = FillMode::kSolid;
     BlendMode blendMode_ = BlendMode::None;
 };

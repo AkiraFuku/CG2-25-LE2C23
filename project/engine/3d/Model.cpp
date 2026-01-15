@@ -39,11 +39,6 @@ void Model::Draw() {
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
             TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
-    //SRVのディスクリプタテーブルの設定
-    DXCommon::GetInstance()->
-        GetCommandList()->
-        SetGraphicsRootDescriptorTable(2,
-            TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
     //描画コマンド
     DXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
@@ -76,6 +71,7 @@ void Model::CreateMaterialResource() {
     materialData_->color = Vector4{ 1.0f,1.0f,1.0f,1.0f };
     materialData_->enableLighting = true;
     materialData_->uvTransform = Makeidetity4x4();
+    materialData_->shininess=0.1f;
 
 }
 Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
