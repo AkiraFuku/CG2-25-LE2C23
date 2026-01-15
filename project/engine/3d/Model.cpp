@@ -71,7 +71,7 @@ void Model::CreateMaterialResource() {
     materialData_->color = Vector4{ 1.0f,1.0f,1.0f,1.0f };
     materialData_->enableLighting = true;
     materialData_->uvTransform = Makeidetity4x4();
-    materialData_->shininess=0.1f;
+    materialData_->shininess=50.0f;
 
 }
 Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
