@@ -3,7 +3,7 @@
 #include "ModelManager.h"
 #include <GameEngine.h>
 #include <Framework.h>
-
+#include <cassert>
 
 void MoveEffect::Initialize(Object3d* model, Camera* camera, const Vector3& position, Player* player_)
 {
@@ -33,6 +33,11 @@ void MoveEffect::Initialize(Object3d* model, Camera* camera, const Vector3& posi
 
     // 行列を設定
     worldMatrix_ = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+    // モデルの更新
+    model_->SetTranslate(transform_.translate);
+    model_->SetRotate(transform_.rotate);
+    model_->Update();
 
 }
 

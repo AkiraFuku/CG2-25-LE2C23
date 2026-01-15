@@ -7,6 +7,7 @@
 #include <memory>
 
 class Player;
+class Score;
 
 class Obstacle
 {
@@ -27,12 +28,21 @@ protected:
     // 死亡フラグ
     bool isDead_ = false;
 
+    // スコア
+    std::vector<std::unique_ptr<Score>> scores_;
+    std::vector<std::unique_ptr<Object3d>> scoreModels_;
+    static inline const uint32_t kNumScores = 5;
+    int scoreValue_ = 10;
+
+    // プレイヤー
+    Player* player_;
+
 public:
 
 
-    Obstacle() = default;
-    virtual ~Obstacle() = default;
-    virtual void Initialize(Object3d* model, Camera* camera, const Vector3& position) = 0;
+    Obstacle();
+    ~Obstacle();
+    virtual void Initialize(Object3d* model, Camera* camera, const Vector3& position, Player* player) = 0;
     virtual void Update();
     virtual void Draw();
     // ワールド座標の取得
@@ -41,5 +51,10 @@ public:
     virtual AABB GetAABB() const;
     // 衝突応答
     virtual void OnCollision(const Player* player) = 0;
+    // 当たり判定
+    bool isCollision(const AABB& aabb1, const AABB& aabb2);
+    void CheckCollision();
+    // スコア管理
+    bool IsScoreNone() const;
 };
 

@@ -13,6 +13,7 @@ enum class MapChipType {
 	kBlank,
     kPlayer,
     kObstacle,
+    kGoal,
 };
 
 // 1マス分のデータ

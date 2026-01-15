@@ -13,6 +13,7 @@ namespace {
 std::map<char, MapChipType> mapChipTypeTable = {
     {'P',MapChipType::kPlayer},
     {'O',MapChipType::kObstacle},
+    {'G',MapChipType::kGoal},
 };
 
 }

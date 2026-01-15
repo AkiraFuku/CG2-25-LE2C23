@@ -5,12 +5,15 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 #include "PSOMnager.h"
+#include "Sprite.h"
 #include "Player.h"
 #include "ObstacleSlow.h"
 #include "ObstacleNormal.h"
 #include "ObstacleFast.h"
 #include "ObstacleMax.h"
 #include "MapChipField.h"
+#include "Bitmappedfont.h"
+#include "Goal.h"
 
 // コンストラクタ
 GameScene::GameScene() = default;
@@ -29,7 +32,7 @@ void GameScene::Initialize() {
 
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(handle_,true);
+    Audio::GetInstance()->PlayAudio(handle_, true);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -38,7 +41,7 @@ void GameScene::Initialize() {
        for (uint32_t i = 0; i < 5; i++)
        {*/
     sprite = std::make_unique<Sprite>();
-   
+
     sprite->Initialize("resources/uvChecker.png");
 
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
@@ -78,6 +81,29 @@ void GameScene::Initialize() {
 
     // マップチップデータのセット 
     player_->SetMapChipField(mapChipField_.get());
+
+    // ビットマップフォントの生成と初期化
+    bitmappedFont_ = std::make_unique<Bitmappedfont>();
+    // ビットマップフォントのスプライト
+    for (int i = 0; i < 10; ++i) {
+        // ファイル名の作成
+        //std::string filePath = "Resources/number" + std::to_string(i) + ".png";
+        // 仮置き画像
+        std::string filePath = "resources/uvChecker.png";
+
+        // スプライトのインスタンスを作成
+        auto sprite = std::make_unique<Sprite>();
+
+        // スプライトの初期化
+        sprite->Initialize(filePath.c_str());
+        sprite->SetPosition(Vector2{ 400.0f, 100.0f });
+
+        // 対応するインデックスの vector に追加
+        bitmappedFontSprite_[i].push_back(std::move(sprite));
+    }
+
+    bitmappedFont_->Initialize(bitmappedFontSprite_, camera.get());
+
 }
 
 void GameScene::Finalize() {
@@ -142,6 +168,7 @@ void GameScene::Update() {
     object3d->Update();
     object3d2->Update();
 
+
     // プレイヤーの更新処理
     player_->Update();
 
@@ -153,18 +180,61 @@ void GameScene::Update() {
     for (auto& obstacle : obstacleNormal_) {
         obstacle->Update();
     }
-   
+
     for (auto& obstacle : obstacleFast_) {
         obstacle->Update();
     }
-    
+
     for (auto& obstacle : obstacleMax_) {
         obstacle->Update();
     }
-    
+
     // 全ての当たり判定を行う
     CheckAllCollisions();
 
+
+    // 障害物の削除処理
+    obstacleSlow_.erase(std::remove_if(obstacleSlow_.begin(), obstacleSlow_.end(),
+        [](const std::unique_ptr<ObstacleSlow>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+        obstacleSlow_.end());
+
+    obstacleNormal_.erase(std::remove_if(obstacleNormal_.begin(), obstacleNormal_.end(),
+        [](const std::unique_ptr<ObstacleNormal>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+
+        obstacleNormal_.end());
+
+    obstacleFast_.erase(std::remove_if(obstacleFast_.begin(), obstacleFast_.end(),
+        [](const std::unique_ptr<ObstacleFast>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+
+        obstacleFast_.end());
+
+    obstacleMax_.erase(std::remove_if(obstacleMax_.begin(), obstacleMax_.end(),
+        [](const std::unique_ptr<ObstacleMax>& obstacle) {
+            return obstacle->IsScoreNone();
+
+        }),
+
+        obstacleMax_.end());
+
+    if (!isStarted_)
+    {
+        if (countdownTimer_ <= 0)
+        {
+            isStarted_ = true;
+        }
+        else
+        {
+            countdownTimer_--;
+            bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
+            bitmappedFont_->Update();
+        }
+    }
 
 
 #ifdef USE_IMGUI
@@ -184,16 +254,27 @@ void GameScene::Update() {
     SpeedStage speedStage = player_->GetSpeedStage();
     ImGui::Text("Current Speed Stage: %d", static_cast<int>(speedStage));
 
+    ImGui::Text("Score");
+    ImGui::Text("Current Score: %d", player_->GetScore());
+
     ImGui::End();
 #endif // USE_IMGUI
 
     //sprite->SetRotation(sprite->GetRotation() + 0.1f);
     sprite->Update();
+
+
 }
+
 void GameScene::Draw() {
     //object3d2->Draw();
     //object3d->Draw();
     //ParticleManager::GetInstance()->Draw();
+
+    if (!isStarted_)
+    {
+        bitmappedFont_->Draw();
+    }
 
     // プレイヤーの描画処理
     player_->Draw();
@@ -221,6 +302,11 @@ void GameScene::Draw() {
 
 void GameScene::CheckAllCollisions()
 {
+    if (!isStarted_)
+    {
+        return;
+    }
+
 #pragma region 自キャラと障害物(遅い)の当たり判定
     // 判定対象1と2の座標
     AABB aabbPlayer, aabbSlow;
@@ -299,8 +385,6 @@ void GameScene::CheckAllCollisions()
 
 #pragma endregion
 
-
-
 }
 
 bool GameScene::isCollision(const AABB& aabb1, const AABB& aabb2)
@@ -339,7 +423,7 @@ void GameScene::GenerateFieldObjects()
             {
             case MapChipType::kBlank:
                 break;
-           
+
             case MapChipType::kPlayer:
             {
                 assert(player_ == nullptr && "自キャラを二重に配置しようとしています");
@@ -350,9 +434,26 @@ void GameScene::GenerateFieldObjects()
                 playerModel_->SetModel("cube.obj");
                 playerModel_->Initialize();
                 player_->Initialize(playerModel_.get(), camera.get(), pos);
+                player_->SetGameScene(this);
 
             }
             break;
+            }
+        }
+    }
+
+    for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+        for (uint32_t j = 0; j < numBlockHorizontal; j++) {
+
+            // 現在の座標のチップタイプを取得
+            MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
+            Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
+
+            switch (type)
+            {
+            case MapChipType::kBlank:
+                break;
+
 
             case MapChipType::kObstacle:
             {
@@ -368,7 +469,7 @@ void GameScene::GenerateFieldObjects()
 
                     // 本体を生成してリストに追加
                     auto obstacle = std::make_unique<ObstacleSlow>();
-                    obstacle->Initialize(model.get(), camera.get(), pos);
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
 
                     // vectorに保存
                     obstacleSlowModel_.push_back(std::move(model));
@@ -386,7 +487,7 @@ void GameScene::GenerateFieldObjects()
 
                     // 本体を生成してリストに追加
                     auto obstacle = std::make_unique<ObstacleNormal>();
-                    obstacle->Initialize(model.get(), camera.get(), pos);
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
 
                     // vectorに保存
                     obstacleNormalModel_.push_back(std::move(model));
@@ -405,7 +506,7 @@ void GameScene::GenerateFieldObjects()
 
                     // 本体を生成してリストに追加
                     auto obstacle = std::make_unique<ObstacleFast>();
-                    obstacle->Initialize(model.get(), camera.get(), pos);
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
 
                     // vectorに保存
                     obstacleFastModel_.push_back(std::move(model));
@@ -424,7 +525,7 @@ void GameScene::GenerateFieldObjects()
 
                     // 本体を生成してリストに追加
                     auto obstacle = std::make_unique<ObstacleMax>();
-                    obstacle->Initialize(model.get(), camera.get(), pos);
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
 
                     // vectorに保存
                     obstacleSlowModel_.push_back(std::move(model));
@@ -437,6 +538,18 @@ void GameScene::GenerateFieldObjects()
 
 
             }
+
+            case MapChipType::kGoal:
+            {
+                auto goalModel = std::make_unique<Object3d>();
+                goalModel->SetModel("cube.obj");
+                goalModel->Initialize();
+                auto goal = std::make_unique<Goal>();
+                goal->Initialize(goalModel.get(), camera.get(), pos);
+                goalModels_.push_back(std::move(goalModel));
+                goals_.push_back(std::move(goal));
+            }
+
             }
         }
 

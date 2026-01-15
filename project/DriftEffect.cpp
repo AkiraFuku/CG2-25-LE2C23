@@ -3,7 +3,7 @@
 #include "ModelManager.h"
 #include <GameEngine.h>
 #include <Framework.h>
-
+#include <cassert>
 
 void DriftEffect::Initialize(Sprite* sprite, Camera* camera, const Vector3& position, Player* player_)
 {

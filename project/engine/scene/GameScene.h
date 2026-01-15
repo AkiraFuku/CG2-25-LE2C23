@@ -16,6 +16,9 @@ class ObstacleNormal;
 class ObstacleFast;
 class ObstacleMax;
 class MapChipField;
+class Score;
+class Bitmappedfont;
+class Goal;
 
 class GameScene :public Scene
 {
@@ -35,6 +38,9 @@ public:
 
     // マップチップの生成
     void GenerateFieldObjects();
+
+    // 開始フラグを取得
+    bool IsStarted() const { return isStarted_; }
 
 private:
     std::unique_ptr<Camera> camera;
@@ -66,26 +72,18 @@ private:
     // ブロック用のワールドトランスフォーム
     std::vector<std::vector<Transform*>> worldTransformObjects;
 
-    //// 自キャラ
-    //std::unique_ptr<Player> player_;
-    //// プレイヤーのモデル
-    //std::unique_ptr<Object3d> playerModel_;
+    // ビットマップフォント
+    std::unique_ptr<Bitmappedfont> bitmappedFont_;
+    std::vector<std::unique_ptr<Sprite>> bitmappedFontSprite_[10];
 
-    //// 障害物
-    //std::vector<std::unique_ptr<ObstacleSlow>> obstacleSlow_;
-    //std::vector<std::unique_ptr<ObstacleNormal>> obstacleNormal_;
-    //std::vector<std::unique_ptr<ObstacleFast>> obstacleFast_;
-    //std::vector<std::unique_ptr<ObstacleMax>> obstacleMax_;
+    // ゴール
+    std::vector<std::unique_ptr<Goal>> goals_;
+    std::vector<std::unique_ptr<Object3d>> goalModels_;
 
-    //// 障害物のモデル
-    //std::vector<std::unique_ptr<Object3d>> obstacleSlowModel_;
-    //std::vector<std::unique_ptr<Object3d>> obstacleNormalModel_;
-    //std::vector<std::unique_ptr<Object3d>> obstacleFastModel_;
-    //std::vector<std::unique_ptr<Object3d>> obstacleMaxModel_;
-
-    //// マップチップフィールド
-    //std::unique_ptr<MapChipField> mapChipField_;
-    //// ブロック用のワールドトランスフォーム
-    //std::vector<std::vector<Transform*>> worldTransformObjects;
+    // スタート前のカウントダウン
+    int32_t countdownTimer_ = 180;
+    // ゲーム開始フラグ
+    bool isStarted_ = false;
+    
 };
 
