@@ -42,6 +42,7 @@ public:
     };
 
     void Initialize(const std::string& directryPath, const std::string& filename);
+    void Update();
 
     void Draw();
 
@@ -58,7 +59,7 @@ private:
     ModelData modelData_;
 
     //頂点リソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
     VertexData* vertexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
     void CreateVertexBuffer();

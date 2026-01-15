@@ -7,6 +7,7 @@
 #include <sstream>
 #include <Windows.h>
 #include <numbers>
+#include <imgui.h>
 void Model::Initialize(const std::string& directryPath, const std::string& filename)
 {
 
@@ -28,6 +29,37 @@ void Model::Initialize(const std::string& directryPath, const std::string& filen
     modelData_.material.textureIndex =
         TextureManager::GetInstance()->GetTextureIndexByFilePath(
             modelData_.material.textureFilePath);
+
+}
+
+void Model::Update()
+{
+#ifdef USE_IMGUI
+    ImGui::Begin("Settings");
+            int* pEnableLighting = reinterpret_cast<int*>(&materialData_->enableLighting);
+            ImGui::Checkbox("Enable Lighting", (bool*)pEnableLighting);
+            if (materialData_->enableLighting) {
+                // 拡散反射 (Diffuse) の設定
+                ImGui::Text("Diffuse (Base)");
+                const char* diffuseItems[] = { "Lambert", "Half-Lambert" };
+                ImGui::Combo("Diffuse Type", &materialData_->diffuseType, diffuseItems, IM_ARRAYSIZE(diffuseItems));
+
+                // 鏡面反射 (Specular) の設定
+                ImGui::Text("Specular (Shininess)");
+                const char* specularItems[] = { "None", "Phong", "Blinn-Phong" };
+                ImGui::Combo("Specular Type", &materialData_->specularType, specularItems, IM_ARRAYSIZE(specularItems));
+
+                // 光沢度
+                ImGui::DragFloat("Shininess", &materialData_->shininess, 0.1f, 1.0f, 256.0f);
+            }
+          
+
+            ImGui::End();
+
+
+#endif // USE_IMGUI
+
+
 }
 void Model::Draw() {
     //VBVの設定
@@ -46,15 +78,15 @@ void Model::Draw() {
 
 void Model::CreateVertexBuffer() {
     //頂点リソースの作成
-    vertexResourse_ =
+    vertexResource_ =
         DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
-        vertexResourse_.Get()->GetGPUVirtualAddress();
+        vertexResource_.Get()->GetGPUVirtualAddress();
     vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
-    vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+    vertexResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
     //頂点データの転送
     memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
