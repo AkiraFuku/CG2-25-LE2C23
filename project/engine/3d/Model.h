@@ -16,7 +16,9 @@ public:
     struct Material {
         Vector4 color;
         int32_t enableLighting;
-        float padding[3]; // パディングを追加してサイズを揃える
+        int32_t diffuseType;  // 0:Lambert, 1:Half-Lambert
+        int32_t specularType; // 0:None, 1:Phong, 2:BlinnPhong
+        float padding[1];
         Matrix4x4 uvTransform; // UV変換行列
         float  shininess;
     };
@@ -27,6 +29,16 @@ public:
     struct ModelData {
         std::vector<VertexData> vertices; // 頂点データの配列
         MaterialData material; // マテリアルデータ
+    };
+    enum  DiffuseType
+    {
+        Lambert,
+        HarfLambert
+    };
+    enum  SpecularType {
+        NONE,
+        Phong,
+        BlinnPhong,
     };
 
     void Initialize(const std::string& directryPath, const std::string& filename);

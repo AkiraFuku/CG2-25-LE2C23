@@ -72,6 +72,8 @@ void Model::CreateMaterialResource() {
     materialData_->enableLighting = true;
     materialData_->uvTransform = Makeidetity4x4();
     materialData_->shininess=50.0f;
+    materialData_->specularType=BlinnPhong;
+    materialData_->diffuseType=HarfLambert;
 
 }
 Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
