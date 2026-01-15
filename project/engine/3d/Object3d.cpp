@@ -74,7 +74,7 @@ void Object3d::CreateWVPResource()
         Map(0, nullptr, reinterpret_cast<void**>(&wvpResource_));
     wvpResource_->WVP = Makeidetity4x4();
     wvpResource_->World = Makeidetity4x4();
-
+    wvpResource_->WorldInverseTranspose=Inverse( wvpResource_->World );
 }
 
 void Object3d::CreateDirectionalLightResource()

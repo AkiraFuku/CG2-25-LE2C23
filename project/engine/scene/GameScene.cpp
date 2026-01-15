@@ -148,8 +148,11 @@ void GameScene::Update() {
     ImGui::Begin("Debug");
     ImGui::Text("Sphire");
     Vector3 pos = object3d->GetTranslate();
+    Vector3 scale = object3d->GetScale();
     ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+    ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
     object3d->SetTranslate(pos);
+    object3d->SetScale(scale);
 
     Vector4 lightColor = object3d->GetDirectionalLightColor();
 

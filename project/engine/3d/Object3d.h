@@ -17,7 +17,7 @@ public:
     struct TransformationMatrix {
         Matrix4x4 WVP;
         Matrix4x4 World;
-
+        Matrix4x4 WorldInverseTranspose;
     };
     struct DirectionalLight {
         Vector4 color;//ライトの色
@@ -114,8 +114,8 @@ private:
     void CreateDirectionalLightResource();
 
     Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
-     CameraForGPU* cameraData_ = nullptr;
-     void  CreateCameraResource();
+    CameraForGPU* cameraData_ = nullptr;
+    void  CreateCameraResource();
     //トランスフォーム
     Transform transform_ = {};
     //カメラ　
