@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
+#include "PSOMnager.h"
 #include "Player.h"
 #include "ObstacleSlow.h"
 #include "ObstacleNormal.h"
@@ -26,9 +27,9 @@ void GameScene::Initialize() {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
-    soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
+    handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(soundData1);
+    Audio::GetInstance()->PlayAudio(handle_,true);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -63,6 +64,7 @@ void GameScene::Initialize() {
     object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("axis.obj");
     object3d->SetModel("plane.obj");
+    object3d->SetBlendMode(BlendMode::Add);
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 

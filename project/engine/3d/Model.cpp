@@ -37,12 +37,12 @@ void Model::Draw() {
     DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
-            TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
+            TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
     //SRVのディスクリプタテーブルの設定
   DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
-            TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
+            TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
     //描画コマンド
    DXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
@@ -50,15 +50,15 @@ void Model::Draw() {
 
 void Model::CreateVertexBuffer() {
     //頂点リソースの作成
-    vertexResourse_ =
+    vertexResource_ =
        DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
     //頂点バッファビューの設定
     vertexBufferView_.BufferLocation =
-        vertexResourse_.Get()->GetGPUVirtualAddress();
+        vertexResource_.Get()->GetGPUVirtualAddress();
     vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
-    vertexResourse_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+    vertexResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
     //頂点データの転送
     memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
@@ -77,11 +77,11 @@ void Model::CreateMaterialResource() {
     materialData_->uvTransform = Makeidetity4x4();
 
 }
-Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename) {
+Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
     //1. 変数の宣言
     MaterialData materialData{}; // 修正: 初期化
     std::string line;
-    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+    std::ifstream file(directoryPath + "/" + filename);//ファイルパスを結合して開く
     //2. ファイルを開く
     assert(file.is_open());//ファイルが開けたか確認
     //3. ファイルからデータを読み込みマテリアルデータを作成
@@ -94,7 +94,7 @@ Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directry
             std::string textureFileName;
             s >> textureFileName;//テクスチャファイル名を読み込み
             //テクスチャのパスを設定
-            materialData.textureFilePath = directryPath + "/" + textureFileName;
+            materialData.textureFilePath = directoryPath + "/" + textureFileName;
         }
     }
 
@@ -102,16 +102,16 @@ Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directry
     return materialData;
 }
 
-Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::string& filename)
+Model::ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename)
 {
     //1. 変数の宣言
     ModelData modelData;
     std::vector<Vector4> positions;//頂点座標
     std::vector<Vector3> normals;//法線ベクトル
-    std::vector<Vector2> texcoords;//テクスチャ座標
+    std::vector<Vector2> texcords;//テクスチャ座標
     std::string line;
     //2. ファイルを開く
-    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+    std::ifstream file(directoryPath + "/" + filename);//ファイルパスを結合して開く
     
     assert(file.is_open());//ファイルが開けたか確認
 
@@ -128,11 +128,11 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
             position.x *= -1.0f; // X軸を反転
             positions.push_back(position);//頂点座標を追加
         } else if (identifier == "vt") {
-            Vector2 texcoord;
-            s >> texcoord.x >> texcoord.y;//テクスチャ座標を読み込み
+            Vector2 texcord;
+            s >> texcord.x >> texcord.y;//テクスチャ座標を読み込み
             // OpenGLとDirectXでY軸の方向が異なるため、Y座標を反転
-            texcoord.y = 1.0f - texcoord.y;
-            texcoords.push_back(texcoord);//テクスチャ座標を追加
+            texcord.y = 1.0f - texcord.y;
+            texcords.push_back(texcord);//テクスチャ座標を追加
         } else if (identifier == "vn") {
             Vector3 normal;
             s >> normal.x >> normal.y >> normal.z;//法線ベクトルを読み込み
@@ -155,12 +155,11 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
                 }
                 // 要素のインデックスから頂点データを構築
                 Vector4 position = positions[elementIndices[0] - 1];//1から始まるので-1
-                Vector2 texcoord = texcoords[elementIndices[1] - 1];//1から始まるので-1
+                Vector2 texcord = texcords[elementIndices[1] - 1];//1から始まるので-1
                 Vector3 normal = normals[elementIndices[2] - 1];//1から始まるので-1
 
-                //    VertexData vertex = { position, texcoord, normal };//頂点データを構築
-                //    modelData.vertices.push_back(vertex);//モデルデータに頂点を追加
-                Triangle[faceVertex] = { position, texcoord, normal };//頂点データを構築
+              
+                Triangle[faceVertex] = { position, texcord, normal };//頂点データを構築
             }
             modelData.vertices.push_back(Triangle[2]);
             modelData.vertices.push_back(Triangle[1]);
@@ -170,7 +169,7 @@ Model::ModelData Model::LoadObjFile(const std::string& directryPath, const std::
             std::string materialFileName;
             s >> materialFileName;//マテリアルファイル名を読み込み
             //マテリアルデータを読み込む
-            modelData.material = LoadMaterialTemplateFile(directryPath, materialFileName);
+            modelData.material = LoadMaterialTemplateFile(directoryPath, materialFileName);
         }
 
     }

@@ -22,6 +22,6 @@ private:
     std::unique_ptr<Sprite> sprite;
 
 
-    Audio::SoundData soundData1;
+     uint32_t handle_=0;
 };
 

@@ -10,7 +10,7 @@ class Model
 public:
     struct VertexData {
         Vector4 position; // 4D position vector
-        Vector2 texcoord; // 2D texture coordinate vector
+        Vector2 texcord; // 2D texture coordinate vector
         Vector3 normal;
     };
     struct Material {
@@ -46,7 +46,7 @@ private:
     ModelData modelData_;
 
     //頂点リソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
     VertexData* vertexData_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
     void CreateVertexBuffer();

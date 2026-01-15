@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Object3dCommon.h"
+#include "PSOMnager.h"
 class Object3d
 {
 
@@ -55,7 +56,9 @@ public:
     const Vector3& GetTranslate()const {
         return transform_.translate;
     }
-
+    void SetBlendMode(BlendMode blendMode) {
+        blendMode_ = blendMode;
+    }
 private:
     
 
@@ -74,6 +77,6 @@ private:
     //カメラ　
     Camera *camera_=nullptr;
     
-
+    BlendMode blendMode_ = BlendMode::None;
 };
 
