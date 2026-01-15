@@ -98,11 +98,11 @@ private:
 
     std::shared_ptr<Model> model_ = nullptr;
     //WVP行列リソース
-    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
     TransformationMatrix* wvpResource_ = nullptr;
     void CreateWVPResource();
     //平行光源
-    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourse_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
     DirectionalLight* directionalLightData_ = nullptr;
     void CreateDirectionalLightResource();
 

@@ -55,6 +55,15 @@
     <Filter Include="engine\GAME">
       <UniqueIdentifier>{e4f50392-c482-4e20-a9b7-c9293b09b7d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダー ファイル\Obj3d">
+      <UniqueIdentifier>{8d68b3c7-11bc-467a-b3d9-73d6dcdce802}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー ファイル\Particle">
+      <UniqueIdentifier>{7b244b68-cc4f-4a97-826a-156c8f7af558}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー ファイル\Sprite">
+      <UniqueIdentifier>{5cdfbd60-b3cb-4a73-9a61-3e8ce0ee3001}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -307,24 +316,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d\Object3d.hlsli">
-      <Filter>シェーダー ファイル</Filter>
+      <Filter>シェーダー ファイル\Obj3d</Filter>
     </None>
     <None Include="resources\shaders\Particle\Particle.hlsli">
-      <Filter>シェーダー ファイル</Filter>
+      <Filter>シェーダー ファイル\Particle</Filter>
+    </None>
+    <None Include="resources\shaders\Sprite\Sprite.hlsli">
+      <Filter>シェーダー ファイル\Sprite</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
+      <Filter>シェーダー ファイル\Obj3d</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\Object3d\Object3d.VS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
+      <Filter>シェーダー ファイル\Obj3d</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\Particle\Particle.PS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
+      <Filter>シェーダー ファイル\Particle</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\Particle\Particle.VS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
+      <Filter>シェーダー ファイル\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Sprite\Sprite.PS.hlsl">
+      <Filter>シェーダー ファイル\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Sprite\Sprite.VS.hlsl">
+      <Filter>シェーダー ファイル\Sprite</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

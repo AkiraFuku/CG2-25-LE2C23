@@ -61,8 +61,8 @@ void PSOMnager::EnsureShaders(PipelineType type, ComPtr<IDxcBlob>& outVS, ComPtr
 
     switch (type) {
     case PipelineType::Sprite:
-        vs = dxCommon->CompileShader(L"resources/shaders/Object3d/Object3D.vs.hlsl", L"vs_6_0");
-        ps = dxCommon->CompileShader(L"resources/shaders/Object3d/Object3D.ps.hlsl", L"ps_6_0");
+        vs = dxCommon->CompileShader(L"resources/shaders/Sprite/Sprite.vs.hlsl", L"vs_6_0");
+        ps = dxCommon->CompileShader(L"resources/shaders/Sprite/Sprite.ps.hlsl", L"ps_6_0");
         break;
     case PipelineType::Object3d:
         vs = dxCommon->CompileShader(L"resources/shaders/Object3d/Object3D.vs.hlsl", L"vs_6_0");
@@ -118,9 +118,109 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     descRangeTexture[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     descRangeTexture[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
- // -----------------------------------------------------------------------
-    // パーティクル用の特別な分岐
     // -----------------------------------------------------------------------
+       // パーティクル用の特別な分岐
+       // -----------------------------------------------------------------------
+
+
+    switch (type)
+    {
+    case PipelineType::Sprite:
+    {
+        rootParameters.resize(4);
+
+        // Enum定義 (可読性のため)
+        enum {
+            kMaterial, kTransform, kTexture
+        };
+
+        // 0. Material (CBV b0, Pixel)
+        rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kMaterial].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kMaterial].Descriptor.ShaderRegister = 0;
+
+        // 1. Transform (CBV b0, Vertex)
+        rootParameters[kTransform].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kTransform].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+        rootParameters[kTransform].Descriptor.ShaderRegister = 0;
+
+        // 2. Texture (Table t0, Pixel)
+        rootParameters[kTexture].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[kTexture].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kTexture].DescriptorTable.pDescriptorRanges = descRangeTexture;
+        rootParameters[kTexture].DescriptorTable.NumDescriptorRanges = 1;
+
+        break;
+    }
+    case PipelineType::Object3d:
+    {
+        rootParameters.resize(4);
+
+        // Enum定義 (可読性のため)
+        enum {
+            kMaterial, kTransform, kTexture, kLight
+        };
+
+        // 0. Material (CBV b0, Pixel)
+        rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kMaterial].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kMaterial].Descriptor.ShaderRegister = 0;
+
+        // 1. Transform (CBV b0, Vertex)
+        rootParameters[kTransform].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kTransform].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+        rootParameters[kTransform].Descriptor.ShaderRegister = 0;
+
+        // 2. Texture (Table t0, Pixel)
+        rootParameters[kTexture].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[kTexture].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kTexture].DescriptorTable.pDescriptorRanges = descRangeTexture;
+        rootParameters[kTexture].DescriptorTable.NumDescriptorRanges = 1;
+
+        // 3. DirectionalLight (CBV b1, Pixel)
+        rootParameters[kLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[kLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[kLight].Descriptor.ShaderRegister = 1;
+        break;
+    }
+    case PipelineType::Particle:
+    {
+        // パーティクル用インスタンシングレンジ (VS t0)
+      // ※ staticにしないとスコープを抜けてデータが壊れる可能性があるため注意
+      //   ここでは関数内完結させるため、vector等で管理するか、static配列にする
+        static D3D12_DESCRIPTOR_RANGE descRangeInstancing[1]{};
+        descRangeInstancing[0].BaseShaderRegister = 0; // t0 (VS)
+        descRangeInstancing[0].NumDescriptors = 1;
+        descRangeInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        descRangeInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+        rootParameters.resize(4);
+
+        // [Param 0] Material (CBV b0, Pixel)
+        rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[0].Descriptor.ShaderRegister = 0;
+
+        // [Param 1] Instancing Data (DescriptorTable t0, Vertex) ★ここが重要
+        rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+        rootParameters[1].DescriptorTable.pDescriptorRanges = descRangeInstancing;
+        rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+
+        // [Param 2] Texture (DescriptorTable t0, Pixel)
+        rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[2].DescriptorTable.pDescriptorRanges = descRangeTexture;
+        rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+
+        // [Param 3] DirectionalLight (CBV b1, Pixel)
+        rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[3].Descriptor.ShaderRegister = 1;
+        break;
+    }
+    }
+
     if (type == PipelineType::Particle) {
         // パーティクル用インスタンシングレンジ (VS t0)
         // ※ staticにしないとスコープを抜けてデータが壊れる可能性があるため注意
@@ -160,9 +260,11 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     // -----------------------------------------------------------------------
     else {
         rootParameters.resize(4);
-        
+
         // Enum定義 (可読性のため)
-        enum { kMaterial, kTransform, kTexture, kLight };
+        enum {
+            kMaterial, kTransform, kTexture, kLight
+        };
 
         // 0. Material (CBV b0, Pixel)
         rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -220,44 +322,47 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     CreateRootSignature(property.type);
     auto rootSignature = rootSignatureCache_[property.type];
 
-     //InputLayoutの設定
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-    inputElementDescs[0].SemanticName = "POSITION";
-    inputElementDescs[0].SemanticIndex = 0;
-    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-    //
-    inputElementDescs[1].SemanticName = "TEXCOORD";
-    inputElementDescs[1].SemanticIndex = 0;
-    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-    //
-    inputElementDescs[2].SemanticName = "NORMAL";
-    inputElementDescs[2].SemanticIndex = 0;
-    inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+    // 2. InputLayoutの設定 (★修正: 可変にする)
+    std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
 
-      D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-    inputLayoutDesc.pInputElementDescs = inputElementDescs;
-    inputLayoutDesc.NumElements = _countof(inputElementDescs);
+    // 共通: 座標
+    inputElementDescs.push_back({
+        "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+        });
+    // 共通: UV
+    inputElementDescs.push_back({
+        "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+        });
 
-  
+    // 3Dオブジェクトとパーティクルは法線が必要だが、スプライトには不要
+    if (property.type != PipelineType::Sprite) {
+        inputElementDescs.push_back({
+           "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
+           D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+            });
+    }
+    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+    inputLayoutDesc.pInputElementDescs = inputElementDescs.data();
+    inputLayoutDesc.NumElements = (UINT)inputElementDescs.size();
+
     // 2. Shader (キャッシュ対応版)
     ComPtr<IDxcBlob> vsBlob;
     ComPtr<IDxcBlob> psBlob;
     EnsureShaders(property.type, vsBlob, psBlob);
 
-   
+
 
     // 4. Rasterizer & Depth
-    D3D12_RASTERIZER_DESC rasterizerDesc {};
-   if (property.fillMode == FillMode::kWireFrame) {
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME; // ワイヤーフレーム
-} else {
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;     // 通常塗りつぶし
-}
+    D3D12_RASTERIZER_DESC rasterizerDesc{};
+    if (property.fillMode == FillMode::kWireFrame) {
+        rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME; // ワイヤーフレーム
+    } else {
+        rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;     // 通常塗りつぶし
+    }
 
-    D3D12_DEPTH_STENCIL_DESC depthDesc {};
+    D3D12_DEPTH_STENCIL_DESC depthDesc{};
     depthDesc.DepthEnable = true;
     //書き込み
     depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
@@ -267,8 +372,9 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     // タイプごとの設定微調整
     switch (property.type) {
     case PipelineType::Sprite:
-        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK; // 2Dはカリングしないことが多い
-        depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+        depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS; // 常に上書き(またはLESS_EQUAL)
         break;
     case PipelineType::Object3d:
         rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
@@ -299,7 +405,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     psoDesc.DepthStencilState = depthDesc;
     psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-      //カラー
+    //カラー
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
@@ -312,7 +418,7 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
 }
 
 D3D12_BLEND_DESC PSOMnager::CreateBlendDesc(BlendMode mode) {
-   D3D12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    D3D12_BLEND_DESC blendDesc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
     blendDesc.RenderTarget[0].BlendEnable = TRUE;
 

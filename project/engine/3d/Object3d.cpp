@@ -47,9 +47,9 @@ void Object3d::Draw()
     // PSOをセット
     DXCommon::GetInstance()->GetCommandList()->SetPipelineState(psoSet.pipelineState.Get());
     //WVP行列リソースの設定
-   DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
+   DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_.Get()->GetGPUVirtualAddress());
     //light
-    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResourse_.Get()->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_.Get()->GetGPUVirtualAddress());
 
     if (model_){
         model_->Draw();
@@ -65,10 +65,10 @@ void Object3d::SetModel(const std::string& filePath)
 void Object3d::CreateWVPResource()
 {
     //座標変換
-    transformationMatrixResourse_ =
+    transformationMatrixResource_ =
       DXCommon::GetInstance()->
         CreateBufferResource(sizeof(TransformationMatrix));
-    transformationMatrixResourse_.Get()->
+    transformationMatrixResource_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&wvpResource_));
     wvpResource_->WVP = Makeidetity4x4();
     wvpResource_->World = Makeidetity4x4();
@@ -77,10 +77,10 @@ void Object3d::CreateWVPResource()
 
 void Object3d::CreateDirectionalLightResource()
 {
-    directionalLightResourse_ =
+    directionalLightResource_ =
         DXCommon::GetInstance()->
         CreateBufferResource(sizeof(DirectionalLight));
-    directionalLightResourse_.Get()->
+    directionalLightResource_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
     directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
     directionalLightData_->direction = { 0.0f,-1.0f,0.0f };

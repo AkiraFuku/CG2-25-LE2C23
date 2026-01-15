@@ -24,7 +24,6 @@ void GameScene::Initialize() {
        for (uint32_t i = 0; i < 5; i++)
        {*/
     sprite = std::make_unique<Sprite>();
-    // sprite->Initialize(spritecommon,"resources/monsterBall.png");
     sprite->Initialize("resources/uvChecker.png");
 
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
@@ -101,9 +100,9 @@ void GameScene::Update() {
 
     if (Input::GetInstance()->GetMouseMove().z)
     {
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(Input::GetInstance()->GetMouseMove().z) * 0.1f });
-        camera->SetTranslate(camreaTranslate);
+        Vector3 cameraTranslate = camera->GetTranslate();
+        cameraTranslate = Add(cameraTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(Input::GetInstance()->GetMouseMove().z) * 0.1f });
+        camera->SetTranslate(cameraTranslate);
 
     }
     /*if (Input::GetInstance()->TriggerMouseDown(0))
@@ -134,9 +133,9 @@ void GameScene::Update() {
         // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
         float normalizedX = x / 32767.0f;
         float normalizedY = y / 32767.0f;
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
-        camera->SetTranslate(camreaTranslate);
+        Vector3 cameraTranslate = camera->GetTranslate();
+        cameraTranslate = Add(cameraTranslate, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+        camera->SetTranslate(cameraTranslate);
     }
 
     camera->Update();
@@ -146,7 +145,7 @@ void GameScene::Update() {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
-    ImGui::Text("Sphire");
+    ImGui::Text("Sphere");
     Vector3 pos = object3d->GetTranslate();
     ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
     object3d->SetTranslate(pos);
