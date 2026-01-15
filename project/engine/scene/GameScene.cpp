@@ -38,13 +38,14 @@ void GameScene::Initialize() {
        for (uint32_t i = 0; i < 5; i++)
        {*/
     sprite = std::make_unique<Sprite>();
-    // sprite->Initialize(spritecommon,"resources/monsterBall.png");
+   
     sprite->Initialize("resources/uvChecker.png");
 
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
     // sprite->SetSize(Vector2{ 100.0f,100.0f });
     //sprites.push_back(sprite);
 
+    sprite->SetBlendMode(BlendMode::Add);
     sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
 
     //}

@@ -62,6 +62,7 @@
     <ClCompile Include="ObstacleNormal.cpp" />
     <ClCompile Include="ObstacleSlow.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PSOMnager.cpp" />
     <ClCompile Include="SceneFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +140,7 @@
     <ClInclude Include="ObstacleNormal.h" />
     <ClInclude Include="ObstacleSlow.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PSOMnager.h" />
     <ClInclude Include="SceneFactory.h" />
   </ItemGroup>
   <ItemGroup>
