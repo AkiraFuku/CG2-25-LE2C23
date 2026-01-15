@@ -1,6 +1,7 @@
 #include "Rand.h"
 #include <GameEngine.h>
 #include <random>
+#include <cassert>
 
 void Rand::Initialize() {
 	// メルセンヌ・ツイスターエンジンの初期化

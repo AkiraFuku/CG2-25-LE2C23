@@ -16,6 +16,8 @@ class MoveEffect;
 class DriftEffect;
 class RotateArrow;
 class SpeedMeter;
+class GameScene;
+class Goal;
 
 // 速さの段階
 enum class SpeedStage
@@ -107,6 +109,21 @@ private:
     std::unique_ptr<Sprite> speedMeterSprite_;
     std::unique_ptr<Sprite> baseSprite_;
 
+    // スコア
+    int score_ = 0;
+
+    // ゲームシーンのポインタ
+    GameScene* gameScene_ = nullptr;
+
+    // 死亡時のプレイヤーの角度
+    Vector3 deadRotate_ = {0.0f,0.0f,3.0f};
+
+    // 死亡演出までのタイマー
+    float deathTimer_ = 10.0f;
+
+    // ゴールしたかどうかのフラグ
+    bool isGoal_ = false;
+
 public:
     // 初期化
     void Initialize(Object3d* model, Camera* camera, const Vector3& position);
@@ -137,8 +154,11 @@ public:
     void OnCollision(const ObstacleNormal* obstacleNormal);
     void OnCollision(const ObstacleFast* obstacleFast);
     void OnCollision(const ObstacleMax* obstacleMax);
+    void OnCollision(const Goal* goal);
     // デスフラグを取得
     bool IsDead() const { return isDead_; }
+    // ゴールフラグを取得
+    bool IsGoal() const { return isGoal_; }
     // マップチップフィールドのセット
     void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
     // 角度を取得
@@ -147,6 +167,11 @@ public:
     bool IsAcceleration() const { return isAcceleration_; }
     // 行列を取得
     Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
+    // スコアを加算
+    void AddScore(int score) { score_ += score; }
+    int GetScore() const { return score_; }
+    // ゲームシーンのポインタを取得
+    void SetGameScene(GameScene* gamescene) { gameScene_ = gamescene; }
     // コンストラクタとデストラクタ
     Player();
     ~Player();

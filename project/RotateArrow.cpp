@@ -3,7 +3,7 @@
 #include "ModelManager.h"
 #include <GameEngine.h>
 #include <Framework.h>
-
+#include <cassert>
 
 void RotateArrow::Initialize(Object3d* model, Camera* camera, const Vector3& position, Player* player_)
 {
@@ -16,6 +16,10 @@ void RotateArrow::Initialize(Object3d* model, Camera* camera, const Vector3& pos
     camera_ = camera;
     transform_.translate = position;
     player = player_;
+
+    // モデルの更新
+    model_->SetTranslate(transform_.translate);
+    model_->Update();
 }
 
 void RotateArrow::Update()

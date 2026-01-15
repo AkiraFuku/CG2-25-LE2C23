@@ -1,6 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+
+    <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.PS.hlsl" />
+    <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.VS.hlsl" />
+    <FxCompile Include="engine\Tool\resources\shaders\Particle\Particle.PS.hlsl" />
+    <FxCompile Include="engine\Tool\resources\shaders\Particle\Particle.VS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DriftEffect.cpp" />
+    <ClCompile Include="engine\math\DrawFunction.cpp" />
+    <ClCompile Include="engine\Tool\Camera.cpp" />
+    <ClCompile Include="engine\2d\Vector2.cpp" />
+    <ClCompile Include="engine\3d\Vector3.cpp" />
+    <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp" />
+    <ClCompile Include="engine\base\DXCommon.cpp" />
+    <ClCompile Include="engine\audio\Audio.cpp" />
+    <ClCompile Include="engine\Tool\ImGuiManager.cpp" />
+    <ClCompile Include="externals\imgui\imgui.cpp" />
+    <ClCompile Include="externals\imgui\imgui_demo.cpp" />
+    <ClCompile Include="externals\imgui\imgui_draw.cpp" />
+    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="externals\imgui\imgui_tables.cpp" />
+    <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="engine\input\Input.cpp" />
+    <ClCompile Include="engine\Tool\Logger.cpp" />
+    <ClCompile Include="engine\GAME\Framework.cpp" />
+    <ClCompile Include="engine\GAME\GameEngine.cpp" />
+    <ClCompile Include="engine\scene\GameScene.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="engine\math\MathFunction.cpp" />
+    <ClCompile Include="engine\base\WinApp.cpp" />
+    <ClCompile Include="engine\2d\SpriteCommon.cpp" />
+    <ClCompile Include="engine\2d\Sprite.cpp" />
+    <ClCompile Include="engine\3d\Object3d.cpp" />
+    <ClCompile Include="engine\3d\Object3dCommon.cpp" />
+    <ClCompile Include="engine\3d\Model.cpp" />
+    <ClCompile Include="engine\3d\ModelManager.cpp" />
+    <ClCompile Include="engine\Tool\StringUtility.cpp" />
+    <ClCompile Include="engine\2d\TextureManager.cpp" />
+    <ClCompile Include="engine\Tool\ParticleManager.cpp" />
+    <ClCompile Include="engine\base\SrvManager.cpp" />
+    <ClCompile Include="engine\Tool\ParicleEmitter.cpp" />
+    <ClCompile Include="engine\scene\Scene.cpp" />
+    <ClCompile Include="engine\scene\SceneManager.cpp" />
+    <ClCompile Include="engine\scene\TitleScene.cpp" />
+
     <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
@@ -23,6 +69,7 @@
   <ItemGroup>
     <ClCompile Include="DriftEffect.cpp" />
     <ClCompile Include="main.cpp" />
+
     <ClCompile Include="MapChipField.cpp" />
     <ClCompile Include="MoveEffect.cpp" />
     <ClCompile Include="Obstacle.cpp" />
@@ -33,6 +80,15 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="RotateArrow.cpp" />
+
+    <ClCompile Include="PSOMnager.cpp" />
+    <ClCompile Include="SceneFactory.cpp" />
+
+    <ClCompile Include="Score.cpp" />
+    <ClCompile Include="Bitmappedfont.cpp" />
+    <ClCompile Include="Goal.cpp" />
+  </ItemGroup>
+ 
     <ClCompile Include="SpeedMeter.cpp" />
     <ClCompile Include="CourseWall.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -152,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DriftEffect.h" />
+
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="MoveEffect.h" />
     <ClInclude Include="Obstacle.h" />
@@ -162,7 +219,15 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rand.h" />
     <ClInclude Include="RotateArrow.h" />
+
+    <ClInclude Include="PSOMnager.h" />
+    <ClInclude Include="SceneFactory.h" />
     <ClInclude Include="SpeedMeter.h" />
+    <ClInclude Include="Score.h" />
+    <ClInclude Include="Bitmappedfont.h" />
+    <ClInclude Include="Goal.h" />
+ 
+   
     <ClInclude Include="CourseWall.h" />
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -341,5 +406,6 @@
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
+
   </ItemGroup>
 </Project>

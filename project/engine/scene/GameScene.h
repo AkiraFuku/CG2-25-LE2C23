@@ -16,7 +16,13 @@ class ObstacleNormal;
 class ObstacleFast;
 class ObstacleMax;
 class MapChipField;
+
+class Score;
+class Bitmappedfont;
+class Goal;
+
 class CourseWall;
+
 
 class GameScene : public Scene {
 public:
@@ -34,6 +40,9 @@ public:
 
   // マップチップの生成
   void GenerateFieldObjects();
+
+    // 開始フラグを取得
+    bool IsStarted() const { return isStarted_; }
 
 private:
   std::unique_ptr<Camera> camera;
@@ -64,6 +73,21 @@ private:
   std::vector<std::unique_ptr<Object3d>> wallModels_;
   std::vector<std::unique_ptr<CourseWall>> walls_;
 
+
+    // ビットマップフォント
+    std::unique_ptr<Bitmappedfont> bitmappedFont_;
+    std::vector<std::unique_ptr<Sprite>> bitmappedFontSprite_[10];
+
+    // ゴール
+    std::vector<std::unique_ptr<Goal>> goals_;
+    std::vector<std::unique_ptr<Object3d>> goalModels_;
+
+    // スタート前のカウントダウン
+    int32_t countdownTimer_ = 180;
+    // ゲーム開始フラグ
+    bool isStarted_ = false;
+    
+
   bool isDead = false;
 
   // マップチップフィールド
@@ -72,4 +96,5 @@ private:
   std::vector<std::vector<Transform *>> worldTransformObjects;
 
  
+
 };

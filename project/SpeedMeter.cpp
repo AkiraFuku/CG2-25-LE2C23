@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include <GameEngine.h>
 #include <Framework.h>
+#include <cassert>
 
 void SpeedMeter::Initialize(Sprite* sprite, Sprite* baseSprite, Camera* camera,Player* player_)
 {
@@ -15,6 +16,9 @@ void SpeedMeter::Initialize(Sprite* sprite, Sprite* baseSprite, Camera* camera,P
     baseSprite_ = baseSprite;
     camera_ = camera;
     player = player_;
+
+    sprite_->Update();
+    baseSprite_->Update();
 }
 
 void SpeedMeter::Update()

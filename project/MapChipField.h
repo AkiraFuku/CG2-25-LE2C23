@@ -10,11 +10,14 @@
 
 // マップチップ種別
 enum class MapChipType {
+
   kBlank,
   kPlayer,
   kObstacle,
   kWallStraight,
   kWallTurn,
+   kGoal,
+
 };
 
 // 1マス分のデータ

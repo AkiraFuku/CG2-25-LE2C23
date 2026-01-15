@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "CourseWall.h"
 #include "Input.h"
+
 #include "MapChipField.h"
 #include "ModelManager.h"
 #include "ObstacleFast.h"
@@ -12,6 +13,8 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 #include "imgui.h"
+#include "Bitmappedfont.h"
+#include "Goal.h"
 
 // コンストラクタ
 GameScene::GameScene() = default;
@@ -27,11 +30,15 @@ void GameScene::Initialize() {
   Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
   ParticleManager::GetInstance()->Setcamera(camera.get());
 
+
   handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
+
 
   Audio::GetInstance()->PlayAudio(handle_, true);
 
+
   TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
+
 
   ParticleManager::GetInstance()->CreateParticleGroup(
       "Test", "resources/uvChecker.png");
@@ -75,8 +82,36 @@ void GameScene::Initialize() {
   // マップチップの生成
   GenerateFieldObjects();
 
-  // マップチップデータのセット
-  player_->SetMapChipField(mapChipField_.get());
+
+    // マップチップの生成
+    GenerateFieldObjects();
+
+    // マップチップデータのセット 
+    player_->SetMapChipField(mapChipField_.get());
+
+    // ビットマップフォントの生成と初期化
+    bitmappedFont_ = std::make_unique<Bitmappedfont>();
+    // ビットマップフォントのスプライト
+    for (int i = 0; i < 10; ++i) {
+        // ファイル名の作成
+        //std::string filePath = "Resources/number" + std::to_string(i) + ".png";
+        // 仮置き画像
+        std::string filePath = "resources/uvChecker.png";
+
+        // スプライトのインスタンスを作成
+        auto sprite = std::make_unique<Sprite>();
+
+        // スプライトの初期化
+        sprite->Initialize(filePath.c_str());
+        sprite->SetPosition(Vector2{ 400.0f, 100.0f });
+
+        // 対応するインデックスの vector に追加
+        bitmappedFontSprite_[i].push_back(std::move(sprite));
+    }
+
+    bitmappedFont_->Initialize(bitmappedFontSprite_, camera.get());
+
+
 }
 
 void GameScene::Finalize() {
@@ -174,10 +209,76 @@ void GameScene::Update() {
     Vector4 lightColor = object3d->GetDirectionalLightColor();
 
 
+
+    // プレイヤーの更新処理
+    player_->Update();
+
     if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
 
         object3d->SetDirectionalLightColor(lightColor);
     }
+
+
+    for (auto& obstacle : obstacleFast_) {
+        obstacle->Update();
+    }
+
+    for (auto& obstacle : obstacleMax_) {
+        obstacle->Update();
+    }
+
+    // 全ての当たり判定を行う
+    CheckAllCollisions();
+
+
+    // 障害物の削除処理
+    obstacleSlow_.erase(std::remove_if(obstacleSlow_.begin(), obstacleSlow_.end(),
+        [](const std::unique_ptr<ObstacleSlow>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+        obstacleSlow_.end());
+
+    obstacleNormal_.erase(std::remove_if(obstacleNormal_.begin(), obstacleNormal_.end(),
+        [](const std::unique_ptr<ObstacleNormal>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+
+        obstacleNormal_.end());
+
+    obstacleFast_.erase(std::remove_if(obstacleFast_.begin(), obstacleFast_.end(),
+        [](const std::unique_ptr<ObstacleFast>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+
+        obstacleFast_.end());
+
+    obstacleMax_.erase(std::remove_if(obstacleMax_.begin(), obstacleMax_.end(),
+        [](const std::unique_ptr<ObstacleMax>& obstacle) {
+            return obstacle->IsScoreNone();
+
+        }),
+
+        obstacleMax_.end());
+
+    if (!isStarted_)
+    {
+        if (countdownTimer_ <= 0)
+        {
+            isStarted_ = true;
+        }
+        else
+        {
+            countdownTimer_--;
+            bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
+            bitmappedFont_->Update();
+        }
+    }
+
+
+#ifdef USE_IMGUI
+    ImGui::Begin("Debug");
+
+
     Vector3 direction= object3d->GetDirectionalLightDirection();
     if(ImGui::DragFloat3("Light Direction", &direction.x)){
     object3d->SetDirectionalLightDirection(direction);
@@ -185,7 +286,7 @@ void GameScene::Update() {
     float intensity= object3d->GetDirectionalLightIntensity();
     if(ImGui::InputFloat("intensity",&intensity)){
      object3d->SetDirectionalLightIntensity(intensity);
-    }
+    }>>>>>>> Develop
     ImGui::Text("Sprite");
     Vector2 Position =
         sprite->GetPosition();
@@ -200,19 +301,42 @@ void GameScene::Update() {
   SpeedStage speedStage = player_->GetSpeedStage();
   ImGui::Text("Current Speed Stage: %d", static_cast<int>(speedStage));
 
+
+    ImGui::Text("Score");
+    ImGui::Text("Current Score: %d", player_->GetScore());
+
+    ImGui::End();
+#endif // USE_IMGUI
+
+    //sprite->SetRotation(sprite->GetRotation() + 0.1f);
+    sprite->Update();
+
+
+
   ImGui::End();
 #endif // USE_IMGUI
 
   // sprite->SetRotation(sprite->GetRotation() + 0.1f);
   sprite->Update();
+
 }
+
 void GameScene::Draw() {
   // object3d2->Draw();
   // object3d->Draw();
   // ParticleManager::GetInstance()->Draw();
 
+
+    if (!isStarted_)
+    {
+        bitmappedFont_->Draw();
+    }
+
+    
+
   // プレイヤーの描画処理
   if (!isDead) {
+
     player_->Draw();
   }
 
@@ -241,7 +365,16 @@ void GameScene::Draw() {
   // sprite->Draw();
 }
 
+
+
+   
 void GameScene::CheckAllCollisions() {
+
+   if (!isStarted_)
+    {
+        return;
+    }
+  
 #pragma region 自キャラと障害物(遅い)の当たり判定
   // 判定対象1と2の座標
   AABB aabbPlayer, aabbSlow;
@@ -316,6 +449,7 @@ void GameScene::CheckAllCollisions() {
 
 #pragma endregion
 
+
 #pragma region 自キャラとコースの壁の当たり判定
   AABB aabbWall;
   for (auto &wall : walls_) {
@@ -337,6 +471,7 @@ bool GameScene::isCollision(const AABB &aabb1, const AABB &aabb2) {
   }
 
   return false;
+
 }
 
 void GameScene::GenerateFieldObjects() {
@@ -438,6 +573,148 @@ void GameScene::GenerateFieldObjects() {
           model->SetModel("cube.obj");
           model->Initialize();
 
+
+    // オブジェクトの生成
+    for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+        for (uint32_t j = 0; j < numBlockHorizontal; j++) {
+
+            // 現在の座標のチップタイプを取得
+            MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
+            Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
+
+            switch (type)
+            {
+            case MapChipType::kBlank:
+                break;
+
+            case MapChipType::kPlayer:
+            {
+                assert(player_ == nullptr && "自キャラを二重に配置しようとしています");
+                // プレイヤーの初期化
+                player_ = std::make_unique<Player>();
+                playerModel_ = std::make_unique<Object3d>();
+                playerModel_->SetTranslate(pos);
+                playerModel_->SetModel("cube.obj");
+                playerModel_->Initialize();
+                player_->Initialize(playerModel_.get(), camera.get(), pos);
+                player_->SetGameScene(this);
+
+            }
+            break;
+            }
+        }
+    }
+
+    for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+        for (uint32_t j = 0; j < numBlockHorizontal; j++) {
+
+            // 現在の座標のチップタイプを取得
+            MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
+            Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
+
+            switch (type)
+            {
+            case MapChipType::kBlank:
+                break;
+
+
+            case MapChipType::kObstacle:
+            {
+                uint8_t subID = mapChipField_->GetMapChipSubIDByIndex(j, i);
+                switch (subID)
+                {
+                case 0:
+                {
+                    // モデルを生成してリストに追加
+                    auto model = std::make_unique<Object3d>();
+                    model->SetModel("cube.obj");
+                    model->Initialize();
+
+                    // 本体を生成してリストに追加
+                    auto obstacle = std::make_unique<ObstacleSlow>();
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                    // vectorに保存
+                    obstacleSlowModel_.push_back(std::move(model));
+                    obstacleSlow_.push_back(std::move(obstacle));
+                }
+                break;
+
+                case 1:
+                {
+                    // 障害物(普通)の初期化
+                    // モデルを生成してリストに追加
+                    auto model = std::make_unique<Object3d>();
+                    model->SetModel("cube.obj");
+                    model->Initialize();
+
+                    // 本体を生成してリストに追加
+                    auto obstacle = std::make_unique<ObstacleNormal>();
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                    // vectorに保存
+                    obstacleNormalModel_.push_back(std::move(model));
+                    obstacleNormal_.push_back(std::move(obstacle));
+                }
+
+                break;
+
+                case 2:
+                {
+                    // 障害物(速い)の初期化
+                    // モデルを生成してリストに追加
+                    auto model = std::make_unique<Object3d>();
+                    model->SetModel("cube.obj");
+                    model->Initialize();
+
+                    // 本体を生成してリストに追加
+                    auto obstacle = std::make_unique<ObstacleFast>();
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                    // vectorに保存
+                    obstacleFastModel_.push_back(std::move(model));
+                    obstacleFast_.push_back(std::move(obstacle));
+                }
+
+                break;
+
+                case 3:
+                {
+                    // 障害物(最大速度)の初期化
+                    // モデルを生成してリストに追加
+                    auto model = std::make_unique<Object3d>();
+                    model->SetModel("cube.obj");
+                    model->Initialize();
+
+                    // 本体を生成してリストに追加
+                    auto obstacle = std::make_unique<ObstacleMax>();
+                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                    // vectorに保存
+                    obstacleSlowModel_.push_back(std::move(model));
+                    obstacleMax_.push_back(std::move(obstacle));
+                }
+
+                break;
+                }
+                break;
+
+
+            }
+
+            case MapChipType::kGoal:
+            {
+                auto goalModel = std::make_unique<Object3d>();
+                goalModel->SetModel("cube.obj");
+                goalModel->Initialize();
+                auto goal = std::make_unique<Goal>();
+                goal->Initialize(goalModel.get(), camera.get(), pos);
+                goalModels_.push_back(std::move(goalModel));
+                goals_.push_back(std::move(goal));
+            }
+
+            }
+
           // 本体を生成してリストに追加
           auto obstacle = std::make_unique<ObstacleMax>();
           obstacle->Initialize(model.get(), camera.get(), pos);
@@ -445,6 +722,7 @@ void GameScene::GenerateFieldObjects() {
           // vectorに保存
           obstacleSlowModel_.push_back(std::move(model));
           obstacleMax_.push_back(std::move(obstacle));
+
         }
 
         break;

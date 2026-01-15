@@ -15,6 +15,8 @@ std::map<char, MapChipType> mapChipTypeTable = {
     {'O', MapChipType::kObstacle},
     {'S', MapChipType::kWallStraight},
     {'T', MapChipType::kWallTurn},
+  {'G',MapChipType::kGoal},
+
 };
 
 } // namespace

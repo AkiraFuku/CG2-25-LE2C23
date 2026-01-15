@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "GameScene.h"
 #include "ModelManager.h"
 #include "Input.h"
 #include "MoveEffect.h"
@@ -7,6 +8,7 @@
 #include "SpeedMeter.h"
 #include <GameEngine.h>
 #include <Framework.h>
+#include <cassert>
 
 Player::Player() = default;
 
@@ -21,9 +23,12 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
     camera_ = camera;
     cameraTransform_.rotate = camera->GetRotate();
     cameraTransform_.translate = camera->GetTranslate();
+    camera_->Update();
     transform_ = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
     transform_.translate = position;
     worldMatrix_ = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+    model_->SetTranslate(transform_.translate);
+    model_->Update();
 
     // 速度を初期化
     velocity_ = { 0.0f, 0.0f, 0.05f };
@@ -68,107 +73,124 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
     speedMeterSprite_->SetPosition(Vector2{ 1400.0f, 600.0f });
     speedMeterSprite_->SetAnchorPoint(Vector2{ 0.0f, 0.0f });
     speedMeter_ = std::make_unique<SpeedMeter>();
-    speedMeter_->Initialize(speedMeterSprite_.get(), baseSprite_.get(), camera_,this);
+    speedMeter_->Initialize(speedMeterSprite_.get(), baseSprite_.get(), camera_, this);
 
 }
 
 void Player::Update()
 {
+
     if (isDead_)
     {
-        // 死亡していたら処理を抜ける
-        return;
+        if (deathTimer_ <= 0)
+        {
+            // プレイヤーの死亡演出
+            transform_.rotate = Lerp(transform_.rotate, deadRotate_, kInterpolationRate);
+        }
+        else
+        {
+            deathTimer_--;
+        }
     }
     else
     {
-        // 速度が0になったら
-        if (speedZ_ <= 0.001f)
+
+        if (gameScene_->IsStarted())
         {
-            // 死亡させる
-            speedZ_ = 0.0f;
-            isDead_ = true;
-            return;
+            // 速度が0になったら
+            if (speedZ_ <= 0.001f)
+            {
+                // 死亡させる
+                speedZ_ = 0.0f;
+                isDead_ = true;
+                return;
+            }
+
+            // 方向操作
+            Rotate();
+
+            if (isDriftStart_)
+            {
+                // ドリフト中の処理
+                Drift();
+            }
+            else
+            {
+                if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE))
+                {
+                    // スペースキーを押したらドリフト開始
+                    isDriftStart_ = true;
+                    // 開始時の速度を記録
+                    preSpeedZ_ = speedZ_;
+                    // 開始時の角度を記録
+                    angleY_ = transform_.rotate.y;
+                }
+            }
+
+
+            // 移動処理
+            Move();
+
         }
-    }
+        // カメラの更新
+        MoveCamera();
+        camera_->Update();
 
-    // 方向操作
-    Rotate();
-
-    if (isDriftStart_)
-    {
-        // ドリフト中の処理
-        Drift();
-    }
-    else
-    {
-        if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE))
+        // 移動エフェクトの更新
+        for (auto& effect : moveEffects_)
         {
-            // スペースキーを押したらドリフト開始
-            isDriftStart_ = true;
-            // 開始時の速度を記録
-            preSpeedZ_ = speedZ_;
-            // 開始時の角度を記録
-            angleY_ = transform_.rotate.y;
+            effect->Update();
         }
+
+        // 加速エフェクトの更新
+        driftEffect_->Update();
+
+        // 方向矢印の更新
+        rotateArrow_->Update();
+
+        // スピードメーターの更新
+        speedMeter_->Update();
+
     }
-
-
-    // 移動処理
-    Move();
 
     // モデルの更新
     model_->SetTranslate(transform_.translate);
     model_->SetRotate(transform_.rotate);
     model_->Update();
-
-    // カメラの更新
-    MoveCamera();
-    camera_->Update();
-
-    // 移動エフェクトの更新
-    for (auto& effect : moveEffects_)
-    {
-        effect->Update();
-    }
-
-    // 加速エフェクトの更新
-    driftEffect_->Update();
-
-    // 方向矢印の更新
-    rotateArrow_->Update();
-
-    // スピードメーターの更新
-    speedMeter_->Update();
 }
 
 void Player::Draw()
 {
-    if (isDead_)
-    {
-        // 死亡していたら処理を抜ける
-        return;
-    }
-
     // プレイヤーの描画
     model_->Draw();
 
-    // 移動エフェクトの描画
-    for (auto& effect : moveEffects_)
+    if (!isDead_)
     {
-        effect->Draw();
+
+        if (!gameScene_->IsStarted())
+        {
+            return;
+        }
+
+        // 移動エフェクトの描画
+        for (auto& effect : moveEffects_)
+        {
+            effect->Draw();
+        }
+
+        if (isAcceleration_)
+        {
+            // 加速エフェクトの描画
+            driftEffect_->Draw();
+        }
+
+        // 方向矢印の描画
+        rotateArrow_->Draw();
+
+        // スピードメーターの描画
+        speedMeter_->Draw();
     }
 
-    if (isAcceleration_)
-    {
-        // 加速エフェクトの描画
-        driftEffect_->Draw();
-    }
-
-    // 方向矢印の描画
-    rotateArrow_->Draw();
-
-    // スピードメーターの描画
-    speedMeter_->Draw();
 }
 
 void Player::Rotate()
@@ -234,7 +256,7 @@ void Player::Drift()
             speedZ_ += kAcceleration;
             // 速度の段階を決定
             DetermineSpeedStage();
-           
+
         }
 
     }
@@ -341,6 +363,16 @@ void Player::OnCollision(const ObstacleMax* obstacleMax)
     {
         isDead_ = true;
     }
+}
+
+void Player::OnCollision(const Goal* goal)
+{
+    if (isGoal_)
+    {
+        return;
+    }
+
+    isGoal_ = true;
 }
 
 
