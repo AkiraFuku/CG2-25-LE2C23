@@ -3,6 +3,7 @@
 #include "DrawFunction.h"
 #include"Object3D.h"
 #include "Model.h"
+#include "Sprite.h"
 #include "Camera.h"
 #include <memory>
 
@@ -11,6 +12,10 @@ class ObstacleNormal;
 class ObstacleFast;
 class ObstacleMax;
 class MapChipField;
+class MoveEffect;
+class DriftEffect;
+class RotateArrow;
+class SpeedMeter;
 
 // 速さの段階
 enum class SpeedStage
@@ -84,6 +89,24 @@ private:
     // マップチップのフィールド
     MapChipField* mapChipField_ = nullptr;
 
+    // 移動エフェクト
+    std::vector<std::unique_ptr<MoveEffect>> moveEffects_;
+    std::vector<std::unique_ptr<Object3d>> moveEffectModels_;
+    static inline const uint32_t kNumMoveEffects = 10;
+
+    // 加速エフェクト
+    std::unique_ptr<DriftEffect> driftEffect_;
+    std::unique_ptr<Sprite> driftEffectSprite_;
+
+    // 方向矢印
+    std::unique_ptr<RotateArrow> rotateArrow_;
+    std::unique_ptr<Object3d> rotateArrowModel_;
+
+    // スピードメーター
+    std::unique_ptr<SpeedMeter> speedMeter_;
+    std::unique_ptr<Sprite> speedMeterSprite_;
+    std::unique_ptr<Sprite> baseSprite_;
+
 public:
     // 初期化
     void Initialize(Object3d* model, Camera* camera, const Vector3& position);
@@ -118,8 +141,14 @@ public:
     bool IsDead() const { return isDead_; }
     // マップチップフィールドのセット
     void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+    // 角度を取得
+    Vector3 GetRotate() const { return transform_.rotate; }
+    // 加速フラグを取得
+    bool IsAcceleration() const { return isAcceleration_; }
+    // 行列を取得
+    Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
     // コンストラクタとデストラクタ
-    Player() = default;
+    Player();
     ~Player();
 };
 

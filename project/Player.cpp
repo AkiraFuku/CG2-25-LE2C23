@@ -1,8 +1,14 @@
 #include "Player.h"
 #include "ModelManager.h"
 #include "Input.h"
+#include "MoveEffect.h"
+#include "DriftEffect.h"
+#include "RotateArrow.h"
+#include "SpeedMeter.h"
 #include <GameEngine.h>
 #include <Framework.h>
+
+Player::Player() = default;
 
 void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position)
 {
@@ -22,6 +28,47 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
     // 速度を初期化
     velocity_ = { 0.0f, 0.0f, 0.05f };
     speedZ_ = velocity_.z;
+
+    // 移動エフェクトの生成と初期化
+    for (int i = 0; i < 10; ++i)
+    {
+        // モデルを生成してリストに追加
+        auto model = std::make_unique<Object3d>();
+        model->SetModel("cube.obj");
+        model->Initialize();
+        moveEffectModels_.push_back(std::move(model));
+        // エフェクト本体を生成してリストに追加
+        auto effect = std::make_unique<MoveEffect>();
+        effect->Initialize(moveEffectModels_.back().get(), camera_, transform_.translate, this);
+        moveEffects_.push_back(std::move(effect));
+    }
+
+    // 加速エフェクトの生成と初期化
+    driftEffectSprite_ = std::make_unique<Sprite>();
+    driftEffectSprite_->Initialize("resources/uvChecker.png");
+    driftEffectSprite_->SetPosition(Vector2{ 0.0f,0.0f });
+    driftEffectSprite_->SetAnchorPoint(Vector2{ 0.0f,0.0f });
+    driftEffect_ = std::make_unique<DriftEffect>();
+    driftEffect_->Initialize(driftEffectSprite_.get(), camera_, transform_.translate, this);
+
+    // 方向矢印の生成と初期化
+    rotateArrowModel_ = std::make_unique<Object3d>();
+    rotateArrowModel_->SetModel("axis.obj");
+    rotateArrowModel_->Initialize();
+    rotateArrow_ = std::make_unique<RotateArrow>();
+    rotateArrow_->Initialize(rotateArrowModel_.get(), camera_, transform_.translate, this);
+
+    // スピードメーターの生成と初期化
+    baseSprite_ = std::make_unique<Sprite>();
+    baseSprite_->Initialize("resources/uvChecker.png");
+    baseSprite_->SetPosition(Vector2{ 800.0f, 300.0f });
+    baseSprite_->SetAnchorPoint(Vector2{ 0.0f, 0.0f });
+    speedMeterSprite_ = std::make_unique<Sprite>();
+    speedMeterSprite_->Initialize("resources/uvChecker.png");
+    speedMeterSprite_->SetPosition(Vector2{ 1400.0f, 600.0f });
+    speedMeterSprite_->SetAnchorPoint(Vector2{ 0.0f, 0.0f });
+    speedMeter_ = std::make_unique<SpeedMeter>();
+    speedMeter_->Initialize(speedMeterSprite_.get(), baseSprite_.get(), camera_,this);
 
 }
 
@@ -78,6 +125,20 @@ void Player::Update()
     MoveCamera();
     camera_->Update();
 
+    // 移動エフェクトの更新
+    for (auto& effect : moveEffects_)
+    {
+        effect->Update();
+    }
+
+    // 加速エフェクトの更新
+    driftEffect_->Update();
+
+    // 方向矢印の更新
+    rotateArrow_->Update();
+
+    // スピードメーターの更新
+    speedMeter_->Update();
 }
 
 void Player::Draw()
@@ -88,7 +149,26 @@ void Player::Draw()
         return;
     }
 
+    // プレイヤーの描画
     model_->Draw();
+
+    // 移動エフェクトの描画
+    for (auto& effect : moveEffects_)
+    {
+        effect->Draw();
+    }
+
+    if (isAcceleration_)
+    {
+        // 加速エフェクトの描画
+        driftEffect_->Draw();
+    }
+
+    // 方向矢印の描画
+    rotateArrow_->Draw();
+
+    // スピードメーターの描画
+    speedMeter_->Draw();
 }
 
 void Player::Rotate()
@@ -146,12 +226,15 @@ void Player::Drift()
             isAcceleration_ = false;
             isDriftStart_ = false;
             driftTimer_ = 0.0f;
+            // 加速エフェクトのアルファ値をリセット
+            driftEffect_->ResetAlpha();
         }
         else
         {
             speedZ_ += kAcceleration;
             // 速度の段階を決定
             DetermineSpeedStage();
+           
         }
 
     }
@@ -263,5 +346,12 @@ void Player::OnCollision(const ObstacleMax* obstacleMax)
 
 Player::~Player()
 {
-    
+    // 移動エフェクト用のメモリ解放
+    moveEffects_.clear();
+    // 加速エフェクト用のメモリ解放
+    driftEffect_.reset();
+    // 方向矢印用のメモリ解放
+    rotateArrow_.reset();
+    // スピードメーター用のメモリ解放
+    speedMeter_.reset();
 }
