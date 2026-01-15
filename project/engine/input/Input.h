@@ -70,6 +70,8 @@ public:
 
     size_t GetConnectedStickNum();
 
+
+
     /// <summary>
 
    /// <summary>

@@ -55,6 +55,15 @@
     <Filter Include="engine\GAME">
       <UniqueIdentifier>{e4f50392-c482-4e20-a9b7-c9293b09b7d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="シェーダー ファイル\Object3d">
+      <UniqueIdentifier>{c1ebee99-5a77-45c0-bef5-04abf250cb5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー ファイル\Particle">
+      <UniqueIdentifier>{2c8dd127-8615-434f-8bae-00add16c0923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="シェーダー ファイル\sprite">
+      <UniqueIdentifier>{59a31dd0-920a-45c1-997f-36c5996bd533}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -174,20 +183,6 @@
     <ClCompile Include="PSOMnager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.PS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="engine\Tool\resources\shaders\Object3d\Object3d.VS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="engine\Tool\resources\shaders\Particle\Particle.PS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="engine\Tool\resources\shaders\Particle\Particle.VS.hlsl">
-      <Filter>シェーダー ファイル</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -320,11 +315,34 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="engine\Tool\resources\shaders\Object3d\Object3d.hlsli">
-      <Filter>シェーダー ファイル</Filter>
+    <None Include="resources\shaders\Object3d\Object3d.hlsli">
+      <Filter>シェーダー ファイル\Object3d</Filter>
     </None>
-    <None Include="engine\Tool\resources\shaders\Particle\Particle.hlsli">
-      <Filter>シェーダー ファイル</Filter>
+    <None Include="resources\shaders\Particle\Particle.hlsli">
+      <Filter>シェーダー ファイル\Particle</Filter>
     </None>
+    <None Include="resources\shaders\Sprite\Sprite.hlsli">
+      <Filter>シェーダー ファイル\sprite</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
+      <Filter>シェーダー ファイル\Object3d</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d\Object3d.VS.hlsl">
+      <Filter>シェーダー ファイル\Object3d</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle\Particle.PS.hlsl">
+      <Filter>シェーダー ファイル\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle\Particle.VS.hlsl">
+      <Filter>シェーダー ファイル\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Sprite\Sprite.PS.hlsl">
+      <Filter>シェーダー ファイル\sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Sprite\Sprite.VS.hlsl">
+      <Filter>シェーダー ファイル\sprite</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

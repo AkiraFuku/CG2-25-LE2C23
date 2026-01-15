@@ -17,7 +17,7 @@ void Object3dCommon::Finalize() {
 }
 void Object3dCommon::Initialize()
 {
-       PsoProperty pso={PipelineType::Object3d,BlendMode::None};
+       PsoProperty pso={PipelineType::Object3d,BlendMode::None,FillMode::kSolid};
     PsoSet psoset=PSOMnager::GetInstance()->GetPsoSet(pso);
     graphicsPipelineState_=psoset.pipelineState;
     rootSignature_=psoset.rootSignature;
