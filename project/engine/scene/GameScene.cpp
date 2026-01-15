@@ -63,6 +63,7 @@ void GameScene::Initialize() {
   object3d2->SetTranslate(Vector3{0.0f, 10.0f, 0.0f});
   object3d2->SetModel("axis.obj");
   object3d->SetModel("plane.obj");
+   ModelManager::GetInstance()->CreateSphereModel("MySphere", 16);
   object3d->SetBlendMode(BlendMode::Add);
   Transform M = {{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
   emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
@@ -161,12 +162,35 @@ void GameScene::Update() {
   CheckAllCollisions();
 
 #ifdef USE_IMGUI
-  ImGui::Begin("Debug");
+    ImGui::Begin("Debug");
+    ImGui::Text("Sphire");
+    Vector3 pos = object3d->GetTranslate();
+    Vector3 scale = object3d->GetScale();
+    ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+    ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
+    object3d->SetTranslate(pos);
+    object3d->SetScale(scale);
 
-  ImGui::Text("Sprite");
-  Vector2 Position = sprite->GetPosition();
-  ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
-  sprite->SetPosition(Position);
+    Vector4 lightColor = object3d->GetDirectionalLightColor();
+
+
+    if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
+
+        object3d->SetDirectionalLightColor(lightColor);
+    }
+    Vector3 direction= object3d->GetDirectionalLightDirection();
+    if(ImGui::DragFloat3("Light Direction", &direction.x)){
+    object3d->SetDirectionalLightDirection(direction);
+    }
+    float intensity= object3d->GetDirectionalLightIntensity();
+    if(ImGui::InputFloat("intensity",&intensity)){
+     object3d->SetDirectionalLightIntensity(intensity);
+    }
+    ImGui::Text("Sprite");
+    Vector2 Position =
+        sprite->GetPosition();
+    ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
+    sprite->SetPosition(Position);
 
   ImGui::Text("PlayerSpeed");
   float playerSpeedZ = player_->GetSpeedZ();

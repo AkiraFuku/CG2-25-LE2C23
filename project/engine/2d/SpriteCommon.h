@@ -30,11 +30,8 @@ private:
 
     //ルートシグネチャ
     Microsoft::WRL::ComPtr<ID3D12RootSignature>rootSignature_;
-    void CreateRootSignature();
     //グラフィックパイプラインステート
     Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
-    void CreatePSO();
-
 
 
 };

@@ -15,8 +15,8 @@ public:
     //Model検索
     std::shared_ptr<Model> findModel(const std::string& filePath);
     static std::unique_ptr<ModelManager> instance;
-         friend struct std::default_delete<ModelManager>;
-
+    friend struct std::default_delete<ModelManager>;
+    void CreateSphereModel(const std::string& modelName, uint32_t subdivision = 16);
 private:
     std::unique_ptr<ModelCommon> modelCommon_;
 

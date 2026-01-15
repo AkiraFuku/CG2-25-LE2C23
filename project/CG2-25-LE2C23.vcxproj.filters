@@ -123,4 +123,24 @@
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\Object3d\Object3d.PS.hlsl">
+      <Filter>シェーダー ファイル\Object3d</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d\Object3d.VS.hlsl">
+      <Filter>シェーダー ファイル\Object3d</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle\Particle.PS.hlsl">
+      <Filter>シェーダー ファイル\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle\Particle.VS.hlsl">
+      <Filter>シェーダー ファイル\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Sprite\Sprite.PS.hlsl">
+      <Filter>シェーダー ファイル\sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Sprite\Sprite.VS.hlsl">
+      <Filter>シェーダー ファイル\sprite</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>
