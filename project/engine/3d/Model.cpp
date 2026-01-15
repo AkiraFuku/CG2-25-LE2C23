@@ -70,7 +70,7 @@ void Model::Draw() {
     DXCommon::GetInstance()->
         GetCommandList()->
         SetGraphicsRootDescriptorTable(2,
-            TextureManager::GetInstance()->GetSrvHundleGPU(modelData_.material.textureIndex));
+            TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
     //描画コマンド
     DXCommon::GetInstance()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 
@@ -142,7 +142,7 @@ Model::ModelData Model::LoadObjFile(const std::string& directoryPath, const std:
     std::vector<Vector2> texcords;//テクスチャ座標
     std::string line;
     //2. ファイルを開く
-    std::ifstream file(directryPath + "/" + filename);//ファイルパスを結合して開く
+    std::ifstream file(directoryPath + "/" + filename);//ファイルパスを結合して開く
     
     assert(file.is_open());//ファイルが開けたか確認
 
@@ -257,7 +257,7 @@ Model* Model::CreateSphere(uint32_t subdivision)
                 vertex.normal.z = vertex.position.z;
 
                 // UV座標
-                vertex.texcoord = { u, 1.0f - v }; // DXはVが逆の場合があるため適宜調整
+                vertex.texcord = { u, 1.0f - v }; // DXはVが逆の場合があるため適宜調整
                 return vertex;
                 };
 
