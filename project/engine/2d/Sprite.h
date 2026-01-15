@@ -106,6 +106,7 @@ public:
     BlendMode GetBlendMode() const {
         return blendMode_;
     }
+    void SetFillMode(FillMode fillMode) { fillMode_ = fillMode; }
     //テクスチャ変更
     void SetTextureByFilePath(const std::string& textureFilePath);
 
@@ -146,5 +147,6 @@ private:
     TransformationMatrix* transformationMatrixData_ = nullptr;
     uint32_t textureIndex_ = 0;
     std::string textureFilePath_;
+    FillMode fillMode_ = FillMode::kSolid;
 };
 

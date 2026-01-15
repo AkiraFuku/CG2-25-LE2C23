@@ -17,11 +17,15 @@ enum class PipelineType {
 enum class BlendMode {
     None, Normal, Add, Subtract, Multiply, Screen
 };
-
+enum class FillMode {
+    kSolid,     // 塗りつぶし
+    kWireFrame  // ワイヤーフレーム
+};
 // PSO取得用キー
 struct PsoProperty {
     PipelineType type;
-    BlendMode blendMode;
+    BlendMode blendMode=BlendMode::None;
+    FillMode fillMode=FillMode::kSolid;
 
     bool operator==(const PsoProperty& other) const {
         return type == other.type && blendMode == other.blendMode;
