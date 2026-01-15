@@ -38,6 +38,11 @@ void Object3d::Update()
 void Object3d::Draw()
 {
     Object3dCommon::GetInstance()->Object3dCommonDraw();
+    PsoProperty psoProp = { PipelineType::Object3d, blendMode_ };
+    PsoSet psoSet = PSOMnager::GetInstance()->GetPsoSet(psoProp);
+
+    // PSOをセット
+    DXCommon::GetInstance()->GetCommandList()->SetPipelineState(psoSet.pipelineState.Get());
     //WVP行列リソースの設定
    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourse_.Get()->GetGPUVirtualAddress());
     //light

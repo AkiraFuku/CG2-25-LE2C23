@@ -192,6 +192,7 @@
     <ClCompile Include="MapChipField.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+
     <ClCompile Include="MoveEffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -206,6 +207,10 @@
     </ClCompile>
     <ClCompile Include="SpeedMeter.cpp">
       <Filter>ソース ファイル</Filter>
+
+    <ClCompile Include="PSOMnager.cpp">
+      <Filter>engine\base</Filter>
+
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -364,6 +369,7 @@
     <ClInclude Include="MapChipField.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+
     <ClInclude Include="MoveEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -378,6 +384,10 @@
     </ClInclude>
     <ClInclude Include="SpeedMeter.h">
       <Filter>ヘッダー ファイル</Filter>
+
+    <ClInclude Include="PSOMnager.h">
+      <Filter>engine\base</Filter>
+
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -27,7 +27,7 @@ private:
     ~TextureManager() = default;
     TextureManager(TextureManager&) = delete;
     TextureManager& operator=(TextureManager&) = delete;
-    std::unordered_map<std::string, TextureData> textureDatas;
+    std::unordered_map<std::string, TextureData> textureDates;
 
     
     
@@ -44,10 +44,10 @@ public:
     void LoadTexture(const std::string& filePath);
     //中間リソース解放
     void ReleaseIntermediateResources();
-    //SRVindex開始番号取得
+    //SRVIndex開始番号取得
     uint32_t GetTextureIndexByFilePath(const std::string& filePath);
     //テクスチャ番号からGPUハンドル
-    D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHundleGPU(uint32_t textureindex);
+    D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureindex);
     //メタデータ
     const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
 };

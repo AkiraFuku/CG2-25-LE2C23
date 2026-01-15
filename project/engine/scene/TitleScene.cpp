@@ -5,7 +5,7 @@
 #include "GameScene.h"
 #include "SceneManager.h"
 #include "ParticleManager.h"//フレームワークに移植
-
+#include "PSOMnager.h"
 
 void TitleScene::Initialize() {
 
@@ -15,9 +15,9 @@ void TitleScene::Initialize() {
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
-    soundData1 = Audio::GetInstance()->SoundLoadWave("resources/fanfare.mp3");
+     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
-    Audio::GetInstance()->PlayAudio(soundData1);
+    Audio::GetInstance()->PlayAudio(handle_,true);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -32,7 +32,7 @@ void TitleScene::Initialize() {
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
     // sprite->SetSize(Vector2{ 100.0f,100.0f });
     //sprites.push_back(sprite);
-
+   // sprite->SetBlendMode(BlendMode::Add);
     sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
 
     //}
@@ -56,7 +56,17 @@ void TitleScene::Update() {
     XINPUT_STATE state;
 
     // 現在のジョイスティックを取得
-
+    if (Input::GetInstance()->TriggerMouseDown(0))
+    {
+      if (Audio::GetInstance()->IsPlaying(handle_))
+        {
+            Audio::GetInstance()->PauseAudio(handle_);
+      } else
+      {
+          Audio::GetInstance()->ResumeAudio(handle_);
+       
+      }
+    }
 
 
     Input::GetInstance()->GetJoyStick(0, state);
@@ -69,7 +79,11 @@ void TitleScene::Update() {
 
         // Aボタンを押したときの処理
 
-
+        if (Audio::GetInstance()->IsPlaying(handle_))
+        {
+            
+            Audio::GetInstance()->StopAudio(handle_);
+        }
 
         GetSceneManager()->ChangeScene("GameScene");
 

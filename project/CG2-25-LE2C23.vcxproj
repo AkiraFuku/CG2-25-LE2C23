@@ -64,8 +64,12 @@
     <ClCompile Include="ObstacleNormal.cpp" />
     <ClCompile Include="ObstacleSlow.cpp" />
     <ClCompile Include="Player.cpp" />
+
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="RotateArrow.cpp" />
+
+    <ClCompile Include="PSOMnager.cpp" />
+
     <ClCompile Include="SceneFactory.cpp" />
     <ClCompile Include="SpeedMeter.cpp" />
   </ItemGroup>
@@ -146,8 +150,12 @@
     <ClInclude Include="ObstacleNormal.h" />
     <ClInclude Include="ObstacleSlow.h" />
     <ClInclude Include="Player.h" />
+
     <ClInclude Include="Rand.h" />
     <ClInclude Include="RotateArrow.h" />
+
+    <ClInclude Include="PSOMnager.h" />
+
     <ClInclude Include="SceneFactory.h" />
     <ClInclude Include="SpeedMeter.h" />
   </ItemGroup>

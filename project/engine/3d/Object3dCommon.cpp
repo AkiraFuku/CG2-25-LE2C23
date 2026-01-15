@@ -1,5 +1,6 @@
 #include "Object3dCommon.h"
 #include "Logger.h"
+#include "PSOMnager.h"
 
 // 静的メンバ変数の初期化
 std::unique_ptr<Object3dCommon> Object3dCommon::instance = nullptr;
@@ -16,8 +17,13 @@ void Object3dCommon::Finalize() {
 }
 void Object3dCommon::Initialize()
 {
+       PsoProperty pso={PipelineType::Object3d,BlendMode::None};
+    PsoSet psoset=PSOMnager::GetInstance()->GetPsoSet(pso);
+    graphicsPipelineState_=psoset.pipelineState;
+    rootSignature_=psoset.rootSignature;
+
     
-    CreatePSO();
+ //   CreatePSO();
 }
 void Object3dCommon::Object3dCommonDraw()
 {

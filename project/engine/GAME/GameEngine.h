@@ -28,7 +28,7 @@ private:
     //ログファイルパス
     const std::filesystem::path logFilePath = "D3DResourceLeakLog.txt";
 
-
+    
 
 };
 
