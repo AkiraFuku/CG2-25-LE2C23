@@ -547,3 +547,11 @@ Matrix4x4 MakeRotateZMatrix(float radian)
         ret.z = start.z + (end.z - start.z) * t;
         return ret;
     }
+
+	float EaseOutFloat(const float t, const float x1, const float x2)
+	{
+        float ret;
+        float easeT = 1.0f - (1.0f - t) * (1.0f - t);
+        ret = (1.0f - easeT) * x1 + easeT * x2;
+        return ret;
+	}

@@ -148,3 +148,9 @@ Matrix4x4 MakeRotateZMatrix( float radian);
     /// <param name="v">ベクトル</param>
     /// <returns></returns>
     Vector3 Lerp(const Vector3& start, const Vector3& end, float t);
+    /// <summary>
+   /// EaseOutFloat
+   /// </summary>
+   /// <param name="v">ベクトル</param>
+   /// <returns></returns>
+    float EaseOutFloat(const float t, const float x1, const float x2);

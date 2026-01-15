@@ -66,7 +66,7 @@ void WinApp::Initialize() {
     //ウィンドウの作成
     hwnd = CreateWindow(
         wc.lpszClassName,//クラス名
-        L"CG2",
+        L"2329_命のツナ",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
