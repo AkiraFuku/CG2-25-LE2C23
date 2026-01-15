@@ -1,0 +1,12 @@
+# START, x, y, z
+START, 0, 0, 0
+
+# STRAIGHT, length, step, halfWidth
+STRAIGHT, 20, 2, 6
+
+# RIGHT, radius, angleDeg, step, halfWidth
+RIGHT, 20, 90, 2, 6
+
+STRAIGHT, 20, 2, 6
+
+RIGHT, 20, 90, 2, 6

@@ -67,8 +67,8 @@ private:
     SpeedStage currentSpeedStage_ = SpeedStage::kNormal;
 
     // 当たり判定サイズ
-    static inline float kWidth;
-    static inline float kHeight;
+    static inline float kWidth = 2.0f;
+    static inline float kHeight = 2.0f;
 
 public:
     // 初期化
@@ -95,6 +95,7 @@ public:
     AABB GetAABB();
     // 衝突応答
     void OnCollision(const Player* player);
+    void SetPosition(const Vector3 &pos) { transform_.translate = pos; }
     // コンストラクタとデストラクタ
     Player() = default;
     ~Player();
