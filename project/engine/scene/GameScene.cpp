@@ -5,6 +5,7 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 #include "PSOMnager.h"
+#include "LightManager.h"
 void GameScene::Initialize() {
 
     camera = std::make_unique<Camera>();
@@ -16,7 +17,7 @@ void GameScene::Initialize() {
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
     Audio::GetInstance()->PlayAudio(handle_, true);
-
+    LightManager::GetInstance()->SetDirectionalLight(0, {1,1,1,1}, {0,-1,0}, 1.0f); // メインライト
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
@@ -24,7 +25,7 @@ void GameScene::Initialize() {
        for (uint32_t i = 0; i < 5; i++)
        {*/
     sprite = std::make_unique<Sprite>();
-    // sprite->Initialize(spritecommon,"resources/monsterBall.png");
+    // sprite->Initialize("resources/monsterBall.png");
     sprite->Initialize("resources/uvChecker.png");
 
     sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
@@ -146,7 +147,7 @@ void GameScene::Update() {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
-    ImGui::Text("Sphire");
+    ImGui::Text("Sphere");
     Vector3 pos = object3d->GetTranslate();
     Vector3 scale = object3d->GetScale();
     ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
@@ -154,10 +155,10 @@ void GameScene::Update() {
     object3d->SetTranslate(pos);
     object3d->SetScale(scale);
 
-    Vector4 lightColor = object3d->GetDirectionalLightColor();
+   
 
 
-    if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
+  /*  if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
 
         object3d->SetDirectionalLightColor(lightColor);
     }
@@ -168,7 +169,7 @@ void GameScene::Update() {
     float intensity= object3d->GetDirectionalLightIntensity();
     if(ImGui::InputFloat("intensity",&intensity)){
      object3d->SetDirectionalLightIntensity(intensity);
-    }
+    }*/
     ImGui::Text("Sprite");
     Vector2 Position =
         sprite->GetPosition();

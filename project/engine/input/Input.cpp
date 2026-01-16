@@ -3,6 +3,7 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 #include <memory>
+#include "WinApp.h"
 
 
 // 静的メンバ変数の初期化
@@ -19,13 +20,13 @@ Input* Input::GetInstance() {
 void Input::Finalize() {
    instance.reset();
 }
-void Input::Initialize(WinApp* winapp) {
-    winApp_ = winapp;
+void Input::Initialize() {
+    
     // DirectInputの初期化
     HRESULT hr;
     Microsoft::WRL::ComPtr<IDirectInput8> directInput = nullptr;
     hr = DirectInput8Create(
-        winApp_->GetInstanceHandle(),
+        WinApp::GetInstance()->GetInstanceHandle(),
         DIRECTINPUT_VERSION,
         IID_IDirectInput8,
         (void**)&directInput,
@@ -40,7 +41,7 @@ void Input::Initialize(WinApp* winapp) {
     assert(SUCCEEDED(hr));
     // キーボードの設定
     hr = keyboard->SetCooperativeLevel(
-        winApp_->GetHwnd(),
+        WinApp::GetInstance()->GetHwnd(),
         DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
     );
     assert(SUCCEEDED(hr));
@@ -51,7 +52,7 @@ void Input::Initialize(WinApp* winapp) {
     hr = mouse->SetDataFormat(&c_dfDIMouse);
     assert(SUCCEEDED(hr));
     hr = mouse->SetCooperativeLevel(
-        winApp_->GetHwnd(),
+        WinApp::GetInstance()->GetHwnd(),
         DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
     );
     assert(SUCCEEDED(hr));

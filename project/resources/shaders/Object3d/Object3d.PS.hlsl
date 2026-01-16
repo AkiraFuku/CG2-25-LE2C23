@@ -1,5 +1,5 @@
 #include "Object3d.hlsli"
-
+static const int kNumDirectionalLights = 3;
 struct Material
 {
     float4 Color;
@@ -21,10 +21,14 @@ struct Camera
 {
     float3 worldPosition;
 };
+struct LightGroup
+{
+    DirectionalLight DirectionalLights[kNumDirectionalLights];
+};
 ConstantBuffer<Camera> gCamera : register(b2);
 
 ConstantBuffer<Material> gMaterial : register(b0);
-ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
+ConstantBuffer<LightGroup> gLight : register(b1);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -89,48 +93,32 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 N = normalize(input.normal);
     float3 V = normalize(gCamera.worldPosition - input.worldPosition);
     
-    float3 finalLighting = float3(0.0f, 0.0f, 0.0f);
+    float3 finalLighting = float3(0.0f, 0.0f, 0.0f);    
+// ★追加: ループでライトを加算
+    for (int i = 0; i < kNumDirectionalLights; ++i)
+    {
+        // 強度が0以下のライトは計算スキップ
+        if (gLight.DirectionalLights[i].intensity <= 0.0f)
+            continue;
 
-    float3 L_dir = normalize(-gDirectionalLight.direction); // 光源への方向
-    finalLighting += CalculateLight(N, L_dir, V, gDirectionalLight.color.rgb, gDirectionalLight.intensity);
-
-    
-    
-    //if (gMaterial.enableLighting != 0)
-    //{
-    //    float Ndotl = dot(normalize(input.normal), -gDirectionalLight.direction);
-    //    float cos = pow(Ndotl * 0.5f + 0.5f, 2.0f);
+        float3 L_dir = normalize(-gLight.DirectionalLights[i].direction);
         
-       
-    //    float RdotE = dot(reflectLight, toEye);
-    //   // float specularPow = pow(saturate(RdotE), gMaterial.shininess);
-    //    float specularPow = pow(saturate(NDotH), gMaterial.shininess);
-    //    float3 diffuse =
-    //gMaterial.Color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-    //    float3 speculer =
-    //    gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
-        
-    //    output.color.rgb = diffuse + speculer;
-    //    output.color.a = gMaterial.Color.a * textureColor.a;
-    //    if (output.color.a < 0.1f)
-    //    {
-    //        discard; // 透明度が低いピクセルを破棄
-            
-    //    }
-        
-    //}
-    //else
-    //{
-    //    output.color = gMaterial.Color * textureColor; // Red color
-    //    if (output.color.a < 0.1f)
-    //    {
-    //        discard; // 透明度が低いピクセルを破棄
-            
-    //    }
-    //}
+        finalLighting += CalculateLight(
+            N,
+            L_dir,
+            V,
+            gLight.DirectionalLights[i].color.rgb,
+            gLight.DirectionalLights[i].intensity
+        );
+    }
     
     output.color.rgb = finalLighting * textureColor.rgb;
     output.color.a = gMaterial.Color.a * textureColor.a;
     
+    // アルファテスト
+    if (output.color.a < 0.01f)
+    {
+        discard;
+    }
     return output;
 }

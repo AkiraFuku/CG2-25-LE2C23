@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iostream> 
 #include "PSOMnager.h"
+#include "LightManager.h"
 static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //ダンプファイルの作成
     SYSTEMTIME time;
@@ -88,14 +89,15 @@ void Framework::Initialize()
 PSOMnager::GetInstance()->Initialize();
 
    /* imguiManager = std::make_unique<ImGuiManager>();*/
+
     ImGuiManager::GetInstance()->Initialize();
     TextureManager::GetInstance()->Initialize();
     ModelManager::GetInstance()->Initialize();
     ParticleManager::GetInstance()->Initialize();
     Logger::Log(StringUtility::ConvertString(std::format(L"WSTRING{}\n", wstr)));
-
+    LightManager::GetInstance()->Initialize();
     // 外部入力
-    Input::GetInstance()->Initialize(WinApp::GetInstance());
+    Input::GetInstance()->Initialize();
 
     SpriteCommon::GetInstance()->Initialize();
     Object3dCommon::GetInstance()->Initialize();
@@ -106,7 +108,7 @@ PSOMnager::GetInstance()->Initialize();
 
 void Framework::Finalize()
 {
-
+    LightManager::GetInstance()->Finalize();
     SrvManager::GetInstance()->Finalize();
     SceneManager::GetInstance()->Finalize();
     DXCommon::GetInstance()->Finalize();
@@ -137,11 +139,10 @@ void Framework::Update()
 #endif
     Input::GetInstance()->Update();
     Audio::GetInstance()-> Update();
-
+    LightManager::GetInstance()->Update();
     DXCommon::GetInstance()->PreDraw();
     SrvManager::GetInstance()->PreDraw();
-    // SpriteCommon::GetInstance()->SpriteCommonDraw();
-    // Object3dCommon::GetInstance()->Object3dCommonDraw();
+  
 }
 
 void Framework::Draw()
