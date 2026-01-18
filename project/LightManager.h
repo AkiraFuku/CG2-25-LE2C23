@@ -8,6 +8,8 @@
 
 // 定数：扱える最大ライト数
 const int kNumDirectionalLights = 3;
+const int kNumPointLights = 3;
+const int kNumSpotLights = 3;
 
 class LightManager
 {
@@ -20,7 +22,7 @@ public: // メンバ関数
     // 更新
     void Update();
     // 描画設定（コマンドリストへのバインド）
-    void Draw( UINT rootParameterIndex);
+    void Draw(UINT rootParameterIndex);
 
     // 終了処理（明示的に解放したい場合）
     void Finalize();
@@ -44,17 +46,37 @@ private: // メンバ変数・内部定義
         Vector3 direction;  // direction
         float intensity;    // intensity
     };
-
+    struct PointLight {
+        Vector4 color;//ライトの色
+        Vector3 position;//ライトの向き
+        float intensity;// 明るさ
+        float radius;
+        float decay;
+        float padding[2];
+    };
+    struct SpotLight {
+        Vector4 color;//ライトの色
+        Vector3 position;//ライトの向き
+        float intensity;// 明るさ
+        Vector3 direction;
+        float distance;
+        float decay;
+        float cosAngle;
+        float cosFalloffStart;
+        float padding;
+    };
     struct LightGroupData {
-        DirectionalLightData lights[kNumDirectionalLights];
+        DirectionalLightData directionalLights[kNumDirectionalLights];
+        SpotLight SpotLights[kNumSpotLights];
+        PointLight PointLightLights[kNumPointLights];
     };
 
     // スマートポインタでリソース管理
     Microsoft::WRL::ComPtr<ID3D12Resource> constBufferResource_;
-    
+
     // マップ先のポインタ（リソース解放時に自動的に無効になるため生ポインタでOKだが、管理には注意）
     LightGroupData* constBufferData_ = nullptr;
-    
+
     // CPU側のライトデータ保持用
     LightGroupData lightData_;
 
