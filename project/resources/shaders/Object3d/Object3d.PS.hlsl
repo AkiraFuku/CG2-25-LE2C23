@@ -1,7 +1,4 @@
 #include "Object3d.hlsli"
-//static const int kNumDirectionalLights = 3;
-//static const int kNumPointLights = 3;
-//static const int kNumSpotLights = 3;
 struct Material
 {
     float4 Color;
