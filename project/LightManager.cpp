@@ -54,8 +54,8 @@ void LightManager::Update() {
         for (int i = 0; i < kNumPointLights; ++i) {
             constBufferData_->PointLightLights[i] = lightData_.PointLightLights[i];
         }
-        for (int i = 0; i < kNumDirectionalLights; ++i) {
-            constBufferData_->directionalLights[i] = lightData_.directionalLights[i];
+        for (int i = 0; i < kNumSpotLights; ++i) {
+            constBufferData_->SpotLights[i] = lightData_.SpotLights[i];
         }
     }
 }
@@ -76,6 +76,29 @@ void LightManager::SetDirectionalLight(int index, const Vector4& color, const Ve
     lightData_.directionalLights[index].color = color;
     lightData_.directionalLights[index].direction = direction;
     lightData_.directionalLights[index].intensity = intensity;
+}
+
+void LightManager::SetPointLight(int index, const Vector4& color, const Vector3& position, float intensity, float radius, float decay) {
+    if (index < 0 || index >= kNumPointLights) return;
+
+    lightData_.PointLightLights[index].color = color;
+    lightData_.PointLightLights[index].position = position;
+    lightData_.PointLightLights[index].intensity = intensity;
+    lightData_.PointLightLights[index].radius = radius;
+    lightData_.PointLightLights[index].decay = decay;
+}
+
+void LightManager::SetSpotLight(int index, const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart) {
+    if (index < 0 || index >= kNumSpotLights) return;
+
+    lightData_.SpotLights[index].color = color;
+    lightData_.SpotLights[index].position = position;
+    lightData_.SpotLights[index].intensity = intensity;
+    lightData_.SpotLights[index].direction = direction;
+    lightData_.SpotLights[index].distance = distance;
+    lightData_.SpotLights[index].decay = decay;
+    lightData_.SpotLights[index].cosAngle = cosAngle;
+    lightData_.SpotLights[index].cosFalloffStart = cosFalloffStart;
 }
 
 void LightManager::CreateConstBufferResource() {

@@ -30,6 +30,12 @@ public: // メンバ関数
     // ライトの設定
     void SetDirectionalLight(int index, const Vector4& color, const Vector3& direction, float intensity);
 
+    void SetPointLight(int index, const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
+    void SetSpotLight(int index, const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
+
+    Vector3 GetPointPos(int index){return lightData_.PointLightLights[index].position;}
+    void SetPointPos(int index,Vector3 pos){lightData_.PointLightLights[index].position=pos;}
+
 private: // メンバ変数・内部定義
     // シングルトンパターンのためコンストラクタを隠蔽
     LightManager() = default;
