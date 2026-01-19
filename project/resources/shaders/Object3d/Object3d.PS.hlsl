@@ -1,7 +1,7 @@
 #include "Object3d.hlsli"
-static const int kNumDirectionalLights = 3;
-static const int kNumPointLights = 3;
-static const int kNumSpotLights = 3;
+//static const int kNumDirectionalLights = 3;
+//static const int kNumPointLights = 3;
+//static const int kNumSpotLights = 3;
 struct Material
 {
     float4 Color;
@@ -44,16 +44,31 @@ struct Camera
 {
     float3 worldPosition;
 };
-struct LightGroup
+struct LightCounts
 {
-    DirectionalLight DirectionalLights[kNumDirectionalLights];
-    SpotLight SpotLights[kNumSpotLights];
-    PointLight PointLightLights[kNumPointLights];
+    int numDirectionalLights;
+    int numPointLights;
+    int numSpotLights;
+    int padding;
 };
+//struct LightGroup
+//{
+//    DirectionalLight DirectionalLights[kNumDirectionalLights];
+//    SpotLight SpotLights[kNumSpotLights];
+//    PointLight PointLightLights[kNumPointLights];
+//};
 ConstantBuffer<Camera> gCamera : register(b2);
 
 ConstantBuffer<Material> gMaterial : register(b0);
-ConstantBuffer<LightGroup> gLight : register(b1);
+
+StructuredBuffer<DirectionalLight> gDirectionalLights : register(t1);
+StructuredBuffer<PointLight> gPointLights : register(t2);
+StructuredBuffer<SpotLight> gSpotLights : register(t3);
+
+// ★追加: カウント用定数バッファ (CBV: b3)
+ConstantBuffer<LightCounts> gLightCounts : register(b3);
+
+//ConstantBuffer<LightGroup> gLight : register(b1);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -119,60 +134,53 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 V = normalize(gCamera.worldPosition - input.worldPosition);
     
     float3 finalLighting = float3(0.0f, 0.0f, 0.0f);    
-// ★追加: ループでライトを加算
-    for (int i = 0; i < kNumDirectionalLights; ++i)
-    {
-        // 強度が0以下のライトは計算スキップ
-        if (gLight.DirectionalLights[i].intensity <= 0.0f)
-            continue;
 
-        float3 L_dir = normalize(-gLight.DirectionalLights[i].direction);
-        
-        finalLighting += CalculateLight(
-            N,
-            L_dir,
-            V,
-            gLight.DirectionalLights[i].color.rgb,
-            gLight.DirectionalLights[i].intensity
-        );
+    
+    // Directional Light
+    for (int i = 0; i < gLightCounts.numDirectionalLights; ++i)
+    {
+        // gDirectionalLights[i] でアクセス
+        float3 L_dir = normalize(-gDirectionalLights[i].direction);
+        finalLighting += CalculateLight(N, L_dir, V, gDirectionalLights[i].color.rgb, gDirectionalLights[i].intensity);
     }
+    
     //ポイントライト
-    for (int i = 0; i < kNumPointLights; ++i)
+    for (int j = 0; j < gLightCounts.numPointLights; ++j)
     {
         // 強度が0以下のライトは計算スキップ
-        if (gLight.PointLightLights[i].intensity <= 0.0f)continue;
+        if (gPointLights[j].intensity <= 0.0f)continue;
 
-        float3 directionToPointLight = gLight.PointLightLights[i].position - input.worldPosition;
+        float3 directionToPointLight = gPointLights[j].position - input.worldPosition;
     // 距離による減衰は計算せず、正規化して方向だけ使う
         float3 L_point = normalize(directionToPointLight);
         float distance = length(directionToPointLight);
-        float factor = pow(saturate(-distance / gLight.PointLightLights[i].radius + 1.0f), gLight.PointLightLights[i].decay);
-        finalLighting += CalculateLight(N, L_point, V, gLight.PointLightLights[i].color.rgb, gLight.PointLightLights[i].intensity * factor);
+        float factor = pow(saturate(-distance / gPointLights[j].radius + 1.0f), gPointLights[j].decay);
+        finalLighting += CalculateLight(N, L_point, V, gPointLights[j].color.rgb, gPointLights[j].intensity * factor);
     }
     //スポットライト
-    for (int i = 0; i < kNumSpotLights; ++i)
+    for (int k = 0; k < gLightCounts.numSpotLights; ++k)
     {
         // 強度が0以下のライトは計算スキップ
-        if (gLight.SpotLights[i].intensity <= 0.0f)
+        if (gSpotLights[k].intensity <= 0.0f)
             continue;
  // 1. 光源への方向ベクトルと距離を計算
-        float3 directionToSpotLight = input.worldPosition - gLight.SpotLights[i].position;
+        float3 directionToSpotLight = input.worldPosition - gSpotLights[k].position;
         float distanceSpot = length(directionToSpotLight);
         float3 L_spot = normalize(directionToSpotLight); // 光源方向 (単位ベクトル)
 
     // 2. 距離による減衰 (Falloff)
     // PointLightと同じく、指定距離(distance)で強度が0になるよう計算
-        float distFactor = pow(saturate(-distanceSpot / gLight.SpotLights[i].distance + 1.0f), gLight.SpotLights[i].decay);
+        float distFactor = pow(saturate(-distanceSpot / gSpotLights[k].distance + 1.0f), gSpotLights[k].decay);
 
     // 3. 角度による減衰 (Cone Falloff)
-        float cosAngle = dot(L_spot, gLight.SpotLights[i].direction);
+        float cosAngle = dot(L_spot, gSpotLights[k].direction);
 
-        float cosDiff = gLight.SpotLights[i].cosFalloffStart - gLight.SpotLights[i].cosAngle;
+        float cosDiff = gSpotLights[k].cosFalloffStart - gSpotLights[k].cosAngle;
 
         float range = max(cosDiff, 0.0001f);
-        float angleFactor = saturate((cosAngle - gLight.SpotLights[i].cosAngle) / range);
+        float angleFactor = saturate((cosAngle - gSpotLights[k].cosAngle) / range);
     
-        finalLighting += CalculateLight(N, L_spot, V, gLight.SpotLights[i].color.rgb, gLight.SpotLights[i].intensity * distFactor * angleFactor);
+        finalLighting += CalculateLight(N, L_spot, V, gSpotLights[k].color.rgb, gSpotLights[k].intensity * distFactor * angleFactor);
     }
     
     output.color.rgb = finalLighting * textureColor.rgb;

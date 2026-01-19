@@ -22,8 +22,8 @@ void GameScene::Initialize() {
    // LightManager::GetInstance()->SetSpotLight(0, { 1.0f, 1.0f, 1.0f, 1.0f },  { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
 
     Vector3 point1 = { 0,0,0 };
-    LightManager::GetInstance()->SetPointLight(0, { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
-    LightManager::GetInstance()->SetPointLight(1, { 1.0f, 1.0f, 1.0f, 1.0f }, { 2,-1,0 }, 4.0f, 2.0f, 0.1f);
+    LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
+    LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2,-1,0 }, 4.0f, 2.0f, 0.1f);
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
@@ -65,6 +65,9 @@ void GameScene::Initialize() {
     emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 }
 void GameScene::Finalize() {
+
+
+    LightManager::GetInstance()->ClearLights();
 
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
@@ -150,17 +153,17 @@ void GameScene::Update() {
             camera->SetTranslate(cameraTranslate);
         }
         {
-            // 左スティックの値を取得
-            float x = (float)state.Gamepad.sThumbRX;
-            float y = (float)state.Gamepad.sThumbRY;
+            //// 左スティックの値を取得
+            //float x = (float)state.Gamepad.sThumbRX;
+            //float y = (float)state.Gamepad.sThumbRY;
 
-            // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
-            float normalizedX = x / 32767.0f;
-            float normalizedY = y / 32767.0f;
-            Vector3 point1 = LightManager::GetInstance()->GetPointPos(0);
+            //// 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+            //float normalizedX = x / 32767.0f;
+            //float normalizedY = y / 32767.0f;
+            //Vector3 point1 = LightManager::GetInstance()->GetPointPos(0);
 
-            point1 = Add(point1, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
-            LightManager::GetInstance()->SetPointPos(0, point1);
+            //point1 = Add(point1, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+            //LightManager::GetInstance()->SetPointPos(0, point1);
             
         }
     }
@@ -180,7 +183,7 @@ void GameScene::Update() {
     object3d->SetTranslate(pos);
     object3d->SetScale(scale);
 
-    ImGui::Begin("light");
+  /*  ImGui::Begin("light");
     ImGui::Text("point");
     Vector3 point1 = LightManager::GetInstance()->GetPointPos(0);
     ImGui::DragFloat3("point1", &(point1.x));
@@ -188,7 +191,7 @@ void GameScene::Update() {
     Vector3 point2 = LightManager::GetInstance()->GetPointPos(1);
     ImGui::DragFloat3("point2", &(point2.x));
     LightManager::GetInstance()->SetPointPos(1, point2);
-    ImGui::End();
+    ImGui::End();*/
 
 
 

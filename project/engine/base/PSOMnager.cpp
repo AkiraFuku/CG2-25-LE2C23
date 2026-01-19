@@ -149,13 +149,13 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     break;
     case PipelineType::Object3d:
     {
-        rootParameters.resize(5);
+        rootParameters.resize(8);
 
 
 
         // Enum定義 (可読性のため)
         enum {
-            kMaterial, kTransform, kTexture, kLight, kCamera
+            kMaterial, kTransform, kTexture, DirLight, PointLight, SpotLight, Count, kCamera
         };
 
         // 0. Material (CBV b0, Pixel)
@@ -174,10 +174,25 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
         rootParameters[kTexture].DescriptorTable.pDescriptorRanges = descRangeTexture;
         rootParameters[kTexture].DescriptorTable.NumDescriptorRanges = 1;
 
-        // 3. DirectionalLight (CBV b1, Pixel)
-        rootParameters[kLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-        rootParameters[kLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-        rootParameters[kLight].Descriptor.ShaderRegister = 1;
+        // ★変更: 3. DirectionalLight (SRV t1)
+        rootParameters[DirLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+        rootParameters[DirLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[DirLight].Descriptor.ShaderRegister = 1; // t1
+
+        // ★追加: 4. PointLight (SRV t2)
+        rootParameters[PointLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+        rootParameters[PointLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[PointLight].Descriptor.ShaderRegister = 2; // t2
+
+        // ★追加: 5. SpotLight (SRV t3)
+        rootParameters[SpotLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+        rootParameters[SpotLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[SpotLight].Descriptor.ShaderRegister = 3; // t3
+
+        // ★追加: 6. LightCounts (CBV b3)
+        rootParameters[Count].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameters[Count].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[Count].Descriptor.ShaderRegister = 3; // b3 (b0,b1,b2は使用済みと仮定、あるいは空いている番号)
         //カメラ
         rootParameters[kCamera].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // 定数バッファビュー
         rootParameters[kCamera].Descriptor.ShaderRegister = 2; // レジスタ番号 2 (b2)
