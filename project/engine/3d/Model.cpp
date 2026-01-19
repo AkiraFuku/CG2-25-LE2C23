@@ -8,11 +8,16 @@
 #include <Windows.h>
 #include <numbers>
 #include <imgui.h>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 void Model::Initialize(const std::string& directryPath, const std::string& filename)
 {
 
 
-    modelData_ = LoadObjFile(directryPath, filename);
+    modelData_ = LoadModelFile(directryPath, filename);
     if (modelData_.material.textureFilePath.empty()) {
         modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
         TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
@@ -133,79 +138,60 @@ Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& director
     return materialData;
 }
 
-Model::ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename)
+Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {
-    //1. 変数の宣言
+       //1. 変数の宣言
     ModelData modelData;
-    std::vector<Vector4> positions;//頂点座標
-    std::vector<Vector3> normals;//法線ベクトル
-    std::vector<Vector2> texcords;//テクスチャ座標
-    std::string line;
-    //2. ファイルを開く
-    std::ifstream file(directoryPath + "/" + filename);//ファイルパスを結合して開く
-    
-    assert(file.is_open());//ファイルが開けたか確認
+    std::string filePath = directoryPath + "/" + filename;
 
-    //3. ファイルからデータを読み込みモデルデータを作成
-    while (std::getline(file, line)) {
-        std::string identifier;
-        std::istringstream s(line);
-        s >> identifier;//行の先頭を識別子として取得
-        ///
-        if (identifier == "v") {
-            Vector4 position;
-            s >> position.x >> position.y >> position.z;//頂点座標を読み込み
-            position.w = 1.0f; // w成分を1.0に設定
-            position.x *= -1.0f; // X軸を反転
-            positions.push_back(position);//頂点座標を追加
-        } else if (identifier == "vt") {
-            Vector2 texcord;
-            s >> texcord.x >> texcord.y;//テクスチャ座標を読み込み
-            // OpenGLとDirectXでY軸の方向が異なるため、Y座標を反転
-            texcord.y = 1.0f - texcord.y;
-            texcords.push_back(texcord);//テクスチャ座標を追加
-        } else if (identifier == "vn") {
-            Vector3 normal;
-            s >> normal.x >> normal.y >> normal.z;//法線ベクトルを読み込み
-            normal.x *= -1.0f; // X軸を反転
-            normals.push_back(normal);
+    ////2. ファイルを開く
+    Assimp::Importer importer;
 
-        } else if (identifier == "f") {
-            VertexData Triangle[3];
-            //面は三角形限定
-            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-                std::string vertexDefinition;
-                s >> vertexDefinition;//頂点定義を読み込み
-                //頂点の要素へのIndexは「位置/UV/法線」の順番で格納されているので、分解して取得
-                std::istringstream v(vertexDefinition);
-                uint32_t elementIndices[3];//位置、UV、法線のインデックス
-                for (uint32_t element = 0; element < 3; ++element) {
-                    std::string index;
-                    std::getline(v, index, '/');//スラッシュで区切って取得
-                    elementIndices[element] = std::stoi(index);//文字列を整数に変換
-                }
-                // 要素のインデックスから頂点データを構築
-                Vector4 position = positions[elementIndices[0] - 1];//1から始まるので-1
-                Vector2 texcord = texcords[elementIndices[1] - 1];//1から始まるので-1
-                Vector3 normal = normals[elementIndices[2] - 1];//1から始まるので-1
-
-              
-                Triangle[faceVertex] = { position, texcord, normal };//頂点データを構築
-            }
-            modelData.vertices.push_back(Triangle[2]);
-            modelData.vertices.push_back(Triangle[1]);
-            modelData.vertices.push_back(Triangle[0]);
-        } else if (identifier == "mtllib")//マテリアルライブラリの読み込み
+    const aiScene* scene = importer.ReadFile(filePath.c_str(),
+        aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
+        aiProcess_FlipUVs        |        // 法線がない場合、自動計算する
+aiProcess_PreTransformVertices    
+    );
+    assert(scene->HasMeshes());
+    for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
+    {
+        aiMesh* mesh = scene->mMeshes[meshIndex];
+        assert(mesh->HasNormals());
+        assert(mesh->HasTextureCoords(0));
+        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces;++faceIndex)
         {
-            std::string materialFileName;
-            s >> materialFileName;//マテリアルファイル名を読み込み
-            //マテリアルデータを読み込む
-            modelData.material = LoadMaterialTemplateFile(directoryPath, materialFileName);
+            aiFace& face = mesh->mFaces[faceIndex];
+            assert(face.mNumIndices == 3);
+            for (uint32_t element = 0; element < face.mNumIndices; ++element)
+            {
+                uint32_t vertexIndex = face.mIndices[element];
+                aiVector3D& position = mesh->mVertices[vertexIndex];
+                aiVector3D& normal = mesh->mNormals[vertexIndex];
+                aiVector3D& texcord = mesh->mTextureCoords[0][vertexIndex];
+                VertexData vertex;
+                vertex.position = { position.x,position.y,position.z,1.0f };
+                vertex.normal = { normal.x,normal.y,normal.z };
+                vertex.texcord = { texcord.x,texcord.y };
+                vertex.position.x *= -1.0f;
+                vertex.normal.x *= -1.0f;
+                modelData.vertices.push_back(vertex);
+            }
         }
-
     }
+    for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex)
+    {
+        aiMaterial* material = scene->mMaterials[materialIndex];
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0)
+        {
+            aiString textureFilePath;
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+            modelData.material.textureFilePath = directoryPath + "/" + textureFilePath.C_Str();
+        }
+    }
+   // modelData.rootNode = ReadNode(scene->mRootNode);
     //4. モデルデータを返す
     return modelData;
+
 }
 
 Model* Model::CreateSphere(uint32_t subdivision)

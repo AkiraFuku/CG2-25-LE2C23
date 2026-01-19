@@ -49,7 +49,7 @@ public:
     //マテリアルの読み込み
     static MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename);
     //OBJファイルの読み込み
-    static ModelData LoadObjFile(const std::string& directryPath, const std::string& filename);
+    static ModelData LoadModelFile(const std::string& directryPath, const std::string& filename);
 
     static Model* CreateSphere(uint32_t subdivision = 16);
 
