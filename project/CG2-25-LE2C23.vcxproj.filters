@@ -186,6 +186,18 @@
     <ClCompile Include="LightManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="engine\io\CameraController.cpp">
+      <Filter>engine\io</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\io\DeathParticles.cpp">
+      <Filter>engine\io</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\io\Enemy.cpp">
+      <Filter>engine\io</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\io\Fade.cpp">
+      <Filter>engine\io</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -313,6 +325,21 @@
     </ClInclude>
     <ClInclude Include="LightManager.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Base.h">
+      <Filter>engine\base</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\io\CameraController.h">
+      <Filter>engine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\io\DeathParticles.h">
+      <Filter>engine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\io\Enemy.h">
+      <Filter>engine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\io\Fade.h">
+      <Filter>engine\io</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

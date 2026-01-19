@@ -42,6 +42,15 @@ Vector3 Division(const Vector3& v1, const Vector3& v2)
 		
 		);
 }
+Vector3 Division(const Vector3& v1, const float f)
+{
+     return Vector3(
+			v1.x / f,
+			v1.y / f,
+			v1.z / f
+		
+		);
+}
 Vector3 operator+(const Vector3& v1, const Vector3& v2)
 {
 
