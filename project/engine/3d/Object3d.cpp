@@ -30,14 +30,14 @@ void Object3d::Update()
     if (camera_)
     {
         cameraData_->worldPosition = camera_->GetTranslate();
-        worldViewProjectionMatrix = Multiply(worldMatrix, camera_->GetViewProtectionMatrix());
+      worldViewProjectionMatrix = Multiply( Multiply(model_->GetModelData().rootNode.localMatrix, worldMatrix), camera_->GetViewProtectionMatrix());
+     //   worldViewProjectionMatrix = Multiply( worldMatrix, camera_->GetViewProtectionMatrix());
     } else {
-        worldViewProjectionMatrix = worldMatrix;
+        worldViewProjectionMatrix =Multiply(model_->GetModelData().rootNode.localMatrix, worldMatrix);
     }
     //行列をGPUに転送
     wvpResource_->WVP = worldViewProjectionMatrix;
     wvpResource_->World = worldMatrix;
-   // directionalLightData_->direction = Normalize(directionalLightData_->direction);
 }
 
 void Object3d::Draw()
@@ -75,35 +75,24 @@ void Object3d::CreateWVPResource()
         Map(0, nullptr, reinterpret_cast<void**>(&wvpResource_));
     wvpResource_->WVP = Makeidetity4x4();
     wvpResource_->World = Makeidetity4x4();
-    wvpResource_->WorldInverseTranspose=Inverse( wvpResource_->World );
+    wvpResource_->WorldInverseTranspose = Inverse(wvpResource_->World);
 }
 
-//void Object3d::CreateDirectionalLightResource()
-//{
-//    directionalLightResource_ =
-//        DXCommon::GetInstance()->
-//        CreateBufferResource(sizeof(DirectionalLight));
-//    directionalLightResource_.Get()->
-//        Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-//    directionalLightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-//    directionalLightData_->direction = { 0.0f,-1.0f,0.0f };
-//    directionalLightData_->intensity = 1.0f;
-//
-//}
+
 
 void Object3d::CreateCameraResource()
 {
     cameraResource_ =
         DXCommon::GetInstance()->
-        CreateBufferResource( (sizeof(CameraForGPU) + 0xff) & ~0xff);
+        CreateBufferResource((sizeof(CameraForGPU) + 0xff) & ~0xff);
     cameraResource_.Get()->
         Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
-    if (camera_!=nullptr)
+    if (camera_ != nullptr)
     {
-        cameraData_->worldPosition=camera_->GetTranslate();
+        cameraData_->worldPosition = camera_->GetTranslate();
     } else
     {
-        cameraData_->worldPosition=Vector3{1.0f,1.0f,1.0f};
+        cameraData_->worldPosition = Vector3{ 1.0f,1.0f,1.0f };
     }
 
 }

@@ -9,9 +9,6 @@
 #include <numbers>
 #include <imgui.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 void Model::Initialize(const std::string& directryPath, const std::string& filename)
 {
@@ -188,8 +185,8 @@ aiProcess_PreTransformVertices
             modelData.material.textureFilePath = directoryPath + "/" + textureFilePath.C_Str();
         }
     }
-   // modelData.rootNode = ReadNode(scene->mRootNode);
-    //4. モデルデータを返す
+    modelData.rootNode = ReadNode(scene->mRootNode);
+   // 4. モデルデータを返す
     return modelData;
 
 }
@@ -281,5 +278,29 @@ Model* Model::CreateSphere(uint32_t subdivision)
     model->CreateMaterialResource();
 
     return model;
+}
+
+ Model::Node Model::ReadNode(aiNode* node)
+{
+   Node result;
+  
+    aiMatrix4x4 aiLocalMatrix = node->mTransformation;
+    aiLocalMatrix.Transpose();
+
+ 
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // Assimpの行列は [row][col] でアクセス可能
+            // 自作Matrix構造体の定義に合わせて代入 (例: result.localMatrix.m[i][j])
+            result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
+        }
+    }
+    result.name = node->mName.C_Str();
+    result.children.resize(node->mNumChildren);
+    for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
+    {
+        result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
+    }
+    return result;
 }
 

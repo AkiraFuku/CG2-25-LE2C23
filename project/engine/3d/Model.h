@@ -4,6 +4,10 @@
 #include "Vector4.h"
 #include <wrl.h>
 #include <d3d12.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "MathFunction.h"
 
 class Model
 {
@@ -26,9 +30,17 @@ public:
         std::string textureFilePath;
         uint_fast16_t textureIndex = 0;
     };
+    struct Node
+    {
+        Matrix4x4 localMatrix=Makeidetity4x4();
+        std::string name;
+        std::vector <Node>children;
+    };
+
     struct ModelData {
         std::vector<VertexData> vertices; // 頂点データの配列
         MaterialData material; // マテリアルデータ
+        Node rootNode;
     };
     enum  DiffuseType
     {
@@ -46,6 +58,7 @@ public:
 
     void Draw();
 
+    ModelData GetModelData(){return modelData_;}
     //マテリアルの読み込み
     static MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename);
     //OBJファイルの読み込み
@@ -53,6 +66,7 @@ public:
 
     static Model* CreateSphere(uint32_t subdivision = 16);
 
+    static Node ReadNode(aiNode*node );
 
 private:
 
