@@ -26,7 +26,7 @@ struct PointLight
     float intensity; // 明るさ
     float radius;
     float decay;
-
+    float2 padding;
 };
 struct SpotLight
 {
@@ -38,6 +38,7 @@ struct SpotLight
     float decay;
     float cosAngle;
     float cosFalloffStart;
+    float padding;
    
 };
 struct Camera
@@ -51,12 +52,6 @@ struct LightCounts
     int numSpotLights;
     int padding;
 };
-//struct LightGroup
-//{
-//    DirectionalLight DirectionalLights[kNumDirectionalLights];
-//    SpotLight SpotLights[kNumSpotLights];
-//    PointLight PointLightLights[kNumPointLights];
-//};
 ConstantBuffer<Camera> gCamera : register(b2);
 
 ConstantBuffer<Material> gMaterial : register(b0);
@@ -68,7 +63,6 @@ StructuredBuffer<SpotLight> gSpotLights : register(t3);
 // ★追加: カウント用定数バッファ (CBV: b3)
 ConstantBuffer<LightCounts> gLightCounts : register(b3);
 
-//ConstantBuffer<LightGroup> gLight : register(b1);
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
@@ -164,7 +158,7 @@ PixelShaderOutput main(VertexShaderOutput input)
         if (gSpotLights[k].intensity <= 0.0f)
             continue;
  // 1. 光源への方向ベクトルと距離を計算
-        float3 directionToSpotLight = input.worldPosition - gSpotLights[k].position;
+        float3 directionToSpotLight = gSpotLights[k].position - input.worldPosition;
         float distanceSpot = length(directionToSpotLight);
         float3 L_spot = normalize(directionToSpotLight); // 光源方向 (単位ベクトル)
 

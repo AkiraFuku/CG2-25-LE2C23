@@ -18,12 +18,14 @@ void GameScene::Initialize() {
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
     Audio::GetInstance()->PlayAudio(handle_, true);
-    // LightManager::GetInstance()->SetDirectionalLight(0, {1,1,1,1}, {0,-1,0}, 1.0f); // メインライト
-   // LightManager::GetInstance()->SetSpotLight(0, { 1.0f, 1.0f, 1.0f, 1.0f },  { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+    LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
 
     Vector3 point1 = { 0,0,0 };
-    LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
-    LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2,-1,0 }, 4.0f, 2.0f, 0.1f);
+    /* LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
+     LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);*/
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
@@ -154,17 +156,16 @@ void GameScene::Update() {
         }
         {
             //// 左スティックの値を取得
-            //float x = (float)state.Gamepad.sThumbRX;
-            //float y = (float)state.Gamepad.sThumbRY;
-
+            float x = (float)state.Gamepad.sThumbRX;
+            float y = (float)state.Gamepad.sThumbRY;
             //// 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
-            //float normalizedX = x / 32767.0f;
-            //float normalizedY = y / 32767.0f;
-            //Vector3 point1 = LightManager::GetInstance()->GetPointPos(0);
+            float normalizedX = x / 32767.0f;
+            float normalizedY = y / 32767.0f;
 
-            //point1 = Add(point1, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
-            //LightManager::GetInstance()->SetPointPos(0, point1);
-            
+            Vector3 point = LightManager::GetInstance()->GetSpotLight(0).direction;
+            point = Add(point, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+            LightManager::GetInstance()->SetSpotLightDirection(0, point);
+
         }
     }
 
@@ -182,16 +183,41 @@ void GameScene::Update() {
     ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
     object3d->SetTranslate(pos);
     object3d->SetScale(scale);
+    if (LightManager::GetInstance()->GetPointLightCount() > 0) {
+        ImGui::Begin("Light Setting");
 
-  /*  ImGui::Begin("light");
-    ImGui::Text("point");
-    Vector3 point1 = LightManager::GetInstance()->GetPointPos(0);
-    ImGui::DragFloat3("point1", &(point1.x));
-    LightManager::GetInstance()->SetPointPos(0, point1);
-    Vector3 point2 = LightManager::GetInstance()->GetPointPos(1);
-    ImGui::DragFloat3("point2", &(point2.x));
-    LightManager::GetInstance()->SetPointPos(1, point2);
-    ImGui::End();*/
+        // 0番目のポイントライトのデータを参照で取得
+        // "auto&" にすることで、ここで書き換えた内容が直接LightManager内のデータに反映されます
+        auto& pointLight2 = LightManager::GetInstance()->GetPointLight(1);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light2 Pos", &pointLight2.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light2 Color", &pointLight2.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light2 Intensity", &pointLight2.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light2 Decay", &pointLight2.decay, 0.1f, 0.0f, 10.0f);
+        auto& pointLight1 = LightManager::GetInstance()->GetPointLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light Pos", &pointLight1.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light Color", &pointLight1.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light Intensity", &pointLight1.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+
+        ImGui::End();
+    }
 
 
 

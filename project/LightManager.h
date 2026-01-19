@@ -26,34 +26,6 @@ public: // メンバ関数
 
     // 終了処理（明示的に解放したい場合）
     void Finalize();
-
-
-    // ライト追加関数
-    void AddDirectionalLight(const Vector4& color, const Vector3& direction, float intensity);
-    void AddPointLight(const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
-    void AddSpotLight(const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
-    
-    void ClearLights(); // 毎フレームリセット用
-
-    //// ライトの設定
-    //void SetDirectionalLight(int index, const Vector4& color, const Vector3& direction, float intensity);
-
-    //void SetPointLight(int index, const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
-    //void SetSpotLight(int index, const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
-
-    //Vector3 GetPointPos(int index){return lightData_.PointLightLights[index].position;}
-    //void SetPointPos(int index,Vector3 pos){lightData_.PointLightLights[index].position=pos;}
-
-private: // メンバ変数・内部定義
-    // シングルトンパターンのためコンストラクタを隠蔽
-    LightManager() = default;
-    ~LightManager() = default;
-    LightManager(const LightManager&) = delete;
-    LightManager& operator=(const LightManager&) = delete;
-
-    //// 定数バッファ作成関数
-    //void CreateConstBufferResource();
-
     // 定数バッファ用構造体 (HLSL側と合わせる)
     struct DirectionalLightData {
         Vector4 color;      // color
@@ -79,11 +51,52 @@ private: // メンバ変数・内部定義
         float cosFalloffStart;
         float padding;
     };
-  /*  struct LightGroupData {
-        DirectionalLightData directionalLights[kNumDirectionalLights];
-        SpotLight SpotLights[kNumSpotLights];
-        PointLight PointLightLights[kNumPointLights];
-    };*/
+
+    // ライト追加関数
+    void AddDirectionalLight(const Vector4& color, const Vector3& direction, float intensity);
+    void AddPointLight(const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
+    void AddSpotLight(const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
+
+    void ClearLights(); // 毎フレームリセット用
+    DirectionalLightData& GetDirectionalLight(size_t index);
+    PointLightData& GetPointLight(size_t index);
+    SpotLightData& GetSpotLight(size_t index);
+
+    // 平行光源 (Directional Light) の設定
+    void SetDirectionalLight(size_t index, const Vector4& color, const Vector3& direction, float intensity);
+
+    // 点光源 (Point Light) の設定
+    void SetPointLight(size_t index, const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
+    void SetPointLightPos(size_t index, const Vector3& position ){pointLights_[index].position=position;};
+
+    // スポットライト (Spot Light) の設定
+    void SetSpotLight(size_t index, const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
+    void SetSpotLightDirection(size_t index,const Vector3& direction){
+    spotLights_[index].direction=direction;
+    };
+    // 有効なライトの数を取得する関数もあると便利です
+    size_t GetDirectionalLightCount() const {
+        return directionalLights_.size();
+    }
+    size_t GetPointLightCount() const {
+        return pointLights_.size();
+    }
+    size_t GetSpotLightCount() const {
+        return spotLights_.size();
+    }
+
+private: // メンバ変数・内部定義
+    // シングルトンパターンのためコンストラクタを隠蔽
+    LightManager() = default;
+    ~LightManager() = default;
+    LightManager(const LightManager&) = delete;
+    LightManager& operator=(const LightManager&) = delete;
+
+    //// 定数バッファ作成関数
+    //void CreateConstBufferResource();
+
+
+
     struct LightCounts {
         int numDirectional;
         int numPoint;
@@ -94,16 +107,6 @@ private: // メンバ変数・内部定義
     // リソース作成ヘルパー
     void CreateStructuredBuffer(size_t sizeInBytes, Microsoft::WRL::ComPtr<ID3D12Resource>& resource);
     void CreateConstBuffer(size_t sizeInBytes, Microsoft::WRL::ComPtr<ID3D12Resource>& resource);
-    //// スマートポインタでリソース管理
-    //Microsoft::WRL::ComPtr<ID3D12Resource> constBufferResource_;
-
-    //// マップ先のポインタ（リソース解放時に自動的に無効になるため生ポインタでOKだが、管理には注意）
-    //LightGroupData* constBufferData_ = nullptr;
-
-    //// CPU側のライトデータ保持用
-    //LightGroupData lightData_;
-
-
     // データ保持用
     std::vector<DirectionalLightData> directionalLights_;
     std::vector<PointLightData> pointLights_;
