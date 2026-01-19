@@ -84,8 +84,7 @@ void Model::CreateVertexBuffer() {
         DXCommon::GetInstance()->
         CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
     //頂点バッファビューの設定
-    vertexBufferView_.BufferLocation =
-        vertexResource_.Get()->GetGPUVirtualAddress();
+    vertexBufferView_.BufferLocation =vertexResource_.Get()->GetGPUVirtualAddress();
     vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
     vertexBufferView_.StrideInBytes = sizeof(VertexData);
     vertexResource_.Get()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
