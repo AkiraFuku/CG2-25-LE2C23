@@ -18,14 +18,14 @@ void GameScene::Initialize() {
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
     Audio::GetInstance()->PlayAudio(handle_, true);
-    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
-    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
     LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
     LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
 
     Vector3 point1 = { 0,0,0 };
-    /* LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
-     LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);*/
+     LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
+     LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
@@ -54,13 +54,13 @@ void GameScene::Initialize() {
     object3d = std::make_unique<Object3d>();
     object3d->Initialize();
 
-    ModelManager::GetInstance()->LoadModel("plane.obj");
+    ModelManager::GetInstance()->LoadModel("plane.gltf");
     ModelManager::GetInstance()->LoadModel("axis.obj");
     ModelManager::GetInstance()->LoadModel("terrain.obj");
     ModelManager::GetInstance()->CreateSphereModel("MySphere", 16);
     // object3d2->SetTranslate(Vector3{ 0.0f,10.0f,0.0f });
     object3d2->SetModel("terrain.obj");
-    object3d->SetModel("MySphere");
+    object3d->SetModel("plane.gltf");
 
     camera->SetTranslate({ 0.0f,0.0f,-10.0f });
     Transform M = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
@@ -163,7 +163,7 @@ void GameScene::Update() {
             float normalizedY = y / 32767.0f;
 
             Vector3 point = LightManager::GetInstance()->GetSpotLight(0).direction;
-            point = Add(point, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+            point = Add(point, Vector3{ normalizedX / 30.0f,0.0f,normalizedY / 30.0f });
             LightManager::GetInstance()->SetSpotLightDirection(0, point);
 
         }
@@ -215,6 +215,20 @@ void GameScene::Update() {
         // 減衰率の調整
         ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
         ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+        auto& Spot = LightManager::GetInstance()->GetSpotLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("spot Light Pos", &Spot.position.x, 0.1f);
+        ImGui::DragFloat3("spot Light ", &Spot.direction.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("spot Light Color", &Spot.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("spot Light Intensity", &Spot.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("spot Light Decay", &Spot.decay, 0.1f, 0.0f, 10.0f);
 
         ImGui::End();
     }
