@@ -16,6 +16,7 @@ public:
         Vector4 position; // 4D position vector
         Vector2 texcord; // 2D texture coordinate vector
         Vector3 normal;
+        Vector4 color;
     };
     struct Material {
         Vector4 color;

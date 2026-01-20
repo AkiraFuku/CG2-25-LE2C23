@@ -38,25 +38,25 @@ void Model::Update()
 {
 #ifdef USE_IMGUI
     ImGui::Begin("Settings");
-            int* pEnableLighting = reinterpret_cast<int*>(&materialData_->enableLighting);
-            ImGui::Checkbox("Enable Lighting", (bool*)pEnableLighting);
-            if (materialData_->enableLighting) {
-                // 拡散反射 (Diffuse) の設定
-                ImGui::Text("Diffuse (Base)");
-                const char* diffuseItems[] = { "Lambert", "Half-Lambert" };
-                ImGui::Combo("Diffuse Type", &materialData_->diffuseType, diffuseItems, IM_ARRAYSIZE(diffuseItems));
+    int* pEnableLighting = reinterpret_cast<int*>(&materialData_->enableLighting);
+    ImGui::Checkbox("Enable Lighting", (bool*)pEnableLighting);
+    if (materialData_->enableLighting) {
+        // 拡散反射 (Diffuse) の設定
+        ImGui::Text("Diffuse (Base)");
+        const char* diffuseItems[] = { "Lambert", "Half-Lambert" };
+        ImGui::Combo("Diffuse Type", &materialData_->diffuseType, diffuseItems, IM_ARRAYSIZE(diffuseItems));
 
-                // 鏡面反射 (Specular) の設定
-                ImGui::Text("Specular (Shininess)");
-                const char* specularItems[] = { "None", "Phong", "Blinn-Phong" };
-                ImGui::Combo("Specular Type", &materialData_->specularType, specularItems, IM_ARRAYSIZE(specularItems));
+        // 鏡面反射 (Specular) の設定
+        ImGui::Text("Specular (Shininess)");
+        const char* specularItems[] = { "None", "Phong", "Blinn-Phong" };
+        ImGui::Combo("Specular Type", &materialData_->specularType, specularItems, IM_ARRAYSIZE(specularItems));
 
-                // 光沢度
-                ImGui::DragFloat("Shininess", &materialData_->shininess, 0.1f, 1.0f, 256.0f);
-            }
-          
+        // 光沢度
+        ImGui::DragFloat("Shininess", &materialData_->shininess, 0.1f, 1.0f, 256.0f);
+    }
 
-            ImGui::End();
+
+    ImGui::End();
 
 
 #endif // USE_IMGUI
@@ -105,9 +105,9 @@ void Model::CreateMaterialResource() {
     materialData_->color = Vector4{ 1.0f,1.0f,1.0f,1.0f };
     materialData_->enableLighting = true;
     materialData_->uvTransform = Makeidetity4x4();
-    materialData_->shininess=50.0f;
-    materialData_->specularType=BlinnPhong;
-    materialData_->diffuseType=HarfLambert;
+    materialData_->shininess = 50.0f;
+    materialData_->specularType = BlinnPhong;
+    materialData_->diffuseType = HarfLambert;
 
 }
 Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
@@ -137,7 +137,7 @@ Model::MaterialData  Model::LoadMaterialTemplateFile(const std::string& director
 
 Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {
-       //1. 変数の宣言
+    //1. 変数の宣言
     ModelData modelData;
     std::string filePath = directoryPath + "/" + filename;
 
@@ -146,8 +146,8 @@ Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const st
 
     const aiScene* scene = importer.ReadFile(filePath.c_str(),
         aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
-        aiProcess_FlipUVs        |        // 法線がない場合、自動計算する
-aiProcess_PreTransformVertices    
+        aiProcess_FlipUVs |        // 法線がない場合、自動計算する
+        aiProcess_PreTransformVertices
     );
     assert(scene->HasMeshes());
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
@@ -171,6 +171,16 @@ aiProcess_PreTransformVertices
                 vertex.texcord = { texcord.x,texcord.y };
                 vertex.position.x *= -1.0f;
                 vertex.normal.x *= -1.0f;
+
+                if (mesh->HasVertexColors(0)) {
+                    vertex.color.x = mesh->mColors[0][i].r;
+                    vertex.color.y = mesh->mColors[0][i].g;
+                    vertex.color.z = mesh->mColors[0][i].b;
+                    vertex.color.w = mesh->mColors[0][i].a;
+                } else {
+                    vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f }; // デフォルト白
+                }
+
                 modelData.vertices.push_back(vertex);
             }
         }
@@ -186,7 +196,7 @@ aiProcess_PreTransformVertices
         }
     }
     modelData.rootNode = ReadNode(scene->mRootNode);
-   // 4. モデルデータを返す
+    // 4. モデルデータを返す
     return modelData;
 
 }
@@ -198,14 +208,14 @@ Model* Model::CreateSphere(uint32_t subdivision)
     // 1. メモリ確保（頂点リソース作成など既存のInitializeの一部が必要だが、
     // ここではvertex生成に集中し、後でリソース生成関数を呼ぶ流れにします）
     // ※TextureManagerへの依存があるため、適当な白画像などをデフォルトにする必要があります
-     
+
     model->modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
-   // TextureManagerを使ってテクスチャを読み込む
-    TextureManager::GetInstance()->LoadTexture( model->modelData_.material.textureFilePath);
+    // TextureManagerを使ってテクスチャを読み込む
+    TextureManager::GetInstance()->LoadTexture(model->modelData_.material.textureFilePath);
 
     // 読み込んだテクスチャのSRVインデックスを取得して設定する
-    model->modelData_.material.textureIndex = 
-        TextureManager::GetInstance()->GetTextureIndexByFilePath( model->modelData_.material.textureFilePath);
+    model->modelData_.material.textureIndex =
+        TextureManager::GetInstance()->GetTextureIndexByFilePath(model->modelData_.material.textureFilePath);
 
     // 分割数に応じた角度の刻み幅
     const float kLonEvery = 2.0f * std::numbers::pi_v<float> / float(subdivision);
@@ -280,14 +290,14 @@ Model* Model::CreateSphere(uint32_t subdivision)
     return model;
 }
 
- Model::Node Model::ReadNode(aiNode* node)
+Model::Node Model::ReadNode(aiNode* node)
 {
-   Node result;
-  
+    Node result;
+
     aiMatrix4x4 aiLocalMatrix = node->mTransformation;
     aiLocalMatrix.Transpose();
 
- 
+
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             // Assimpの行列は [row][col] でアクセス可能

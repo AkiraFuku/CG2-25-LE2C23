@@ -3,4 +3,5 @@ struct VertexShaderOutput{
     float2 texCoord : TEXCOORD0; // Texture coordinates
     float3 normal : NORMAL0;
     float3 worldPosition : POSITION0;
+    float4 color : COLOR0;
 };
