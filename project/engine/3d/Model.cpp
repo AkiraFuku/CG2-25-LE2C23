@@ -147,14 +147,15 @@ Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const st
     const aiScene* scene = importer.ReadFile(filePath.c_str(),
         aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
         aiProcess_FlipUVs |        // 法線がない場合、自動計算する
-        aiProcess_PreTransformVertices
+        aiProcess_PreTransformVertices |
+        aiProcess_GenNormals
     );
     assert(scene->HasMeshes());
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
     {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
-        assert(mesh->HasTextureCoords(0));
+        //assert(mesh->HasTextureCoords(0));
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces;++faceIndex)
         {
             aiFace& face = mesh->mFaces[faceIndex];
@@ -164,21 +165,29 @@ Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const st
                 uint32_t vertexIndex = face.mIndices[element];
                 aiVector3D& position = mesh->mVertices[vertexIndex];
                 aiVector3D& normal = mesh->mNormals[vertexIndex];
-                aiVector3D& texcord = mesh->mTextureCoords[0][vertexIndex];
+                //                aiVector3D& texcord = mesh->mTextureCoords[0][vertexIndex];
                 VertexData vertex;
                 vertex.position = { position.x,position.y,position.z,1.0f };
                 vertex.normal = { normal.x,normal.y,normal.z };
-                vertex.texcord = { texcord.x,texcord.y };
+                //               vertex.texcord = { texcord.x,texcord.y };
                 vertex.position.x *= -1.0f;
                 vertex.normal.x *= -1.0f;
 
-                if (mesh->HasVertexColors(0)) {
-                    vertex.color.x = mesh->mColors[0][i].r;
-                    vertex.color.y = mesh->mColors[0][i].g;
-                    vertex.color.z = mesh->mColors[0][i].b;
-                    vertex.color.w = mesh->mColors[0][i].a;
+
+                if (mesh->HasTextureCoords(0)) {
+                    aiVector3D& texcord = mesh->mTextureCoords[0][vertexIndex];
+                    vertex.texcord = { texcord.x, texcord.y };
                 } else {
-                    vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f }; // デフォルト白
+                    vertex.texcord = { 0.0f, 0.0f }; // UVがない場合は0で埋める
+                }
+
+
+                if (mesh->HasVertexColors(0)) {
+                    // AssimpはRGBのみの場合でも自動的にAlpha=1.0などで補完してくれます
+                    aiColor4D& color = mesh->mColors[0][vertexIndex];
+                    vertex.color = { color.r, color.g, color.b, color.a };
+                } else {
+                    vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f }; // ない場合は白
                 }
 
                 modelData.vertices.push_back(vertex);
@@ -195,6 +204,7 @@ Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const st
             modelData.material.textureFilePath = directoryPath + "/" + textureFilePath.C_Str();
         }
     }
+    
     modelData.rootNode = ReadNode(scene->mRootNode);
     // 4. モデルデータを返す
     return modelData;

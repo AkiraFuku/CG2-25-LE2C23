@@ -113,11 +113,16 @@ PixelShaderOutput main(VertexShaderOutput input)
     PixelShaderOutput output;
     
     float4 textureColor = gTexture.Sample(gSampler, input.texCoord); // UV変換はVSで行っている前提、または必要ならここで計算
-    float4 finalColor = textureColor * input.color;
+    float4 baseColor = gMaterial.Color * textureColor * input.color;
     // ライティングが無効ならそのまま返す
+     // アルファテスト
+    if (output.color.a < 0.01f)
+    {
+        discard;
+    }
     if (gMaterial.enableLighting == 0)
     {
-        output.color = gMaterial.Color * finalColor;
+        output.color = baseColor;
         return output;
     }
 
@@ -174,8 +179,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         finalLighting += CalculateLight(N, L_spot, V, gSpotLights[k].color.rgb, gSpotLights[k].intensity * distFactor * angleFactor);
     }
     
-    output.color.rgb = finalLighting * finalColor.rgb;
-    output.color.a = gMaterial.Color.a * finalColor.a;
+    output.color.rgb = finalLighting * baseColor.rgb;
+    output.color.a = baseColor.a;
     
     // アルファテスト
     if (output.color.a < 0.01f)
