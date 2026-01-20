@@ -468,7 +468,6 @@ Matrix4x4 MakeRotateZMatrix(float radian)
 		
 		);
 	}
-//}//namespace KamataEngine{
 
 	//加算
 	Vector3 Add(const Vector3& v1, const Vector3& v2){

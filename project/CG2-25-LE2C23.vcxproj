@@ -15,11 +15,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-
     <ClCompile Include="Bitmappedfont.cpp" />
-
     <ClCompile Include="CourseWall.cpp" />
-
     <ClCompile Include="DriftEffect.cpp" />
     <ClCompile Include="engine\math\DrawFunction.cpp" />
     <ClCompile Include="engine\Tool\Camera.cpp" />
@@ -42,6 +39,7 @@
     <ClCompile Include="engine\GAME\GameEngine.cpp" />
     <ClCompile Include="engine\scene\GameScene.cpp" />
     <ClCompile Include="Goal.cpp" />
+    <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -79,11 +77,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractSceneFactory.h" />
-
     <ClInclude Include="Bitmappedfont.h" />
-
     <ClInclude Include="CourseWall.h" />
-
     <ClInclude Include="DriftEffect.h" />
     <ClInclude Include="engine\math\DrawFunction.h" />
     <ClInclude Include="engine\Tool\Camera.h" />
@@ -124,6 +119,7 @@
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
     <ClInclude Include="Goal.h" />
+    <ClInclude Include="LightManager.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="MoveEffect.h" />
     <ClInclude Include="Obstacle.h" />
@@ -259,15 +255,15 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalOptions>/ignore:4049 /ignore:4098 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imgui.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\generated\outputs\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/ignore:4049 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imgui.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\generated\outputs\$(Configuration)\;$(ProjectDir)externals\assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -287,7 +283,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -295,9 +291,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\generated\outputs\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\generated\outputs\$(Configuration)\;$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -319,7 +314,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <TreatWarningAsError>false</TreatWarningAsError>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\audio;$(ProjectDir)engine\2d;$(ProjectDir)engine\GAME;$(ProjectDir)engine\math;$(ProjectDir)engine\3d;$(ProjectDir)engine\base;$(ProjectDir)engine\io;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)engine\Tool;$(ProjectDir)externals\imgui;$(ProjectDir)externals\DirectXTex;$(ProjectDir);$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -328,8 +323,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
       <LinkTimeCodeGeneration />
-      <AdditionalDependencies>imgui.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\generated\outputs\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>imgui.lib;assimp-vc143-mt.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\generated\outputs\$(Configuration)\;$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"

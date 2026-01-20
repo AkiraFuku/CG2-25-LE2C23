@@ -12,6 +12,9 @@
 #include "Player.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
+#include "PSOMnager.h"
+#include "LightManager.h"
+#include <numbers>
 #include "imgui.h"
 #include "Bitmappedfont.h"
 #include "Goal.h"
@@ -40,12 +43,15 @@ void GameScene::Initialize() {
 
     camera = std::make_unique<Camera>();
     camera->SetRotate({ 0.3f, 0.0f, 0.0f });
+
     camera->SetTranslate({ 0.0f, 0.0f, 0.0f });
+
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
 
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
+
 
 
     Audio::GetInstance()->PlayAudio(handle_, true);
@@ -94,6 +100,7 @@ void GameScene::Initialize() {
     mapChipField_->LoadMapChipCsv("resources/mapchip.csv");
 
 
+
     // マップチップの生成
     GenerateFieldObjects();
 
@@ -127,6 +134,8 @@ void GameScene::Initialize() {
 
 void GameScene::Finalize() {
 
+    LightManager::GetInstance()->ClearLights();
+
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
 void GameScene::Update() {
@@ -148,6 +157,7 @@ void GameScene::Update() {
     }
     if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B)) {
     }
+
 
     //// マウスホイールの入力取得
 
@@ -207,6 +217,62 @@ void GameScene::Update() {
     // ゴールの更新処理
     for (auto& goal : goals_) {
         goal->Update();
+
+
+    //// マウスホイールの入力取得
+
+    // if (Input::GetInstance()->GetMouseMove().z) {
+    //   Vector3 camreaTranslate = camera->GetTranslate();
+    //   camreaTranslate =
+    //       Add(camreaTranslate,
+    //           Vector3{0.0f, 0.0f,
+    //                   static_cast<float>(Input::GetInstance()->GetMouseMove().z)
+    //                   *
+    //                       0.1f});
+    //   camera->SetTranslate(camreaTranslate);
+    // }
+
+    if (Input::GetInstance()->GetJoyStick(0, state)) {
+        // 左スティックの値を取得
+        float x = (float)state.Gamepad.sThumbLX;
+        float y = (float)state.Gamepad.sThumbLY;
+
+        // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+        float normalizedX = x / 32767.0f;
+        float normalizedY = y / 32767.0f;
+        Vector3 camreaTranslate = camera->GetTranslate();
+        camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,
+                                                       normalizedY / 60.0f, 0.0f });
+        camera->SetTranslate(camreaTranslate);
+    }
+
+    camera->Update();
+    object3d->Update();
+    object3d2->Update();
+
+    // プレイヤーの更新処理
+    player_->Update();
+
+    // 障害物の更新処理
+    for (auto& obstacle : obstacleSlow_) {
+        obstacle->Update();
+    }
+
+    for (auto& obstacle : obstacleNormal_) {
+        obstacle->Update();
+    }
+
+    for (auto& obstacle : obstacleFast_) {
+        obstacle->Update();
+    }
+
+    for (auto& obstacle : obstacleMax_) {
+        obstacle->Update();
+    }
+
+    for (auto& wall : walls_) {
+        wall->Update();
+
     }
 
     // 全ての当たり判定を行う
@@ -214,17 +280,51 @@ void GameScene::Update() {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
-    ImGui::Text("Sphire");
+    ImGui::Text("Sphere");
     Vector3 pos = object3d->GetTranslate();
     Vector3 scale = object3d->GetScale();
     ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
     ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
     object3d->SetTranslate(pos);
     object3d->SetScale(scale);
+    if (LightManager::GetInstance()->GetPointLightCount() > 0) {
+        ImGui::Begin("Light Setting");
 
-    Vector4 lightColor = object3d->GetDirectionalLightColor();
+        // 0番目のポイントライトのデータを参照で取得
+        // "auto&" にすることで、ここで書き換えた内容が直接LightManager内のデータに反映されます
+        auto& pointLight2 = LightManager::GetInstance()->GetPointLight(1);
 
-    
+        // 位置の調整
+        ImGui::DragFloat3("Point Light2 Pos", &pointLight2.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light2 Color", &pointLight2.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light2 Intensity", &pointLight2.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light2 Decay", &pointLight2.decay, 0.1f, 0.0f, 10.0f);
+        auto& pointLight1 = LightManager::GetInstance()->GetPointLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light Pos", &pointLight1.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light Color", &pointLight1.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light Intensity", &pointLight1.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+
+        ImGui::End();
+    }
+
+
+
     // 障害物の削除処理
     obstacleSlow_.erase(std::remove_if(obstacleSlow_.begin(), obstacleSlow_.end(),
         [](const std::unique_ptr<ObstacleSlow>& obstacle) {
@@ -259,8 +359,7 @@ void GameScene::Update() {
         if (countdownTimer_ <= 0)
         {
             isStarted_ = true;
-        }
-        else
+        } else
         {
             countdownTimer_--;
             bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
@@ -273,6 +372,7 @@ void GameScene::Update() {
     ImGui::Begin("Debug");
 
 
+
     Vector3 direction = object3d->GetDirectionalLightDirection();
     if (ImGui::DragFloat3("Light Direction", &direction.x)) {
         object3d->SetDirectionalLightDirection(direction);
@@ -281,6 +381,16 @@ void GameScene::Update() {
     if (ImGui::InputFloat("intensity", &intensity)) {
         object3d->SetDirectionalLightIntensity(intensity);
     }
+
+    /* Vector3 direction= object3d->GetDirectionalLightDirection();
+     if(ImGui::DragFloat3("Light Direction", &direction.x)){
+     object3d->SetDirectionalLightDirection(direction);
+     }
+     float intensity= object3d->GetDirectionalLightIntensity();
+     if(ImGui::InputFloat("intensity",&intensity)){
+      object3d->SetDirectionalLightIntensity(intensity);
+     }*/
+
     ImGui::Text("Sprite");
     Vector2 Position =
         sprite->GetPosition();
@@ -329,12 +439,15 @@ void GameScene::Draw() {
 
 
     // プレイヤーの描画処理
-    player_->Draw();
+
+        player_->Draw();
+   
 
     // 障害物の描画処理
     for (auto& obstacle : obstacleSlow_) {
         obstacle->Draw();
     }
+
 
     for (auto& obstacle : obstacleNormal_) {
         obstacle->Draw();
@@ -355,6 +468,7 @@ void GameScene::Draw() {
     for (auto& goal : goals_) {
 
         goal->Draw();
+
     }
 
     ///////スプライトの描画
@@ -451,6 +565,7 @@ void GameScene::CheckAllCollisions() {
     for (auto& wall : walls_) {
         aabbWall = wall->GetAABB();
         if (isCollision(aabbPlayer, aabbWall)) {
+
             player_->OnCollision(wall.get());
         }
     }
@@ -464,6 +579,7 @@ void GameScene::CheckAllCollisions() {
             player_->OnCollision(goal.get());
         }
     }
+
 
 
 #pragma endregion
@@ -480,6 +596,8 @@ bool GameScene::isCollision(const AABB& aabb1, const AABB& aabb2) {
     return false;
 
 }
+
+
 
 void GameScene::GenerateFieldObjects() {
     // 要素数
@@ -504,13 +622,11 @@ void GameScene::GenerateFieldObjects() {
             MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
             Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
 
-            switch (type)
-            {
+            switch (type) {
             case MapChipType::kBlank:
                 break;
 
-            case MapChipType::kPlayer:
-            {
+            case MapChipType::kPlayer: {
                 assert(player_ == nullptr && "自キャラを二重に配置しようとしています");
                 // プレイヤーの初期化
                 player_ = std::make_unique<Player>();
@@ -519,6 +635,7 @@ void GameScene::GenerateFieldObjects() {
                 playerModel_->SetModel("cube.obj");
                 playerModel_->Initialize();
                 player_->Initialize(playerModel_.get(), camera.get(), pos);
+
                 player_->SetGameScene(this);
 
             }
@@ -536,95 +653,301 @@ void GameScene::GenerateFieldObjects() {
             MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
             Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
 
-            switch (type)
-            {
-            case MapChipType::kBlank:
-                break;
 
+            
 
-            case MapChipType::kObstacle:
-            {
+            case MapChipType::kObstacle: {
                 uint8_t subID = mapChipField_->GetMapChipSubIDByIndex(j, i);
-                switch (subID)
                 {
+                    switch (subID) {
+                    case 0: {
+                        // モデルを生成してリストに追加
+                        auto model = std::make_unique<Object3d>();
+                        model->SetModel("cube.obj");
+                        model->Initialize();
+
+                        // 本体を生成してリストに追加
+                        auto obstacle = std::make_unique<ObstacleSlow>();
+                        obstacle->Initialize(model.get(), camera.get(), pos);
+
+                        // vectorに保存
+                        obstacleSlowModel_.push_back(std::move(model));
+                        obstacleSlow_.push_back(std::move(obstacle));
+                    } break;
+
+                    case 1: {
+                        // 障害物(普通)の初期化
+                        // モデルを生成してリストに追加
+                        auto model = std::make_unique<Object3d>();
+                        model->SetModel("cube.obj");
+                        model->Initialize();
+
+                        // 本体を生成してリストに追加
+                        auto obstacle = std::make_unique<ObstacleNormal>();
+                        obstacle->Initialize(model.get(), camera.get(), pos);
+
+                        // vectorに保存
+                        obstacleNormalModel_.push_back(std::move(model));
+                        obstacleNormal_.push_back(std::move(obstacle));
+                    }
+
+                          break;
+
+                    case 2: {
+                        // 障害物(速い)の初期化
+                        // モデルを生成してリストに追加
+                        auto model = std::make_unique<Object3d>();
+                        model->SetModel("cube.obj");
+                        model->Initialize();
+
+                        // 本体を生成してリストに追加
+                        auto obstacle = std::make_unique<ObstacleFast>();
+                        obstacle->Initialize(model.get(), camera.get(), pos);
+
+                        // vectorに保存
+                        obstacleFastModel_.push_back(std::move(model));
+                        obstacleFast_.push_back(std::move(obstacle));
+                    }
+
+                          break;
+
+                    case 3: {
+                        // 障害物(最大速度)の初期化
+                        // モデルを生成してリストに追加
+                        auto model = std::make_unique<Object3d>();
+                        model->SetModel("cube.obj");
+                        model->Initialize();
+
+
+                        // オブジェクトの生成
+                        for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+                            for (uint32_t j = 0; j < numBlockHorizontal; j++) {
+
+                                // 現在の座標のチップタイプを取得
+                                MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
+                                Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
+
+                                switch (type)
+                                {
+                                case MapChipType::kBlank:
+                                    break;
+
+                                case MapChipType::kPlayer:
+                                {
+                                    assert(player_ == nullptr && "自キャラを二重に配置しようとしています");
+                                    // プレイヤーの初期化
+                                    player_ = std::make_unique<Player>();
+                                    playerModel_ = std::make_unique<Object3d>();
+                                    playerModel_->SetTranslate(pos);
+                                    playerModel_->SetModel("cube.obj");
+                                    playerModel_->Initialize();
+                                    player_->Initialize(playerModel_.get(), camera.get(), pos);
+                                    player_->SetGameScene(this);
+
+                                }
+                                break;
+                                }
+                            }
+                        }
+
+                        for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+                            for (uint32_t j = 0; j < numBlockHorizontal; j++) {
+
+                                // 現在の座標のチップタイプを取得
+                                MapChipType type = mapChipField_->GetMapChipTypeByIndex(j, i);
+                                Vector3 pos = mapChipField_->GetMapChipPositionByIndex(j, i);
+
+                                switch (type)
+                                {
+                                case MapChipType::kBlank:
+                                    break;
+
+
+                                case MapChipType::kObstacle:
+                                {
+                                    uint8_t subID = mapChipField_->GetMapChipSubIDByIndex(j, i);
+                                    switch (subID)
+                                    {
+                                    case 0:
+                                    {
+                                        // モデルを生成してリストに追加
+                                        auto model = std::make_unique<Object3d>();
+                                        model->SetModel("cube.obj");
+                                        model->Initialize();
+
+                                        // 本体を生成してリストに追加
+                                        auto obstacle = std::make_unique<ObstacleSlow>();
+                                        obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                                        // vectorに保存
+                                        obstacleSlowModel_.push_back(std::move(model));
+                                        obstacleSlow_.push_back(std::move(obstacle));
+                                    }
+                                    break;
+
+                                    case 1:
+                                    {
+                                        // 障害物(普通)の初期化
+                                        // モデルを生成してリストに追加
+                                        auto model = std::make_unique<Object3d>();
+                                        model->SetModel("cube.obj");
+                                        model->Initialize();
+
+                                        // 本体を生成してリストに追加
+                                        auto obstacle = std::make_unique<ObstacleNormal>();
+                                        obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                                        // vectorに保存
+                                        obstacleNormalModel_.push_back(std::move(model));
+                                        obstacleNormal_.push_back(std::move(obstacle));
+                                    }
+
+                                    break;
+
+                                    case 2:
+                                    {
+                                        // 障害物(速い)の初期化
+                                        // モデルを生成してリストに追加
+                                        auto model = std::make_unique<Object3d>();
+                                        model->SetModel("cube.obj");
+                                        model->Initialize();
+
+                                        // 本体を生成してリストに追加
+                                        auto obstacle = std::make_unique<ObstacleFast>();
+                                        obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                                        // vectorに保存
+                                        obstacleFastModel_.push_back(std::move(model));
+                                        obstacleFast_.push_back(std::move(obstacle));
+                                    }
+
+                                    break;
+
+                                    case 3:
+                                    {
+                                        // 障害物(最大速度)の初期化
+                                        // モデルを生成してリストに追加
+                                        auto model = std::make_unique<Object3d>();
+                                        model->SetModel("cube.obj");
+                                        model->Initialize();
+
+                                        // 本体を生成してリストに追加
+                                        auto obstacle = std::make_unique<ObstacleMax>();
+                                        obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
+
+                                        // vectorに保存
+                                        obstacleSlowModel_.push_back(std::move(model));
+                                        obstacleMax_.push_back(std::move(obstacle));
+                                    }
+
+                                    break;
+                                    }
+                                    break;
+
+
+                                }
+
+                                case MapChipType::kGoal:
+                                {
+                                    auto goalModel = std::make_unique<Object3d>();
+                                    goalModel->SetModel("cube.obj");
+                                    goalModel->Initialize();
+                                    auto goal = std::make_unique<Goal>();
+                                    goal->Initialize(goalModel.get(), camera.get(), pos);
+                                    goalModels_.push_back(std::move(goalModel));
+                                    goals_.push_back(std::move(goal));
+                                }
+
+                                }
+
+                                // 本体を生成してリストに追加
+                                auto obstacle = std::make_unique<ObstacleMax>();
+                                obstacle->Initialize(model.get(), camera.get(), pos);
+
+                                // vectorに保存
+                                obstacleSlowModel_.push_back(std::move(model));
+                                obstacleMax_.push_back(std::move(obstacle));
+
+                            }
+
+                            break;
+                        }
+                        break;
+                    }
+                    }
+            case MapChipType::kWallStraight: {
+                // 1) モデルを生成してリストに追加
+                auto model = std::make_unique<Object3d>();
+                model->SetModel("cube.obj"); // ここを壁モデルに（例: "wall.obj" とか）
+                model->Initialize();
+
+                // 2) 置く位置を少し上げたいなら（壁が地面に埋まるなら）
+                Vector3 wallPos = pos;
+                // wallPos.y += 1.0f; // 必要なら
+
+                // 3) 本体を生成してリストに追加
+                auto wall = std::make_unique<CourseWall>();
+                wall->Initialize(model.get(), camera.get(), wallPos);
+
+                // 4) サイズ調整（マスに合わせる）
+                wall->SetScale(Vector3{ 1.0f, 2.0f, 1.0f }); // 好きに調整
+
+                // 5) subID があるなら向きに使える（例）
+                // uint8_t subID = mapChipField_->GetMapChipSubIDByIndex(j, i);
+                // if (subID == 1) wall->SetYaw(1.570796f); // 90度
+
+                // 6) vectorに保存
+                wallModels_.push_back(std::move(model));
+                walls_.push_back(std::move(wall));
+            } break;
+            case MapChipType::kWallTurn: {
+                auto model = std::make_unique<Object3d>();
+                model->SetModel("cube.obj");
+                model->Initialize();
+
+                Vector3 wallPos = pos; // まず2.0グリッド中心
+
+                const float dx =
+                    (MapChipField::kBlockWidth - MapChipField::kTurnWidth) *
+                    0.5f; // 0.5
+                const float dz =
+                    (MapChipField::kBlockHeight - MapChipField::kTurnHeight) *
+                    0.5f; // 0.5
+
+                uint8_t subID = mapChipField_->GetMapChipSubIDByIndex(j, i);
+
+                switch (subID) {
                 case 0:
-                {
-                    // モデルを生成してリストに追加
-                    auto model = std::make_unique<Object3d>();
-                    model->SetModel("cube.obj");
-                    model->Initialize();
-
-                    // 本体を生成してリストに追加
-                    auto obstacle = std::make_unique<ObstacleSlow>();
-                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
-
-                    // vectorに保存
-                    obstacleSlowModel_.push_back(std::move(model));
-                    obstacleSlow_.push_back(std::move(obstacle));
-                }
-                break;
-
+                    wallPos.x += dx;
+                    wallPos.z += dz;
+                    break; // 右奥
                 case 1:
-                {
-                    // 障害物(普通)の初期化
-                    // モデルを生成してリストに追加
-                    auto model = std::make_unique<Object3d>();
-                    model->SetModel("cube.obj");
-                    model->Initialize();
-
-                    // 本体を生成してリストに追加
-                    auto obstacle = std::make_unique<ObstacleNormal>();
-                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
-
-                    // vectorに保存
-                    obstacleNormalModel_.push_back(std::move(model));
-                    obstacleNormal_.push_back(std::move(obstacle));
-                }
-
-                break;
-
+                    wallPos.x -= dx;
+                    wallPos.z += dz;
+                    break; // 左奥
                 case 2:
-                {
-                    // 障害物(速い)の初期化
-                    // モデルを生成してリストに追加
-                    auto model = std::make_unique<Object3d>();
-                    model->SetModel("cube.obj");
-                    model->Initialize();
-
-                    // 本体を生成してリストに追加
-                    auto obstacle = std::make_unique<ObstacleFast>();
-                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
-
-                    // vectorに保存
-                    obstacleFastModel_.push_back(std::move(model));
-                    obstacleFast_.push_back(std::move(obstacle));
-                }
-
-                break;
-
+                    wallPos.x -= dx;
+                    wallPos.z -= dz;
+                    break; // 左手前
                 case 3:
-                {
-                    // 障害物(最大速度)の初期化
-                    // モデルを生成してリストに追加
-                    auto model = std::make_unique<Object3d>();
-                    model->SetModel("cube.obj");
-                    model->Initialize();
-
-                    // 本体を生成してリストに追加
-                    auto obstacle = std::make_unique<ObstacleMax>();
-                    obstacle->Initialize(model.get(), camera.get(), pos, player_.get());
-
-                    // vectorに保存
-                    obstacleSlowModel_.push_back(std::move(model));
-                    obstacleMax_.push_back(std::move(obstacle));
+                    wallPos.x += dx;
+                    wallPos.z -= dz;
+                    break; // 右手前
+                default:
+                    break;
                 }
 
-                break;
+                auto wall = std::make_unique<CourseWall>();
+                wall->Initialize(model.get(), camera.get(), wallPos);
+
+                wall->SetScale(Vector3{ 1.0f, 2.0f, 1.0f }); // 見た目は小さく
+
+                wallModels_.push_back(std::move(model));
+                walls_.push_back(std::move(wall));
+            } break;
                 }
-                break;
-
-
             }
+
 
             case MapChipType::kGoal:
             {
@@ -718,3 +1041,4 @@ void GameScene::GenerateFieldObjects() {
 
 
 }
+
