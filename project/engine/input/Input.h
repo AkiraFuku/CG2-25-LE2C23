@@ -5,7 +5,6 @@
 #include <dinput.h>
 #include <Xinput.h>
 #pragma comment(lib, "xinput.lib")
-#include "WinApp.h"
 #include <memory>
 class Input
 {
@@ -30,7 +29,7 @@ public:
         LONG z;
     };
 public:
-    void Initialize(WinApp* winapp);
+    void Initialize();
 
     void Update();
     // --- キーボード用 ---
@@ -114,7 +113,7 @@ private:
     // マウスの状態を格納する構造体
     DIMOUSESTATE mouseState = {};
     DIMOUSESTATE preMouseState = {};
-    WinApp* winApp_ = nullptr;
+  
 
     // --- ゲームパッド用変数 ---
     // メンバ変数として保持する

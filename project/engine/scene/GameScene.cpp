@@ -12,6 +12,9 @@
 #include "Player.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
+#include "PSOMnager.h"
+#include "LightManager.h"
+#include <numbers>
 #include "imgui.h"
 #include "Bitmappedfont.h"
 #include "Goal.h"
@@ -33,11 +36,16 @@ void GameScene::Initialize() {
 
   handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
+    Audio::GetInstance()->PlayAudio(handle_, true);
+    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+    LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
 
-  Audio::GetInstance()->PlayAudio(handle_, true);
-
-
-  TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
+    Vector3 point1 = { 0,0,0 };
+    /* LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
+     LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);*/
+    TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
 
   ParticleManager::GetInstance()->CreateParticleGroup(
@@ -115,7 +123,7 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Finalize() {
-
+      LightManager::GetInstance()->ClearLights();
   ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
 void GameScene::Update() {
@@ -198,15 +206,49 @@ void GameScene::Update() {
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
-    ImGui::Text("Sphire");
+    ImGui::Text("Sphere");
     Vector3 pos = object3d->GetTranslate();
     Vector3 scale = object3d->GetScale();
     ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
     ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
     object3d->SetTranslate(pos);
     object3d->SetScale(scale);
+    if (LightManager::GetInstance()->GetPointLightCount() > 0) {
+        ImGui::Begin("Light Setting");
 
-    Vector4 lightColor = object3d->GetDirectionalLightColor();
+        // 0番目のポイントライトのデータを参照で取得
+        // "auto&" にすることで、ここで書き換えた内容が直接LightManager内のデータに反映されます
+        auto& pointLight2 = LightManager::GetInstance()->GetPointLight(1);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light2 Pos", &pointLight2.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light2 Color", &pointLight2.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light2 Intensity", &pointLight2.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light2 Decay", &pointLight2.decay, 0.1f, 0.0f, 10.0f);
+        auto& pointLight1 = LightManager::GetInstance()->GetPointLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light Pos", &pointLight1.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light Color", &pointLight1.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light Intensity", &pointLight1.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+
+        ImGui::End();
+    }
+
 
 
 
