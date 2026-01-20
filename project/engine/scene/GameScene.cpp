@@ -26,17 +26,17 @@ GameScene::GameScene() = default;
 GameScene::~GameScene()
 {
     // メモリ解放
-     player_.release();
-     obstacleFastModel_.clear();
-     obstacleFast_.clear();
-     obstacleMaxModel_.clear();
-     obstacleMax_.clear();
-     obstacleNormalModel_.clear();
-     obstacleNormal_.clear();
-     obstacleSlowModel_.clear();
-     obstacleSlow_.clear();
-     wallModels_.clear();
-     walls_.clear();
+    player_.release();
+    obstacleFastModel_.clear();
+    obstacleFast_.clear();
+    obstacleMaxModel_.clear();
+    obstacleMax_.clear();
+    obstacleNormalModel_.clear();
+    obstacleNormal_.clear();
+    obstacleSlowModel_.clear();
+    obstacleSlow_.clear();
+    wallModels_.clear();
+    walls_.clear();
 }
 
 void GameScene::Initialize() {
@@ -218,204 +218,153 @@ void GameScene::Update() {
     for (auto& goal : goals_) {
         goal->Update();
 
-
-        //// マウスホイールの入力取得
-
-        // if (Input::GetInstance()->GetMouseMove().z) {
-        //   Vector3 camreaTranslate = camera->GetTranslate();
-        //   camreaTranslate =
-        //       Add(camreaTranslate,
-        //           Vector3{0.0f, 0.0f,
-        //                   static_cast<float>(Input::GetInstance()->GetMouseMove().z)
-        //                   *
-        //                       0.1f});
-        //   camera->SetTranslate(camreaTranslate);
-        // }
-
-        if (Input::GetInstance()->GetJoyStick(0, state)) {
-            // 左スティックの値を取得
-            float x = (float)state.Gamepad.sThumbLX;
-            float y = (float)state.Gamepad.sThumbLY;
-
-            // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
-            float normalizedX = x / 32767.0f;
-            float normalizedY = y / 32767.0f;
-            Vector3 camreaTranslate = camera->GetTranslate();
-            camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,
-                                                           normalizedY / 60.0f, 0.0f });
-            camera->SetTranslate(camreaTranslate);
-        }
-
-        camera->Update();
-        object3d->Update();
-        object3d2->Update();
-
-        // プレイヤーの更新処理
-        player_->Update();
-
-        // 障害物の更新処理
-        for (auto& obstacle : obstacleSlow_) {
-            obstacle->Update();
-        }
-
-        for (auto& obstacle : obstacleNormal_) {
-            obstacle->Update();
-        }
-
-        for (auto& obstacle : obstacleFast_) {
-            obstacle->Update();
-        }
-
-        for (auto& obstacle : obstacleMax_) {
-            obstacle->Update();
-        }
-
-        for (auto& wall : walls_) {
-            wall->Update();
-
-        }
-
-        // 全ての当たり判定を行う
-        CheckAllCollisions();
-
-#ifdef USE_IMGUI
-        ImGui::Begin("Debug");
-        ImGui::Text("Sphere");
-        Vector3 pos = object3d->GetTranslate();
-        Vector3 scale = object3d->GetScale();
-        ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
-        ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
-        object3d->SetTranslate(pos);
-        object3d->SetScale(scale);
-        if (LightManager::GetInstance()->GetPointLightCount() > 0) {
-            ImGui::Begin("Light Setting");
-
-            // 0番目のポイントライトのデータを参照で取得
-            // "auto&" にすることで、ここで書き換えた内容が直接LightManager内のデータに反映されます
-            auto& pointLight2 = LightManager::GetInstance()->GetPointLight(1);
-
-            // 位置の調整
-            ImGui::DragFloat3("Point Light2 Pos", &pointLight2.position.x, 0.1f);
-
-            // 色の調整
-            ImGui::ColorEdit4("Point Light2 Color", &pointLight2.color.x);
-
-            // 強度の調整
-            ImGui::DragFloat("Point Light2 Intensity", &pointLight2.intensity, 0.1f, 0.0f, 100.0f);
-
-            // 減衰率の調整
-            ImGui::DragFloat("Point Light2 Decay", &pointLight2.decay, 0.1f, 0.0f, 10.0f);
-            auto& pointLight1 = LightManager::GetInstance()->GetPointLight(0);
-
-            // 位置の調整
-            ImGui::DragFloat3("Point Light Pos", &pointLight1.position.x, 0.1f);
-
-            // 色の調整
-            ImGui::ColorEdit4("Point Light Color", &pointLight1.color.x);
-
-            // 強度の調整
-            ImGui::DragFloat("Point Light Intensity", &pointLight1.intensity, 0.1f, 0.0f, 100.0f);
-
-            // 減衰率の調整
-            ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
-            ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
-
-            ImGui::End();
-        }
-
-
-
-        // 障害物の削除処理
-        obstacleSlow_.erase(std::remove_if(obstacleSlow_.begin(), obstacleSlow_.end(),
-            [](const std::unique_ptr<ObstacleSlow>& obstacle) {
-                return obstacle->IsScoreNone();
-            }),
-            obstacleSlow_.end());
-
-        obstacleNormal_.erase(std::remove_if(obstacleNormal_.begin(), obstacleNormal_.end(),
-            [](const std::unique_ptr<ObstacleNormal>& obstacle) {
-                return obstacle->IsScoreNone();
-            }),
-
-            obstacleNormal_.end());
-
-        obstacleFast_.erase(std::remove_if(obstacleFast_.begin(), obstacleFast_.end(),
-            [](const std::unique_ptr<ObstacleFast>& obstacle) {
-                return obstacle->IsScoreNone();
-            }),
-
-            obstacleFast_.end());
-
-        obstacleMax_.erase(std::remove_if(obstacleMax_.begin(), obstacleMax_.end(),
-            [](const std::unique_ptr<ObstacleMax>& obstacle) {
-                return obstacle->IsScoreNone();
-
-            }),
-
-            obstacleMax_.end());
-
-        if (!isStarted_)
-        {
-            if (countdownTimer_ <= 0)
-            {
-                isStarted_ = true;
-            }
-            else
-            {
-                countdownTimer_--;
-                bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
-                bitmappedFont_->Update();
-            }
-        }
-
-
-#ifdef USE_IMGUI
-        ImGui::Begin("Debug");
-
-
-        /* Vector3 direction= object3d->GetDirectionalLightDirection();
-         if(ImGui::DragFloat3("Light Direction", &direction.x)){
-         object3d->SetDirectionalLightDirection(direction);
-         }
-         float intensity= object3d->GetDirectionalLightIntensity();
-         if(ImGui::InputFloat("intensity",&intensity)){
-          object3d->SetDirectionalLightIntensity(intensity);
-         }*/
-
-        ImGui::Text("Sprite");
-        Vector2 Position =
-            sprite->GetPosition();
-        ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
-        sprite->SetPosition(Position);
-
-        ImGui::Text("PlayerSpeed");
-        float playerSpeedZ = player_->GetSpeedZ();
-        ImGui::SliderFloat("SpeedZ", &playerSpeedZ, 0.0f, 2.0f);
-
-        ImGui::Text("Speed Stage");
-        SpeedStage speedStage = player_->GetSpeedStage();
-        ImGui::Text("Current Speed Stage: %d", static_cast<int>(speedStage));
-
-
-        ImGui::Text("Score");
-        ImGui::Text("Current Score: %d", player_->GetScore());
-
-        ImGui::End();
-#endif // USE_IMGUI
-
-        //sprite->SetRotation(sprite->GetRotation() + 0.1f);
-        sprite->Update();
-
-
-
-        ImGui::End();
-#endif // USE_IMGUI
-
-        // sprite->SetRotation(sprite->GetRotation() + 0.1f);
-        sprite->Update();
-
     }
+
+    for (auto& wall : walls_) {
+        wall->Update();
+    }
+
+    // 当たり判定
+    CheckAllCollisions();
+
+#ifdef USE_IMGUI
+    ImGui::Begin("Debug");
+    ImGui::Text("Sphere");
+    Vector3 pos = object3d->GetTranslate();
+    Vector3 scale = object3d->GetScale();
+    ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+    ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
+    object3d->SetTranslate(pos);
+    object3d->SetScale(scale);
+    if (LightManager::GetInstance()->GetPointLightCount() > 0) {
+        ImGui::Begin("Light Setting");
+
+        // 0番目のポイントライトのデータを参照で取得
+        // "auto&" にすることで、ここで書き換えた内容が直接LightManager内のデータに反映されます
+        auto& pointLight2 = LightManager::GetInstance()->GetPointLight(1);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light2 Pos", &pointLight2.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light2 Color", &pointLight2.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light2 Intensity", &pointLight2.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light2 Decay", &pointLight2.decay, 0.1f, 0.0f, 10.0f);
+        auto& pointLight1 = LightManager::GetInstance()->GetPointLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light Pos", &pointLight1.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light Color", &pointLight1.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light Intensity", &pointLight1.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+
+        ImGui::End();
+    }
+
+
+
+    // 障害物の削除処理
+    obstacleSlow_.erase(std::remove_if(obstacleSlow_.begin(), obstacleSlow_.end(),
+        [](const std::unique_ptr<ObstacleSlow>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+        obstacleSlow_.end());
+
+    obstacleNormal_.erase(std::remove_if(obstacleNormal_.begin(), obstacleNormal_.end(),
+        [](const std::unique_ptr<ObstacleNormal>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+
+        obstacleNormal_.end());
+
+    obstacleFast_.erase(std::remove_if(obstacleFast_.begin(), obstacleFast_.end(),
+        [](const std::unique_ptr<ObstacleFast>& obstacle) {
+            return obstacle->IsScoreNone();
+        }),
+
+        obstacleFast_.end());
+
+    obstacleMax_.erase(std::remove_if(obstacleMax_.begin(), obstacleMax_.end(),
+        [](const std::unique_ptr<ObstacleMax>& obstacle) {
+            return obstacle->IsScoreNone();
+
+        }),
+
+        obstacleMax_.end());
+
+    if (!isStarted_)
+    {
+        if (countdownTimer_ <= 0)
+        {
+            isStarted_ = true;
+        }
+        else
+        {
+            countdownTimer_--;
+            bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
+            bitmappedFont_->Update();
+        }
+    }
+
+
+#ifdef USE_IMGUI
+    ImGui::Begin("Debug");
+
+
+    /* Vector3 direction= object3d->GetDirectionalLightDirection();
+     if(ImGui::DragFloat3("Light Direction", &direction.x)){
+     object3d->SetDirectionalLightDirection(direction);
+     }
+     float intensity= object3d->GetDirectionalLightIntensity();
+     if(ImGui::InputFloat("intensity",&intensity)){
+      object3d->SetDirectionalLightIntensity(intensity);
+     }*/
+
+    ImGui::Text("Sprite");
+    Vector2 Position =
+        sprite->GetPosition();
+    ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
+    sprite->SetPosition(Position);
+
+    ImGui::Text("PlayerSpeed");
+    float playerSpeedZ = player_->GetSpeedZ();
+    ImGui::SliderFloat("SpeedZ", &playerSpeedZ, 0.0f, 2.0f);
+
+    ImGui::Text("Speed Stage");
+    SpeedStage speedStage = player_->GetSpeedStage();
+    ImGui::Text("Current Speed Stage: %d", static_cast<int>(speedStage));
+
+
+    ImGui::Text("Score");
+    ImGui::Text("Current Score: %d", player_->GetScore());
+
+    ImGui::End();
+#endif // USE_IMGUI
+
+    //sprite->SetRotation(sprite->GetRotation() + 0.1f);
+    sprite->Update();
+
+
+
+    ImGui::End();
+#endif // USE_IMGUI
+
+    // sprite->SetRotation(sprite->GetRotation() + 0.1f);
+    sprite->Update();
+
 }
+
 
 void GameScene::Draw() {
     // object3d2->Draw();
@@ -432,8 +381,8 @@ void GameScene::Draw() {
 
     // プレイヤーの描画処理
 
-        player_->Draw();
-   
+    player_->Draw();
+
 
     // 障害物の描画処理
     for (auto& obstacle : obstacleSlow_) {
