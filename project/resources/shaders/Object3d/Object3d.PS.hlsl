@@ -38,6 +38,16 @@ struct SpotLight
     float padding;
    
 };
+struct AreaLight
+{
+    float4 color;
+    float3 position;
+    float intensity;
+    float3 right; // 幅の半分 * 回転
+    float decay;
+    float3 up; // 高さの半分 * 回転
+    float range;
+};
 struct Camera
 {
     float3 worldPosition;
@@ -47,7 +57,7 @@ struct LightCounts
     int numDirectionalLights;
     int numPointLights;
     int numSpotLights;
-    int padding;
+    int numAreaLights;
 };
 ConstantBuffer<Camera> gCamera : register(b2);
 
@@ -56,7 +66,7 @@ ConstantBuffer<Material> gMaterial : register(b0);
 StructuredBuffer<DirectionalLight> gDirectionalLights : register(t1);
 StructuredBuffer<PointLight> gPointLights : register(t2);
 StructuredBuffer<SpotLight> gSpotLights : register(t3);
-
+StructuredBuffer<AreaLight> gAreaLights : register(t4);
 // ★追加: カウント用定数バッファ (CBV: b3)
 ConstantBuffer<LightCounts> gLightCounts : register(b3);
 
@@ -106,6 +116,22 @@ float3 CalculateLight(float3 N, float3 L, float3 V, float3 lightColor, float int
     }
 
     return diffuse + specular;
+}
+
+
+float3 ClosestPointOnRect(float3 P, float3 lightPos, float3 lightRight, float3 lightUp)
+{
+    float3 d = P - lightPos;
+    
+    // 各軸への射影
+    float u = dot(d, lightRight) / dot(lightRight, lightRight); // 正規化されていない軸対応
+    float v = dot(d, lightUp) / dot(lightUp, lightUp);
+
+    // -1 ~ 1 の範囲にクランプ (right/upは半分の長さを持っているので、係数は-1~1)
+    u = clamp(u, -1.0f, 1.0f);
+    v = clamp(v, -1.0f, 1.0f);
+
+    return lightPos + lightRight * u + lightUp * v;
 }
 
 PixelShaderOutput main(VertexShaderOutput input)
@@ -173,7 +199,53 @@ PixelShaderOutput main(VertexShaderOutput input)
     
         finalLighting += CalculateLight(N, L_spot, V, gSpotLights[k].color.rgb, gSpotLights[k].intensity * distFactor * angleFactor);
     }
-    
+    for (int a = 0; a < gLightCounts.numAreaLights; ++a) {
+        if (gAreaLights[a].intensity <= 0.0f) continue;
+
+        // --- スペキュラ計算 (代表点近似) ---
+        // 1. 反射ベクトル R を計算
+        float3 R = reflect(-V, N);
+        
+        // 2. 反射レイ (Pos, R) と エリアライト平面 の交差判定
+        // 平面の方程式: dot(P - LightPos, Normal) = 0
+        // LightNormalは Right x Up で求まる
+        float3 lightNormal = normalize(cross(gAreaLights[a].right, gAreaLights[a].up));
+        float den = dot(R, lightNormal);
+        
+        float3 specPoint = gAreaLights[a].position;
+        // 平面と交差する場合のみ計算、裏側ならライト中心を使う
+        if (den != 0.0f) {
+            float t = dot(gAreaLights[a].position - input.worldPosition, lightNormal) / den;
+            if (t > 0.0f) {
+                float3 intersectPoint = input.worldPosition + R * t;
+                // 交点を矩形内にクランプ
+                specPoint = ClosestPointOnRect(intersectPoint, gAreaLights[a].position, gAreaLights[a].right, gAreaLights[a].up);
+            }
+        }
+
+        // --- ディフューズ計算 ---
+        // ディフューズは単純化のため、シェーディング点から矩形への最近傍点を使う
+        float3 diffPoint = ClosestPointOnRect(input.worldPosition, gAreaLights[a].position, gAreaLights[a].right, gAreaLights[a].up);
+
+        // --- ライティング計算 ---
+        // 本来はDiffuseとSpecularでLベクトルが異なりますが、
+        // 既存のCalculateLightを再利用するため、ここではSpecular用の点(specPoint)を優先して計算するか、
+        // もしくは独自に計算を展開します。今回は「ハイライトの形状」が重要なのでspecPointを使います。
+        
+        float3 L_area = specPoint - input.worldPosition;
+        float distanceArea = length(L_area);
+        L_area = normalize(L_area);
+
+        // 減衰 (Pointと同じロジックを使用)
+        float atten = pow(saturate(-distanceArea / gAreaLights[a].range + 1.0f), gAreaLights[a].decay);
+        
+        // NdotLチェック (光が裏から当たっていないか)
+        // エリアライト自体にも向き(lightNormal)があるので、ライトがこちらを向いているかも考慮すべきですが
+        // 簡易実装では省略されることが多いです。
+
+        // 既存関数を利用して加算
+        finalLighting += CalculateLight(N, L_area, V, gAreaLights[a].color.rgb, gAreaLights[a].intensity * atten);
+    } 
     output.color.rgb = finalLighting * textureColor.rgb;
     output.color.a = gMaterial.Color.a * textureColor.a;
     

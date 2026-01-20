@@ -23,5 +23,7 @@ private:
     std::unique_ptr<Object3d> object3d;
     std::unique_ptr<ParicleEmitter> emitter;
   uint32_t handle_=0;
+
+    Vector3 position = { 0.0f, 0.0f, 0.0f }; 
 };
 

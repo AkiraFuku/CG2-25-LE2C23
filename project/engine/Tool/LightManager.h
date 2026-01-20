@@ -10,7 +10,7 @@
 const int kNumDirectionalLights = 3;
 const int kNumPointLights = 3;
 const int kNumSpotLights = 3;
-
+const int kNumAreaLights = 3;
 class LightManager
 {
 public: // メンバ関数
@@ -51,12 +51,20 @@ public: // メンバ関数
         float cosFalloffStart;
         float padding;
     };
-
+    struct AreaLightData {
+        Vector4 color;      // 色
+        Vector3 position;   // 中心座標
+        float intensity;    // 強度
+        Vector3 right;      // ライトの右方向ベクトル * 幅の半分
+        float decay;        // 減衰率
+        Vector3 up;         // ライトの上方向ベクトル * 高さの半分
+        float range;        // 影響範囲（最大距離）
+    };
     // ライト追加関数
     void AddDirectionalLight(const Vector4& color, const Vector3& direction, float intensity);
     void AddPointLight(const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
     void AddSpotLight(const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
-
+    void AddAreaLight(const Vector4& color, const Vector3& position, float intensity, const Vector3& right, const Vector3& up, float decay, float range);
     void ClearLights(); // 毎フレームリセット用
     DirectionalLightData& GetDirectionalLight(size_t index);
     PointLightData& GetPointLight(size_t index);
@@ -67,12 +75,14 @@ public: // メンバ関数
 
     // 点光源 (Point Light) の設定
     void SetPointLight(size_t index, const Vector4& color, const Vector3& position, float intensity, float radius, float decay);
-    void SetPointLightPos(size_t index, const Vector3& position ){pointLights_[index].position=position;};
+    void SetPointLightPos(size_t index, const Vector3& position) {
+        pointLights_[index].position = position;
+    };
 
     // スポットライト (Spot Light) の設定
     void SetSpotLight(size_t index, const Vector4& color, const Vector3& position, float intensity, const Vector3& direction, float distance, float decay, float cosAngle, float cosFalloffStart);
-    void SetSpotLightDirection(size_t index,const Vector3& direction){
-    spotLights_[index].direction=direction;
+    void SetSpotLightDirection(size_t index, const Vector3& direction) {
+        spotLights_[index].direction = direction;
     };
     // 有効なライトの数を取得する関数もあると便利です
     size_t GetDirectionalLightCount() const {
@@ -84,7 +94,10 @@ public: // メンバ関数
     size_t GetSpotLightCount() const {
         return spotLights_.size();
     }
-
+    size_t GetAreaLightCount() const {
+        return areaLights_.size();
+    }
+    void SetAreaLight(size_t index, const Vector4& color, const Vector3& position, float intensity, const Vector3& right, const Vector3& up, float decay, float range);
 private: // メンバ変数・内部定義
     // シングルトンパターンのためコンストラクタを隠蔽
     LightManager() = default;
@@ -101,7 +114,7 @@ private: // メンバ変数・内部定義
         int numDirectional;
         int numPoint;
         int numSpot;
-        int padding;
+        int numArea;
     };
 
     // リソース作成ヘルパー
@@ -111,11 +124,12 @@ private: // メンバ変数・内部定義
     std::vector<DirectionalLightData> directionalLights_;
     std::vector<PointLightData> pointLights_;
     std::vector<SpotLightData> spotLights_;
-
+    std::vector<AreaLightData> areaLights_;
     // GPUリソース
     Microsoft::WRL::ComPtr<ID3D12Resource> dirLightBuff_;
     Microsoft::WRL::ComPtr<ID3D12Resource> pointLightBuff_;
     Microsoft::WRL::ComPtr<ID3D12Resource> spotLightBuff_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> areaLightBuff_;
     Microsoft::WRL::ComPtr<ID3D12Resource> countBuff_;
 
     // カウントバッファマップ用

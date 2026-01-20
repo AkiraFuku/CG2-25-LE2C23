@@ -21,7 +21,7 @@ void LightManager::Initialize() {
     CreateStructuredBuffer(sizeof(DirectionalLightData) * kMaxLights, dirLightBuff_);
     CreateStructuredBuffer(sizeof(PointLightData) * kMaxLights, pointLightBuff_);
     CreateStructuredBuffer(sizeof(SpotLightData) * kMaxLights, spotLightBuff_);
-
+    CreateStructuredBuffer(sizeof(AreaLightData) * kMaxLights, areaLightBuff_);
     CreateConstBuffer(sizeof(LightCounts), countBuff_);
     countBuff_->Map(0, nullptr, reinterpret_cast<void**>(&countData_));
 
@@ -31,6 +31,7 @@ void LightManager::ClearLights() {
     directionalLights_.clear();
     pointLights_.clear();
     spotLights_.clear();
+    areaLights_.clear();
 }
 
 LightManager::DirectionalLightData& LightManager::GetDirectionalLight(size_t index)
@@ -84,7 +85,17 @@ void LightManager::SetSpotLight(size_t index, const Vector4& color, const Vector
         spotLights_[index].cosFalloffStart = cosFalloffStart;
     }
 }
-
+void LightManager::SetAreaLight(size_t index, const Vector4& color, const Vector3& position, float intensity, const Vector3& right, const Vector3& up, float decay, float range) {
+    if (index < areaLights_.size()) {
+        areaLights_[index].color = color;
+        areaLights_[index].position = position;
+        areaLights_[index].intensity = intensity;
+        areaLights_[index].right = right;
+        areaLights_[index].up = up;
+        areaLights_[index].decay = decay;
+        areaLights_[index].range = range;
+    }
+}
 
 void LightManager::AddDirectionalLight(const Vector4& color, const Vector3& direction, float intensity) {
 
@@ -120,7 +131,17 @@ void LightManager::AddSpotLight(const Vector4& color, const Vector3& position, f
     spotLights_.push_back(light);
 }
 
-
+void LightManager::AddAreaLight(const Vector4& color, const Vector3& position, float intensity, const Vector3& right, const Vector3& up, float decay, float range) {
+    AreaLightData light;
+    light.color = color;
+    light.position = position;
+    light.intensity = intensity;
+    light.right = right;
+    light.up = up;
+    light.decay = decay;
+    light.range = range;
+    areaLights_.push_back(light);
+}
 
 void LightManager::Update() {
 
@@ -128,6 +149,7 @@ void LightManager::Update() {
     countData_->numDirectional = (int)directionalLights_.size();
     countData_->numPoint = (int)pointLights_.size();
     countData_->numSpot = (int)spotLights_.size();
+    countData_->numArea = (int)areaLights_.size(); 
     if (!directionalLights_.empty()) {
         DirectionalLightData* dst = nullptr;
         dirLightBuff_->Map(0, nullptr, reinterpret_cast<void**>(&dst));
@@ -146,19 +168,28 @@ void LightManager::Update() {
         memcpy(dst, spotLights_.data(), sizeof(SpotLightData) * spotLights_.size());
         spotLightBuff_->Unmap(0, nullptr);
     }
-
+    if (!areaLights_.empty()) {
+        AreaLightData* dst = nullptr;
+        areaLightBuff_->Map(0, nullptr, reinterpret_cast<void**>(&dst));
+        memcpy(dst, areaLights_.data(), sizeof(AreaLightData) * areaLights_.size());
+        areaLightBuff_->Unmap(0, nullptr);
+    }
 }
 
 void LightManager::Draw(UINT rootParameterIndex) {
-
+     enum {
+             DirLight, PointLight, SpotLight,AreaLight ,Count   };
     // Dir (Index 3)
-    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + 0, dirLightBuff_->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + DirLight, dirLightBuff_->GetGPUVirtualAddress());
     // Point (Index 4)
-    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + 1, pointLightBuff_->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + PointLight, pointLightBuff_->GetGPUVirtualAddress());
     // Spot (Index 5)
-    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + 2, spotLightBuff_->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + SpotLight, spotLightBuff_->GetGPUVirtualAddress());
+    // Area
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootShaderResourceView(rootParameterIndex + AreaLight, areaLightBuff_->GetGPUVirtualAddress());
+
     // Count (Index 6)
-    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex + 3, countBuff_->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex + Count, countBuff_->GetGPUVirtualAddress());
 }
 
 

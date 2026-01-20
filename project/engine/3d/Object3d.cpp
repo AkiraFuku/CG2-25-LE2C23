@@ -103,7 +103,7 @@ void Object3d::Draw()
     DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_.Get()->GetGPUVirtualAddress());
     //light
     LightManager::GetInstance()->Draw(3);
-    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(7, cameraResource_->GetGPUVirtualAddress());
+    DXCommon::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(8, cameraResource_->GetGPUVirtualAddress());
     if (model_) {
         model_->Draw();
     }

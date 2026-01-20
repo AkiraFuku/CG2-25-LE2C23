@@ -149,14 +149,13 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
     break;
     case PipelineType::Object3d:
     {
-        rootParameters.resize(8);
+        rootParameters.resize(9);
 
 
 
         // Enum定義 (可読性のため)
         enum {
-            kMaterial, kTransform, kTexture, DirLight, PointLight, SpotLight, Count, kCamera
-        };
+kMaterial, kTransform, kTexture, DirLight, PointLight, SpotLight, AreaLight, Count, kCamera        };
 
         // 0. Material (CBV b0, Pixel)
         rootParameters[kMaterial].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -188,6 +187,10 @@ void PSOMnager::CreateRootSignature(PipelineType type) {
         rootParameters[SpotLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
         rootParameters[SpotLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
         rootParameters[SpotLight].Descriptor.ShaderRegister = 3; // t3
+
+        rootParameters[AreaLight].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+        rootParameters[AreaLight].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        rootParameters[AreaLight].Descriptor.ShaderRegister = 4; // t4
 
         // ★追加: 6. LightCounts (CBV b3)
         rootParameters[Count].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;

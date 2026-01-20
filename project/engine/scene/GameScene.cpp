@@ -18,14 +18,14 @@ void GameScene::Initialize() {
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
     Audio::GetInstance()->PlayAudio(handle_, true);
+    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
     //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
-    //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
-    LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
-    LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+  //  LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+   // LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
 
     Vector3 point1 = { 0,0,0 };
-    LightManager::GetInstance()->AddPointLight({ 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
-    LightManager::GetInstance()->AddPointLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);
+   /* LightManager::GetInstance()->AddPointLight({ 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
+    LightManager::GetInstance()->AddPointLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);*/
         TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
@@ -45,8 +45,29 @@ void GameScene::Initialize() {
     //}
 
 
-
-
+//
+//  Vector3 right = { 1.0f, 1.0f, 1.0f }; // 長さ2.0 (幅4.0)
+//
+//// Up: Z軸方向 (奥行き) 
+//// ※ここをY軸(0,1,0)にすると「壁」になりますが、Z軸(0,0,1)にすると「床/天井」と平行になります
+//Vector3 up    = { 1.0f, 1.0f,   1.0f }; // 長さ2.0 (奥行き4.0)
+//
+//// その他パラメータ
+//Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+//float intensity = 2.0f;
+//float decay = 1.0f;
+//float range = 10.0f;
+//
+//    // --- ライトの登録 ---
+//    LightManager::GetInstance()->AddAreaLight(
+//        color,
+//        position,
+//        intensity,
+//        right,
+//        up,
+//        decay,
+//        range
+//    );
    // object3d の初期化
     object3d2 = std::make_unique<Object3d>();
     object3d2->Initialize();
@@ -162,9 +183,9 @@ void GameScene::Update() {
             float normalizedX = x / 32767.0f;
             float normalizedY = y / 32767.0f;
 
-            Vector3 point = LightManager::GetInstance()->GetSpotLight(0).direction;
-            point = Add(point, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
-            LightManager::GetInstance()->SetSpotLightDirection(0, point);
+      //     Vector3 point = LightManager::GetInstance()->GetSpotLight(0).direction;
+            position = Add(position, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+            /*LightManager::GetInstance()->SetSpotLightDirection(0, point);*/
 
         }
     }
@@ -179,10 +200,39 @@ void GameScene::Update() {
     ImGui::Text("Sphere");
     Vector3 pos = object3d->GetTranslate();
     Vector3 scale = object3d->GetScale();
-    ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+    Vector3 rotate = object3d->GetRotate();
+    ImGui::DragFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
     ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
+    ImGui::DragFloat3("rotate", &(rotate.x), 0.1f, 1000.0f);
+    
     object3d->SetTranslate(pos);
     object3d->SetScale(scale);
+    object3d->SetRotate(rotate);
+ImGui::DragFloat3("Apos", &(position.x), 0.1f, 1000.0f);
+//// --- エリアライトのパラメータ設定 ---
+//  Vector3 right = { 2.0f, 0.0f, 0.0f }; // 長さ2.0 (幅4.0)
+//
+//// Up: Z軸方向 (奥行き) 
+//// ※ここをY軸(0,1,0)にすると「壁」になりますが、Z軸(0,0,1)にすると「床/天井」と平行になります
+//Vector3 up    = { 0.0f, 0.0f, 2.0f }; // 長さ2.0 (奥行き4.0)
+
+//// その他パラメータ
+//Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+//float intensity = 2.0f;
+//float decay = 1.0f;
+//float range = 10.0f;
+//
+//    // --- ライトの登録 ---
+//    LightManager::GetInstance()->SetAreaLight(
+//        0,
+//        color,
+//        position,
+//        intensity,
+//        right,
+//        up,
+//        decay,
+//        range
+//    );
     if (LightManager::GetInstance()->GetPointLightCount() > 0) {
         ImGui::Begin("Light Setting");
 
@@ -248,7 +298,8 @@ void GameScene::Update() {
         ImGui::End();
     }
 
-
+    
+    
 
     /*  if (ImGui::ColorEdit4("LightColor", &lightColor.x)) {
 
@@ -275,7 +326,7 @@ void GameScene::Update() {
     sprite->Update();
 }
 void GameScene::Draw() {
-    object3d2->Draw();
+   // object3d2->Draw();
     object3d->Draw();
     // ParticleManager::GetInstance()->Draw();
      ///////スプライトの描画

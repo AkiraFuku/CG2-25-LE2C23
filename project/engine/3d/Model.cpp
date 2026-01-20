@@ -199,7 +199,7 @@ Model* Model::CreateSphere(uint32_t subdivision)
     // ここではvertex生成に集中し、後でリソース生成関数を呼ぶ流れにします）
     // ※TextureManagerへの依存があるため、適当な白画像などをデフォルトにする必要があります
      
-    model->modelData_.material.textureFilePath = "resources/uvChecker.png"; // 確実に存在する画像を指定
+    model->modelData_.material.textureFilePath = "resources/monsterBall.png"; // 確実に存在する画像を指定
    // TextureManagerを使ってテクスチャを読み込む
     TextureManager::GetInstance()->LoadTexture( model->modelData_.material.textureFilePath);
 
