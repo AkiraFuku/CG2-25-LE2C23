@@ -29,10 +29,10 @@ void MapChipField::ResetMapChipData() {
     line.resize(kNumBlockHorizontal);
 
     // ★ここを追加：初期値を全部 kBlank にする
-    for (auto &cell : line) {
+   /* for (auto &cell : line) {
       cell.type = MapChipType::kBlank;
       cell.subID = 0;
-    }
+    }*/
   }
 }
 
@@ -98,6 +98,7 @@ void MapChipField::LoadMapChipCsv(const std::string &filePath) {
 
       // 空白の場合はスキップ
       if (word.empty()) {
+          mapChipData_.data[i][j].type = MapChipType::kBlank;
         continue;
       }
 

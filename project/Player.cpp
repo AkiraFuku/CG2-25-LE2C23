@@ -79,6 +79,11 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
 
 void Player::Update()
 {
+    if (isGoal_)
+    {
+        // ゴールしたら動かない
+        return;
+    }
 
     if (isDead_)
     {
@@ -229,7 +234,7 @@ void Player::MoveCamera()
     worldMatrix_ = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     // カメラの位置を更新
-    Vector3 offset = { 0.0f, 5.0f, -20.0f };
+    Vector3 offset = { 0.0f, 8.0f, -30.0f };
     offset = TransformNormal(offset, worldMatrix_);
     targetPos_ = transform_.translate + offset;
     cameraTransform_.translate = Lerp(cameraTransform_.translate, targetPos_, kInterpolationRate);
@@ -373,6 +378,11 @@ void Player::OnCollision(const Goal* goal)
     }
 
     isGoal_ = true;
+}
+
+void Player::OnCollision(const CourseWall* courseWall)
+{
+    isDead_ = true;
 }
 
 

@@ -18,6 +18,7 @@ class RotateArrow;
 class SpeedMeter;
 class GameScene;
 class Goal;
+class CourseWall;
 
 // 速さの段階
 enum class SpeedStage
@@ -155,6 +156,7 @@ public:
     void OnCollision(const ObstacleFast* obstacleFast);
     void OnCollision(const ObstacleMax* obstacleMax);
     void OnCollision(const Goal* goal);
+    void OnCollision(const CourseWall* courseWall);
     // デスフラグを取得
     bool IsDead() const { return isDead_; }
     // ゴールフラグを取得
