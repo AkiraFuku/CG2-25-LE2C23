@@ -18,15 +18,15 @@ void GameScene::Initialize() {
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
     Audio::GetInstance()->PlayAudio(handle_, true);
-    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
-    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
-    LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
-    LightManager::GetInstance()->AddSpotLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+    //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
+    LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
 
     Vector3 point1 = { 0,0,0 };
-    /* LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
-     LightManager::GetInstance()->AddPointLight( { 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);*/
-    TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
+    LightManager::GetInstance()->AddPointLight({ 1.0f, 1.0f, 1.0f, 1.0f }, point1, 4.0f, 2.0f, 0.1f);
+    LightManager::GetInstance()->AddPointLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 0,0,0 }, 4.0f, 2.0f, 0.1f);
+        TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
     ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
     /*   std::vector<Sprite*> sprites;
@@ -215,6 +215,35 @@ void GameScene::Update() {
         // 減衰率の調整
         ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
         ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+        auto& spotLight2 = LightManager::GetInstance()->GetSpotLight(1);
+
+        // 位置の調整
+        ImGui::DragFloat3("spot Light2 Pos", &spotLight2.position.x, 0.1f);
+        ImGui::DragFloat3("spot Light Pos", &spotLight2.direction.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("spot Light2 Color", &spotLight2.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("spot Light2 Intensity", &spotLight2.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("spot Light2 Decay", &spotLight2.decay, 0.1f, 0.0f, 10.0f);
+        auto& spotLight1 = LightManager::GetInstance()->GetSpotLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("spot Light Pos", &spotLight1.position.x, 0.1f);
+        ImGui::DragFloat3("spot Light ", &spotLight1.direction.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("spot Light Color", &spotLight1.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("spot Light Intensity", &spotLight1.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("spot Light Decay", &spotLight1.decay, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("spot Light rad", &spotLight1.distance, 0.1f, 0.0f, 10.0f);
 
         ImGui::End();
     }
@@ -250,5 +279,5 @@ void GameScene::Draw() {
     object3d->Draw();
     // ParticleManager::GetInstance()->Draw();
      ///////スプライトの描画
-    sprite->Draw();
+    //sprite->Draw();
 }
