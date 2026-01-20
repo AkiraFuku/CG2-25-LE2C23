@@ -147,7 +147,9 @@ Model::ModelData Model::LoadModelFile(const std::string& directoryPath, const st
     const aiScene* scene = importer.ReadFile(filePath.c_str(),
         aiProcess_FlipWindingOrder |              // 三角形化されていないポリゴンを三角形にする
         aiProcess_FlipUVs        |        // 法線がない場合、自動計算する
-aiProcess_PreTransformVertices    
+aiProcess_PreTransformVertices | // 座標変換をベイク
+        aiProcess_GenNormals |           // 法線がない場合、自動生成を試みる
+        aiProcess_Triangulate   
     );
     assert(scene->HasMeshes());
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
