@@ -151,7 +151,7 @@ void Framework::Draw()
     ImGuiManager::GetInstance()->Draw();
     DXCommon::GetInstance()->PostDraw();
     TextureManager::GetInstance()->ReleaseIntermediateResources();
-
+   // LightManager::GetInstance()->Draw(3);
     // 基底クラスの描画処理（純粋仮想関数として宣言されているため、必ずオーバーライドする必要があります）
 }
 void Framework::Run()
