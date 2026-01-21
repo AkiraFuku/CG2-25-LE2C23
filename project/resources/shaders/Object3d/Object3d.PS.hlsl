@@ -150,7 +150,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     float3 N = normalize(input.normal);
     float3 V = normalize(gCamera.worldPosition - input.worldPosition);
     
-    float3 finalLighting = float3(0.0f, 0.0f, 0.0f);    
+    float3 finalLighting = float3(0.0f, 0.0f, 0.0f);
 
     
     // Directional Light
@@ -165,7 +165,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     for (int j = 0; j < gLightCounts.numPointLights; ++j)
     {
         // 強度が0以下のライトは計算スキップ
-        if (gPointLights[j].intensity <= 0.0f)continue;
+        if (gPointLights[j].intensity <= 0.0f)
+            continue;
 
         float3 directionToPointLight = gPointLights[j].position - input.worldPosition;
     // 距離による減衰は計算せず、正規化して方向だけ使う
@@ -199,53 +200,30 @@ PixelShaderOutput main(VertexShaderOutput input)
     
         finalLighting += CalculateLight(N, L_spot, V, gSpotLights[k].color.rgb, gSpotLights[k].intensity * distFactor * angleFactor);
     }
-    for (int a = 0; a < gLightCounts.numAreaLights; ++a) {
-        if (gAreaLights[a].intensity <= 0.0f) continue;
+    for (int a = 0; a < gLightCounts.numAreaLights; ++a)
+    {
+        // 強度が0以下のライトは計算スキップ
+        if (gAreaLights[a].intensity <= 0.0f)
+            continue;
 
-        // --- スペキュラ計算 (代表点近似) ---
-        // 1. 反射ベクトル R を計算
-        float3 R = reflect(-V, N);
+        // 1. エリアライトの矩形上で、現在のピクセル位置に最も近い点を算出
+        // 定義済みの ClosestPointOnRect 関数を使用
+        float3 closestPoint = ClosestPointOnRect(input.worldPosition, gAreaLights[a].position, gAreaLights[a].right, gAreaLights[a].up);
+
+        // 2. 光源への方向ベクトルと距離を計算
+        // 通常のポイントライトと異なり、中心位置ではなく「最も近い点」へのベクトルを使用する
+        float3 directionToAreaLight = closestPoint - input.worldPosition;
+        float distanceArea = length(directionToAreaLight);
+        float3 L_area = normalize(directionToAreaLight);
+
+        // 3. 距離による減衰 (Falloff)
+        // PointLight等と同様の減衰計算 (radiusの代わりにrangeを使用)
+        float factor = pow(saturate(-distanceArea / gAreaLights[a].range + 1.0f), gAreaLights[a].decay);
         
-        // 2. 反射レイ (Pos, R) と エリアライト平面 の交差判定
-        // 平面の方程式: dot(P - LightPos, Normal) = 0
-        // LightNormalは Right x Up で求まる
-        float3 lightNormal = normalize(cross(gAreaLights[a].right, gAreaLights[a].up));
-        float den = dot(R, lightNormal);
-        
-        float3 specPoint = gAreaLights[a].position;
-        // 平面と交差する場合のみ計算、裏側ならライト中心を使う
-        if (den != 0.0f) {
-            float t = dot(gAreaLights[a].position - input.worldPosition, lightNormal) / den;
-            if (t > 0.0f) {
-                float3 intersectPoint = input.worldPosition + R * t;
-                // 交点を矩形内にクランプ
-                specPoint = ClosestPointOnRect(intersectPoint, gAreaLights[a].position, gAreaLights[a].right, gAreaLights[a].up);
-            }
-        }
-
-        // --- ディフューズ計算 ---
-        // ディフューズは単純化のため、シェーディング点から矩形への最近傍点を使う
-        float3 diffPoint = ClosestPointOnRect(input.worldPosition, gAreaLights[a].position, gAreaLights[a].right, gAreaLights[a].up);
-
-        // --- ライティング計算 ---
-        // 本来はDiffuseとSpecularでLベクトルが異なりますが、
-        // 既存のCalculateLightを再利用するため、ここではSpecular用の点(specPoint)を優先して計算するか、
-        // もしくは独自に計算を展開します。今回は「ハイライトの形状」が重要なのでspecPointを使います。
-        
-        float3 L_area = specPoint - input.worldPosition;
-        float distanceArea = length(L_area);
-        L_area = normalize(L_area);
-
-        // 減衰 (Pointと同じロジックを使用)
-        float atten = pow(saturate(-distanceArea / gAreaLights[a].range + 1.0f), gAreaLights[a].decay);
-        
-        // NdotLチェック (光が裏から当たっていないか)
-        // エリアライト自体にも向き(lightNormal)があるので、ライトがこちらを向いているかも考慮すべきですが
-        // 簡易実装では省略されることが多いです。
-
-        // 既存関数を利用して加算
-        finalLighting += CalculateLight(N, L_area, V, gAreaLights[a].color.rgb, gAreaLights[a].intensity * atten);
-    } 
+        // 4. ライティング計算
+        // 算出した L_area を使って、共通の CalculateLight 関数で拡散反射・鏡面反射を計算
+        finalLighting += CalculateLight(N, L_area, V, gAreaLights[a].color.rgb, gAreaLights[a].intensity * factor);
+    }
     output.color.rgb = finalLighting * textureColor.rgb;
     output.color.a = gMaterial.Color.a * textureColor.a;
     
