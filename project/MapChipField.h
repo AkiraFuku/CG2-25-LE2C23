@@ -40,8 +40,8 @@ enum MapChipCharIndex {
 class MapChipField {
 public:
     // 1ブロックのサイズ
-    static inline const float kBlockWidth = 2.0f;
-    static inline const float kBlockHeight = 2.0f;
+    static inline const float kBlockWidth = 3.0f;
+    static inline const float kBlockHeight = 3.0f;
 
     // 1ブロックのサイズ
     static inline const float kTurnWidth = 1.0f;
@@ -49,8 +49,8 @@ public:
 
 private:
     // ブロックの個数
-    static inline const uint32_t kNumBlockVirtical = 200;
-    static inline const uint32_t kNumBlockHorizontal = 200;
+    static inline const uint32_t kNumBlockVirtical = 500;
+    static inline const uint32_t kNumBlockHorizontal = 500;
 
     MapChipData mapChipData_;
 

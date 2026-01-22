@@ -53,6 +53,7 @@ private:
     // 角度
     float driftAngle_ = 0.0f;
     float angleY_ = 0.0f;
+    float decelerationAngle_ = 0.2f;
 
     // 速度
     Vector3 velocity_ = {};

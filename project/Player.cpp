@@ -31,11 +31,11 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
     model_->Update();
 
     // 速度を初期化
-    velocity_ = { 0.0f, 0.0f, 0.05f };
+    velocity_ = { 0.0f, 0.0f, 0.2f };
     speedZ_ = velocity_.z;
 
     // 移動エフェクトの生成と初期化
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         // モデルを生成してリストに追加
         auto model = std::make_unique<Object3d>();
@@ -44,7 +44,7 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
         moveEffectModels_.push_back(std::move(model));
         // エフェクト本体を生成してリストに追加
         auto effect = std::make_unique<MoveEffect>();
-        effect->Initialize(moveEffectModels_.back().get(), camera_, transform_.translate, this);
+        effect->Initialize(moveEffectModels_.back().get(), camera_, transform_.translate * static_cast<float>(i + 1), this);
         moveEffects_.push_back(std::move(effect));
     }
 
@@ -201,7 +201,7 @@ void Player::Draw()
 void Player::Rotate()
 {
     // 回転速さ[ラジアン/frame]
-    const float kRotSpeed = 0.01f;
+    const float kRotSpeed = 0.008f;
 
     // 押した方向で移動ベクトルを変更
     if (Input::GetInstance()->PushedKeyDown(DIK_A)) {
@@ -269,12 +269,24 @@ void Player::Drift()
     {
         if (Input::GetInstance()->TriggerKeyUp(DIK_SPACE))
         {
-            // スペースキーを離したら加速開始
-            isAcceleration_ = true;
             // どれくらい曲がったかを記録
             driftAngle_ = std::abs(transform_.rotate.y - angleY_);
-            // 最大速度を決定
-            topSpeedZ_ = preSpeedZ_ + (driftAngle_ * driftTimer_);
+
+            // 曲がった角度が小さかったら
+            if (driftAngle_ < std::abs(decelerationAngle_))
+            {
+                // 減速
+                speedZ_ *= kSpeedDecayRate;
+                // ドリフト終了フラグを立てる
+                isDriftStart_ = false;
+            }
+            else
+            {
+                // 最大速度を決定
+                topSpeedZ_ = preSpeedZ_ + (driftAngle_ * driftTimer_);
+                // 加速開始フラグを立てる
+                isAcceleration_ = true;
+            }
 
             if (topSpeedZ_ > kMaxSpeedZ)
             {
@@ -288,7 +300,7 @@ void Player::Drift()
             // 減速
             speedZ_ *= kSpeedDecayRate;
             // タイマーを加算
-            driftTimer_ += 0.1f;
+            driftTimer_ += 0.005f;
 
             // 速度の段階を決定
             DetermineSpeedStage();
