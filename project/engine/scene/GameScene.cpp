@@ -26,7 +26,8 @@ GameScene::GameScene() = default;
 GameScene::~GameScene()
 {
     // メモリ解放
-    player_.release();
+    player_.reset();
+    playerModel_.reset();
     obstacleFastModel_.clear();
     obstacleFast_.clear();
     obstacleMaxModel_.clear();
@@ -59,6 +60,7 @@ void GameScene::Initialize() {
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
+    LightManager::GetInstance()->AddDirectionalLight({ 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
 
     ParticleManager::GetInstance()->CreateParticleGroup(
         "Test", "resources/uvChecker.png");
@@ -97,7 +99,7 @@ void GameScene::Initialize() {
 
     // マップチップフィールドの初期化
     mapChipField_ = std::make_unique<MapChipField>();
-    mapChipField_->LoadMapChipCsv("resources/mapchip.csv");
+    mapChipField_->LoadMapChipCsv("resources/stage2.csv");
 
 
 
@@ -218,10 +220,6 @@ void GameScene::Update() {
     for (auto& goal : goals_) {
         goal->Update();
 
-    }
-
-    for (auto& wall : walls_) {
-        wall->Update();
     }
 
     // 当たり判定
@@ -712,7 +710,7 @@ void GameScene::GenerateFieldObjects() {
                 wall->Initialize(model.get(), camera.get(), wallPos);
 
                 // 4) サイズ調整（マスに合わせる）
-                wall->SetScale(Vector3{ 1.0f, 2.0f, 1.0f }); // 好きに調整
+                wall->SetScale(Vector3{ 2.0f, 4.0f, 2.0f }); // 好きに調整
 
                 // 5) subID があるなら向きに使える（例）
                 // uint8_t subID = mapChipField_->GetMapChipSubIDByIndex(j, i);
@@ -762,7 +760,7 @@ void GameScene::GenerateFieldObjects() {
                 auto wall = std::make_unique<CourseWall>();
                 wall->Initialize(model.get(), camera.get(), wallPos);
 
-                wall->SetScale(Vector3{ 1.0f, 2.0f, 1.0f }); // 見た目は小さく
+                wall->SetScale(Vector3{ 2.0f, 4.0f, 2.0f }); // 見た目は小さく
 
                 wallModels_.push_back(std::move(model));
                 walls_.push_back(std::move(wall));

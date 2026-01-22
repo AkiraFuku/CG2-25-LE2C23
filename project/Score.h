@@ -23,7 +23,7 @@ private:
 
     // 速度
     Vector3 velocity_ = {};
-    float speed_ = 0.1f;
+    float speed_ = 0.8f;
 
     // プレイヤーのポインタ
     Player* player = nullptr;
