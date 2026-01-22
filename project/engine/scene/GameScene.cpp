@@ -93,7 +93,7 @@ void GameScene::Initialize() {
     ModelManager::GetInstance()->CreateSphereModel("MySphere", 16);
     object3d->SetBlendMode(BlendMode::Add);
     Transform M = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
-    emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
+    //emitter = std::make_unique<ParicleEmitter>("Test", M, 10, 5.0f, 0.0f);
 
     // マップチップフィールドの初期化
     mapChipField_ = std::make_unique<MapChipField>();
@@ -139,7 +139,7 @@ void GameScene::Finalize() {
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
 void GameScene::Update() {
-    emitter->Update();
+    //emitter->Update();
 
     XINPUT_STATE state;
 

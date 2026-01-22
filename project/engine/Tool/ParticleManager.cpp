@@ -183,6 +183,49 @@ void ParticleManager::Emit(const std::string name, const Vector3& postion, uint3
 
 }
 
+void ParticleManager::EmitBubble(const std::string &name,
+                                 const Vector3 &position, uint32_t count) {
+  assert(particleGroups.contains(name));
+
+  // 発生位置の広がり（泡が湧く口の半径）
+  std::uniform_real_distribution<float> spawnXZ(-0.3f, 0.3f);
+
+  // 上昇速度
+  std::uniform_real_distribution<float> speedY(0.8f, 2.2f);
+
+  // 横揺れの初期速度（小さめ）
+  std::uniform_real_distribution<float> speedXZ(-0.25f, 0.25f);
+
+  // 寿命
+  std::uniform_real_distribution<float> life(1.0f, 2.5f);
+
+  // サイズ
+  std::uniform_real_distribution<float> scale(0.15f, 0.45f);
+
+  for (uint32_t i = 0; i < count; ++i) {
+    Particle p{};
+    float s = scale(randomEngine_);
+
+    p.transfom.scale = {s, s, s};
+    p.transfom.rotate = {0.0f, 0.0f, 0.0f};
+
+    p.transfom.translate = {position.x + spawnXZ(randomEngine_), position.y,
+                            position.z + spawnXZ(randomEngine_)};
+
+    p.velocity = {speedXZ(randomEngine_), speedY(randomEngine_),
+                  speedXZ(randomEngine_)};
+
+    // 泡っぽい色（ほぼ白、ちょい青）
+    p.color = {0.85f, 0.95f, 1.0f, 1.0f};
+
+    p.lifeTime = life(randomEngine_);
+    p.currentTime = 0.0f;
+
+    particleGroups[name].particles.push_back(p);
+  }
+}
+
+
 void ParticleManager::CreateRootSignature()
 {
     PsoProperty pso = { PipelineType::Particle,BlendMode::Add };
