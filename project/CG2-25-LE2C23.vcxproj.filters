@@ -65,6 +65,7 @@
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="engine\base\PSOMnager.cpp" />
     <ClCompile Include="engine\scene\SceneFactory.cpp" />
+    <ClCompile Include="fade.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractSceneFactory.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="engine\base\PSOMnager.h" />
     <ClInclude Include="engine\scene\SceneFactory.h" />
+    <ClInclude Include="fade.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d\Object3d.hlsli" />

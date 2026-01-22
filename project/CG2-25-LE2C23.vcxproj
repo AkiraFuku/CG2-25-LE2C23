@@ -40,6 +40,7 @@
     <ClCompile Include="engine\GAME\Framework.cpp" />
     <ClCompile Include="engine\GAME\GameEngine.cpp" />
     <ClCompile Include="engine\scene\GameScene.cpp" />
+    <ClCompile Include="fade.cpp" />
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp">
@@ -120,6 +121,7 @@
     <ClInclude Include="engine\scene\Scene.h" />
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
+    <ClInclude Include="fade.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="MapChipField.h" />
