@@ -58,6 +58,8 @@ public:
 
     void Draw();
 
+    void SetLight (bool islight){materialData_->enableLighting=islight;};
+
     ModelData GetModelData(){return modelData_;}
     //マテリアルの読み込み
     static MaterialData LoadMaterialTemplateFile(const std::string& directryPath, const std::string& filename);
@@ -71,7 +73,7 @@ public:
 private:
 
     ModelData modelData_;
-
+     std::string filename_;
     //頂点リソース
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
     VertexData* vertexData_ = nullptr;

@@ -15,7 +15,6 @@ void Object3d::Initialize()
     //WVP行列リソースの作成
     CreateWVPResource();
     //平行光源リソースの作成
-   // CreateDirectionalLightResource();
     transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
     camera_ = Object3dCommon::GetInstance()->GetDefaultCamera();
     CreateCameraResource();

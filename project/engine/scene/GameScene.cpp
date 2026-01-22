@@ -275,7 +275,7 @@ void GameScene::Update() {
     sprite->Update();
 }
 void GameScene::Draw() {
-    object3d2->Draw();
+   // object3d2->Draw();
     object3d->Draw();
     // ParticleManager::GetInstance()->Draw();
      ///////スプライトの描画

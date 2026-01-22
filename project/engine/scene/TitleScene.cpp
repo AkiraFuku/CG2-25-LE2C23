@@ -9,134 +9,100 @@
 
 void TitleScene::Initialize() {
 
-    camera = std::make_unique<Camera>();
-    camera->SetRotate({ 0.0f,0.0f,0.0f });
-    camera->SetTranslate({ 0.0f,0.0f,-5.0f });
-    Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
-    ParticleManager::GetInstance()->Setcamera(camera.get());
+   
+    // カメラの生成と設定
+    camera_ = std::make_unique<Camera>();
+    camera_->SetTranslate({0.0f, 0.0f, -10.0f}); // 少し手前に引く
+    camera_->SetRotate({0.0f, 0.0f, 0.0f});
+    // ParticleManager::GetInstance()->Setcamera(camera_)
 
-     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
+    // 自作エンジンの仕組み：描画対象にカメラを登録する（またはCommonにセットする）
+    Object3dCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
-    Audio::GetInstance()->PlayAudio(handle_,true);
+    // スカイドーム
+    skydome_ = std::make_unique<SkyDome>();
+    skydome_->Initialize();
 
-    TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
+    // タイトルロゴ
+    titleObject_ = std::make_unique<Object3d>();
+    titleObject_->Initialize();
+    titleObject_->SetModel("titleFont/titleFont.obj");
+    titleObject_->SetScale({20.0f, 20.0f, 20.0f});
+    titleObject_->SetTranslate({0.0f, 10.0f, 0.0f});
 
-    ParticleManager::GetInstance()->CreateParticleGroup("Test", "resources/uvChecker.png");
-    /*   std::vector<Sprite*> sprites;
-       for (uint32_t i = 0; i < 5; i++)
-       {*/
-    sprite = std::make_unique<Sprite>();
-    // sprite->Initialize(spritecommon,"resources/monsterBall.png");
-    sprite->Initialize("resources/monsterBall.png");
+    // プレイヤー（装飾）
+    playerObject_ = std::make_unique<Object3d>();
+    playerObject_->Initialize();
+    playerObject_->SetModel("player.obj");
+    playerObject_->SetScale({1.0f, 1.0f, 1.0f});
+    playerObject_->SetRotate({0.0f, 3.14f * 0.65f, 0.0f}); // Y軸回転
+    playerObject_->SetTranslate({0.0f, 0.0f, 0.0f});
+    
 
-    sprite->SetPosition(Vector2{ 25.0f + 100.0f,100.0f });
-    // sprite->SetSize(Vector2{ 100.0f,100.0f });
-    //sprites.push_back(sprite);
-   // sprite->SetBlendMode(BlendMode::Add);
-    sprite->SetAnchorPoint(Vector2{ 0.5f,0.5f });
-
-    //}
-
-
-
-
-
-
-    ModelManager::GetInstance()->LoadModel("plane.obj");
-
-
+    phase_ = Phase::kMain; // とりあえずMainから開始
 }
+
 void TitleScene::Finalize() {
-
-    ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
+    // unique_ptrを使っているので自動解放されますが、
+    // 音声の停止などが必要ならここに書きます
 }
+
 void TitleScene::Update() {
-
-
+    // カメラ更新
+    camera_->Update();
     XINPUT_STATE state;
 
     // 現在のジョイスティックを取得
-    if (Input::GetInstance()->TriggerMouseDown(0))
-    {
-      if (Audio::GetInstance()->IsPlaying(handle_))
-        {
-            Audio::GetInstance()->PauseAudio(handle_);
-      } else
-      {
-          Audio::GetInstance()->ResumeAudio(handle_);
-       
-      }
-    }
+
 
 
     Input::GetInstance()->GetJoyStick(0, state);
-
-    // Aボタンを押していたら
-
-    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
-
-
-
-        // Aボタンを押したときの処理
-
-        if (Audio::GetInstance()->IsPlaying(handle_))
+  if (Input::GetInstance()->GetJoyStick(0, state))
+    {
         {
-            
-            Audio::GetInstance()->StopAudio(handle_);
+            // 左スティックの値を取得
+            float x = (float)state.Gamepad.sThumbLX;
+            float y = (float)state.Gamepad.sThumbLY;
+
+            // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+            float normalizedX = x / 32767.0f;
+            float normalizedY = y / 32767.0f;
+            Vector3 cameraTranslate = camera_->GetTranslate();
+            cameraTranslate = Add(cameraTranslate, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
+            camera_->SetTranslate(cameraTranslate);
         }
-
-        GetSceneManager()->ChangeScene("GameScene");
-
+      
     }
-    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B))
-    {
+    // アニメーション計算 
+    counter_ += 1.0f / 60.0f;
+    counter_ = std::fmod(counter_, kTimeTitleMove);
+    float angle = counter_ / kTimeTitleMove * 2.0f * 3.14159f;
+    
+    // タイトルの浮遊アニメーション
+    Vector3 titlePos = titleObject_->GetTranslate();
+    titlePos.y = std::sin(angle) + 10.0f; 
+    titleObject_->SetTranslate(titlePos);
 
+    // 更新処理
+    skydome_->Update();
+    titleObject_->Update();
+    playerObject_->Update();
+
+
+    // シーン遷移処理
+    // 自作エンジンのInputクラスに合わせて書き換え
+    // 例: Input::GetInstance()->TriggerKey(DIK_SPACE) や TriggerPadButton(...)
+    if (Input::GetInstance()->TriggerPadDown(0,XINPUT_GAMEPAD_A) || 
+        Input::GetInstance()->TriggerKeyDown(DIK_SPACE)) {
+        
+        // シーン切り替え予約
+        SceneManager::GetInstance()->ChangeScene("GameScene");
     }
-
-    //マウスホイールの入力取得
-
-    if (Input::GetInstance()->GetMouseMove().z)
-    {
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ 0.0f,0.0f,static_cast<float>(Input::GetInstance()->GetMouseMove().z) * 0.1f });
-        camera->SetTranslate(camreaTranslate);
-
-    }
-    if (Input::GetInstance()->GetJoyStick(0, state))
-    {
-        // 左スティックの値を取得
-        float x = (float)state.Gamepad.sThumbLX;
-        float y = (float)state.Gamepad.sThumbLY;
-
-        // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
-        float normalizedX = x / 32767.0f;
-        float normalizedY = y / 32767.0f;
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,normalizedY / 60.0f,0.0f });
-        camera->SetTranslate(camreaTranslate);
-    }
-
-    camera->Update();
-
-
-#ifdef USE_IMGUI
-    ImGui::Begin("Debug");
-
-    ImGui::Text("Sprite");
-    Vector2 Position =
-        sprite->GetPosition();
-    ImGui::SliderFloat2("Position", &(Position.x), 0.1f, 1000.0f);
-    sprite->SetPosition(Position);
-
-    ImGui::End();
-#endif // USE_IMGUI
-
-    //sprite->SetRotation(sprite->GetRotation() + 0.1f);
-    sprite->Update();
 }
-void TitleScene::Draw() {
 
-    ParticleManager::GetInstance()->Draw();
-    ///////スプライトの描画
-    sprite->Draw();
+void TitleScene::Draw() {
+    // 描画コマンド発行
+    skydome_->Draw();
+    titleObject_->Draw();
+    playerObject_->Draw();
 }

@@ -68,6 +68,10 @@ public:
     void SetFillMode(FillMode fillMode) {
         fillMode_ = fillMode;
     }
+    void isModelLight(bool light){
+  
+        model_->SetLight(light);
+    }
 
     void SetRadius(float radius) { radius_ = radius; }
 private:

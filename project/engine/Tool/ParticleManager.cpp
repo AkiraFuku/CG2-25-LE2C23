@@ -45,10 +45,15 @@ void ParticleManager::Finalize() {
 
 void ParticleManager::ReleaseParticleGroup(const std::string name)
 {
+  
     particleGroups.erase(name);
 }
 
 void ParticleManager::Update() {
+    if (!camera_) {
+        return;
+    }
+   
     Matrix4x4 backFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
     //ビルボード行列計算
     Matrix4x4 billboardMatrix = Multiply(backFrontMatrix, camera_->GetWorldMatrix());
