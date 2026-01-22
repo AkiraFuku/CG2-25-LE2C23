@@ -17,6 +17,7 @@ class ObstacleFast;
 class ObstacleMax;
 class MapChipField;
 class CourseWall;
+class BubbleFade;
 
 class GameScene : public Scene {
 public:
@@ -70,6 +71,17 @@ private:
   std::unique_ptr<MapChipField> mapChipField_;
   // ブロック用のワールドトランスフォーム
   std::vector<std::vector<Transform *>> worldTransformObjects;
+
+  private:
+  enum class Phase {
+    kFadeIn,  // フェードイン
+    kMain,    // メイン
+    kFadeOut, // フェードアウト
+  };
+
+  Phase phase_ = Phase::kFadeIn;
+
+  std::unique_ptr<BubbleFade> fade_ = nullptr;
 
   //// 自キャラ
   // std::unique_ptr<Player> player_;

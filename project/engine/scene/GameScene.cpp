@@ -12,6 +12,7 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 #include "imgui.h"
+#include"BubbleFade.h"
 
 // コンストラクタ
 GameScene::GameScene() = default;
@@ -76,11 +77,32 @@ void GameScene::Initialize() {
 
   // マップチップデータのセット
   player_->SetMapChipField(mapChipField_.get());
+
+  // Fade作成（FadeがBubbleParticleを生成して管理する）
+  fade_ = std::make_unique<BubbleFade>();
+
+  BubbleFade::Params p;
+  p.fadeOutTime = 1.0f;
+  p.fadeInTime = 0.8f;
+  p.emitPerSec = 380.0f; // 量
+  p.emitBatch = 10;      // 呼び回数を減らす
+  p.emitterBasePos = {0.0f, -2.0f, 0.0f};
+  p.clearOnFadeInStart = true; // FadeIn開始で泡リセットするならtrue
+
+  fade_->Initialize(camera.get(), "resources/uvChecker.png", p);
+  fade_->StartFadeIn();
 }
 
 void GameScene::Finalize() {
 
   ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
+
+    if (fade_) {
+    fade_->Finalize();
+  }
+
+  ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
+  ParticleManager::GetInstance()->Finalize();
 }
 void GameScene::Update() {
   emitter->Update();
@@ -181,6 +203,8 @@ void GameScene::Update() {
 
   // sprite->SetRotation(sprite->GetRotation() + 0.1f);
   sprite->Update();
+
+    fade_->Update();
 }
 void GameScene::Draw() {
   // object3d2->Draw();
@@ -215,6 +239,8 @@ void GameScene::Draw() {
 
   ///////スプライトの描画
   // sprite->Draw();
+
+  fade_->Draw();
 }
 
 void GameScene::CheckAllCollisions() {
