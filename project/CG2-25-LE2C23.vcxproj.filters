@@ -59,6 +59,8 @@
     <ClCompile Include="SceneFactory.cpp" />
     <ClCompile Include="SpeedMeter.cpp" />
     <ClCompile Include="CourseWall.cpp" />
+    <ClCompile Include="BubbleParticle.cpp" />
+    <ClCompile Include="BubbleFade.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractSceneFactory.h" />
@@ -115,6 +117,8 @@
     <ClInclude Include="SceneFactory.h" />
     <ClInclude Include="SpeedMeter.h" />
     <ClInclude Include="CourseWall.h" />
+    <ClInclude Include="BubbleParticle.h" />
+    <ClInclude Include="BubbleFade.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Tool\resources\shaders\Object3d\Object3d.hlsli" />

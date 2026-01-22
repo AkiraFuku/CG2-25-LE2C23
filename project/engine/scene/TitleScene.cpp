@@ -44,11 +44,26 @@ void TitleScene::Initialize() {
 
     ModelManager::GetInstance()->LoadModel("plane.obj");
 
+    // Fade作成（FadeがBubbleParticleを生成して管理する）
+    fade_ = std::make_unique<BubbleFade>();
 
+    BubbleFade::Params p;
+    p.fadeOutTime = 1.0f;
+    p.fadeInTime = 0.8f;
+    p.emitPerSec = 380.0f; // 量
+    p.emitBatch = 10;      // 呼び回数を減らす
+    p.emitterBasePos = {0.0f, -2.0f, 0.0f};
+    p.clearOnFadeInStart = true; // FadeIn開始で泡リセットするならtrue
+
+    fade_->Initialize(camera.get(), "resources/uvChecker.png", p);
 }
 void TitleScene::Finalize() {
+  if (fade_) {
+    fade_->Finalize();
+  }
 
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
+  ParticleManager::GetInstance()->Finalize();
 }
 void TitleScene::Update() {
 
@@ -70,6 +85,27 @@ void TitleScene::Update() {
 
 
     Input::GetInstance()->GetJoyStick(0, state);
+
+    if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE)) {
+      if (!fade_->IsActive()) {
+        requestedSceneChange_ = true;
+        fade_->StartFadeOut();
+      }
+    }
+
+    fade_->Update();
+
+    // 覆い完了したらシーン切替（ここがキモ）
+    if (requestedSceneChange_ && fade_->IsCoverComplete()) {
+      // ここでScene切替
+      GetSceneManager()->ChangeScene("GameScene");
+
+      // ※GameScene側で fade_->StartFadeIn() したいなら、
+      // FadeをSceneManager側に持たせるか、Fadeを共有オブジェクトにすると綺麗。
+      // TitleScene内にFadeがある設計なら、TitleSceneでChangeSceneした瞬間に消えるので
+      // 「フェードインもやりたい」なら Fade を
+      // SceneManager/Framework側に置くのが正解。
+    }
 
     // Aボタンを押していたら
 
@@ -136,7 +172,12 @@ void TitleScene::Update() {
 }
 void TitleScene::Draw() {
 
-    ParticleManager::GetInstance()->Draw();
-    ///////スプライトの描画
-    sprite->Draw();
+    if (fade_) {
+    fade_->Draw();
+  }
+
+
+    //ParticleManager::GetInstance()->Draw();
+    /////////スプライトの描画
+    //sprite->Draw();
 }
