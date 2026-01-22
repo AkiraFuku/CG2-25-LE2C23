@@ -113,7 +113,10 @@ PixelShaderOutput main(VertexShaderOutput input)
     PixelShaderOutput output;
     
     float4 textureColor = gTexture.Sample(gSampler, input.texCoord); // UV変換はVSで行っている前提、または必要ならここで計算
-
+    if (textureColor.a < 0.01f)
+    {
+        discard;
+    }
     // ライティングが無効ならそのまま返す
     if (gMaterial.enableLighting == 0)
     {

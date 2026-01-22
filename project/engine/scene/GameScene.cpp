@@ -12,7 +12,6 @@
 #include "Player.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
-#include "PSOMnager.h"
 #include "LightManager.h"
 #include <numbers>
 #include "imgui.h"
@@ -26,7 +25,7 @@ GameScene::GameScene() = default;
 GameScene::~GameScene()
 {
     // メモリ解放
-    player_.release();
+    player_.reset();
     obstacleFastModel_.clear();
     obstacleFast_.clear();
     obstacleMaxModel_.clear();
@@ -50,12 +49,12 @@ void GameScene::Initialize() {
     ParticleManager::GetInstance()->Setcamera(camera.get());
 
 
-    handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
+    handle_ = Audio::GetInstance()->LoadAudio("resources/津軽三味線合奏.mp3");
 
 
 
     Audio::GetInstance()->PlayAudio(handle_, true);
-
+    LightManager::GetInstance()-> AddDirectionalLight({1.0f,1.0f,1.0f,1.0f},{ 0,-1,0 }, 1.0f);
 
     TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
 
@@ -136,16 +135,22 @@ void GameScene::Finalize() {
 
     LightManager::GetInstance()->ClearLights();
 
+    Audio::GetInstance()->StopAudio(handle_);
+
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
 void GameScene::Update() {
+    if ( player_->IsDead())
+    {
+        Audio::GetInstance()-> PauseAudio(handle_);
+    }
     emitter->Update();
 
-    XINPUT_STATE state;
+   /* XINPUT_STATE state;*/
 
     // 現在のジョイスティックを取得
 
-    Input::GetInstance()->GetJoyStick(0, state);
+    //Input::GetInstance()->GetJoyStick(0, state);
 
     // Aボタンを押していたら
 
@@ -153,9 +158,10 @@ void GameScene::Update() {
 
         // Aボタンを押したときの処理
 
-        GetSceneManager()->ChangeScene("TitleScene");
+       
     }
     if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B)) {
+ GetSceneManager()->ChangeScene("TitleScene");
     }
 
 
@@ -172,19 +178,19 @@ void GameScene::Update() {
     //   camera->SetTranslate(camreaTranslate);
     // }
 
-    if (Input::GetInstance()->GetJoyStick(0, state)) {
-        // 左スティックの値を取得
-        float x = (float)state.Gamepad.sThumbLX;
-        float y = (float)state.Gamepad.sThumbLY;
+    //if (Input::GetInstance()->GetJoyStick(0, state)) {
+    //    // 左スティックの値を取得
+    //    float x = (float)state.Gamepad.sThumbLX;
+    //    float y = (float)state.Gamepad.sThumbLY;
 
-        // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
-        float normalizedX = x / 32767.0f;
-        float normalizedY = y / 32767.0f;
-        Vector3 camreaTranslate = camera->GetTranslate();
-        camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,
-                                                       normalizedY / 60.0f, 0.0f });
-        camera->SetTranslate(camreaTranslate);
-    }
+    //    // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+    //    float normalizedX = x / 32767.0f;
+    //    float normalizedY = y / 32767.0f;
+    //    Vector3 camreaTranslate = camera->GetTranslate();
+    //    camreaTranslate = Add(camreaTranslate, Vector3{ normalizedX / 60.0f,
+    //                                                   normalizedY / 60.0f, 0.0f });
+    //    camera->SetTranslate(camreaTranslate);
+    //}
 
     camera->Update();
     object3d->Update();

@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "GameScene.h"
 #include "ModelManager.h"
-#include "Input.h"
+
 #include "MoveEffect.h"
 #include "DriftEffect.h"
 #include "RotateArrow.h"
@@ -79,6 +79,9 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
 
 void Player::Update()
 {
+
+
+    Input::GetInstance()->GetJoyStick(0, state_);
     if (isGoal_)
     {
         // ゴールしたら動かない
@@ -91,13 +94,11 @@ void Player::Update()
         {
             // プレイヤーの死亡演出
             transform_.rotate = Lerp(transform_.rotate, deadRotate_, kInterpolationRate);
-        }
-        else
+        } else
         {
             deathTimer_--;
         }
-    }
-    else
+    } else
     {
 
         if (gameScene_->IsStarted())
@@ -118,10 +119,9 @@ void Player::Update()
             {
                 // ドリフト中の処理
                 Drift();
-            }
-            else
+            } else
             {
-                if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE))
+                if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE) || Input::GetInstance()->PushPadDown(0, XINPUT_GAMEPAD_A))
                 {
                     // スペースキーを押したらドリフト開始
                     isDriftStart_ = true;
@@ -204,12 +204,28 @@ void Player::Rotate()
     const float kRotSpeed = 0.01f;
 
     // 押した方向で移動ベクトルを変更
-    if (Input::GetInstance()->PushedKeyDown(DIK_A)) {
-        transform_.rotate.y -= kRotSpeed;
-    }
-    else if (Input::GetInstance()->PushedKeyDown(DIK_D)) {
-        transform_.rotate.y += kRotSpeed;
-    }
+
+    if (Input::GetInstance()->PushedKeyDown(DIK_A) || Input::GetInstance()->PushedKeyDown(DIK_D))
+    {
+        if (Input::GetInstance()->PushedKeyDown(DIK_A)) {
+            transform_.rotate.y -= kRotSpeed;
+        } else if (Input::GetInstance()->PushedKeyDown(DIK_D)) {
+            transform_.rotate.y += kRotSpeed;
+        }
+    } else
+
+
+        if (Input::GetInstance()->GetJoyStick(0, state_)) {
+            // 左スティックの値を取得
+            float x = (float)state_.Gamepad.sThumbLX;
+            float y = (float)state_.Gamepad.sThumbLY;
+
+            // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+            float normalizedX = x / 32767.0f;
+            float normalizedY = y / 32767.0f;
+            transform_.rotate.y += kRotSpeed * normalizedX;
+        }
+
 }
 
 void Player::Move()
@@ -255,8 +271,7 @@ void Player::Drift()
             driftTimer_ = 0.0f;
             // 加速エフェクトのアルファ値をリセット
             driftEffect_->ResetAlpha();
-        }
-        else
+        } else
         {
             speedZ_ += kAcceleration;
             // 速度の段階を決定
@@ -264,10 +279,9 @@ void Player::Drift()
 
         }
 
-    }
-    else
+    } else
     {
-        if (Input::GetInstance()->TriggerKeyUp(DIK_SPACE))
+        if (Input::GetInstance()->TriggerKeyUp(DIK_SPACE)|| Input::GetInstance()->TriggerPadUP(0, XINPUT_GAMEPAD_A))
         {
             // スペースキーを離したら加速開始
             isAcceleration_ = true;
@@ -282,8 +296,7 @@ void Player::Drift()
                 topSpeedZ_ = kMaxSpeedZ;
             }
 
-        }
-        else
+        } else
         {
             // 減速
             speedZ_ *= kSpeedDecayRate;
@@ -303,16 +316,13 @@ void Player::DetermineSpeedStage()
     if (speedZ_ < kSlowSpeedZ)
     {
         currentSpeedStage_ = SpeedStage::kSlow;
-    }
-    else if (speedZ_ < kNormalSpeedZ)
+    } else if (speedZ_ < kNormalSpeedZ)
     {
         currentSpeedStage_ = SpeedStage::kNormal;
-    }
-    else if (speedZ_ < kFastSpeedZ)
+    } else if (speedZ_ < kFastSpeedZ)
     {
         currentSpeedStage_ = SpeedStage::kFast;
-    }
-    else
+    } else
     {
         currentSpeedStage_ = SpeedStage::kMax;
     }

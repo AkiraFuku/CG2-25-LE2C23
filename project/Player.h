@@ -6,7 +6,7 @@
 #include "Sprite.h"
 #include "Camera.h"
 #include <memory>
-
+#include "Input.h"
 class ObstacleSlow;
 class ObstacleNormal;
 class ObstacleFast;
@@ -124,6 +124,12 @@ private:
 
     // ゴールしたかどうかのフラグ
     bool isGoal_ = false;
+
+      XINPUT_STATE state_;
+
+    // 現在のジョイスティックを取得
+
+   
 
 public:
     // 初期化
