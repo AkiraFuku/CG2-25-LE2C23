@@ -12,7 +12,7 @@ void SkyDome::Initialize() {
 
 
     // 必要なら大きさを調整
-    object_->SetScale({1000.0f, 1000.0f, 1000.0f});
+    
     object_->SetRadius(1000.0f);
 }
 

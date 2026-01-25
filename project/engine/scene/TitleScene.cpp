@@ -6,10 +6,10 @@
 #include "SceneManager.h"
 #include "ParticleManager.h"//フレームワークに移植
 #include "PSOMnager.h"
-
+#include "LightManager.h"
 void TitleScene::Initialize() {
 
-   
+   LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f);
     // カメラの生成と設定
     camera_ = std::make_unique<Camera>();
     camera_->SetTranslate({0.0f, 0.0f, -10.0f}); // 少し手前に引く
@@ -43,8 +43,7 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Finalize() {
-    // unique_ptrを使っているので自動解放されますが、
-    // 音声の停止などが必要ならここに書きます
+     LightManager::GetInstance()->ClearLights();
 }
 
 void TitleScene::Update() {

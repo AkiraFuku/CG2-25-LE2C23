@@ -18,7 +18,7 @@ void GameScene::Initialize() {
     handle_ = Audio::GetInstance()->LoadAudio("resources/fanfare.mp3");
 
     Audio::GetInstance()->PlayAudio(handle_, true);
-    //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
+    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
     //LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f); // メインライト
     LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
     LightManager::GetInstance()->AddSpotLight({ 1.0f, 1.0f, 1.0f, 1.0f }, { 2.0f, 1.25f, 0.0f }, 4.0f, Normalize({ -1.0f,-1.0f,0.0f }), 7.0f, 2.0f, std::cos(std::numbers::pi_v<float> / 3.0f), 1.0f); // メインライト
