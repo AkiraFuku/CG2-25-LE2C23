@@ -43,6 +43,7 @@ private:
 
     // アニメーション用変数
     float counter_ = 0.0f;
+    float posY_ = 1.7f;
     static inline const float kTimeTitleMove = 2.0f;
 
     Phase phase_ = Phase::kFadeIn;

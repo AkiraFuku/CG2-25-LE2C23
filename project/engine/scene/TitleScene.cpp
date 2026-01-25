@@ -12,7 +12,7 @@ void TitleScene::Initialize() {
    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f);
     // カメラの生成と設定
     camera_ = std::make_unique<Camera>();
-    camera_->SetTranslate({0.0f, 0.0f, -10.0f}); // 少し手前に引く
+    camera_->SetTranslate({0.0f, 1.5f, -10.0f}); // 少し手前に引く
     camera_->SetRotate({0.0f, 0.0f, 0.0f});
     // ParticleManager::GetInstance()->Setcamera(camera_)
 
@@ -27,8 +27,9 @@ void TitleScene::Initialize() {
     titleObject_ = std::make_unique<Object3d>();
     titleObject_->Initialize();
     titleObject_->SetModel("titleFont/titleFont.obj");
-    titleObject_->SetScale({20.0f, 20.0f, 20.0f});
-    titleObject_->SetTranslate({0.0f, 10.0f, 0.0f});
+    titleObject_->SetScale({0.5f, 0.5f, 0.5f});
+    titleObject_->SetTranslate({0.0f, posY_, 9.0f});
+    
 
     // プレイヤー（装飾）
     playerObject_ = std::make_unique<Object3d>();
@@ -79,7 +80,7 @@ void TitleScene::Update() {
     
     // タイトルの浮遊アニメーション
     Vector3 titlePos = titleObject_->GetTranslate();
-    titlePos.y = std::sin(angle) + 10.0f; 
+    titlePos.y = std::sin(angle)+posY_ ; 
     titleObject_->SetTranslate(titlePos);
 
     // 更新処理
