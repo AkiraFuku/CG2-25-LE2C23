@@ -15,6 +15,7 @@ void GameEngine::Initialize() {
    SceneManager::GetInstance()->ChangeScene("TitleScene");
      Fade::GetInstance()->Initialize();
      StageManager::GetInstance()->RoadStage();
+
 };
 void GameEngine::Finalize() {  
     SceneManager::GetInstance()->Finalize();

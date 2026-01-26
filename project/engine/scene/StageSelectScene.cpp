@@ -45,7 +45,7 @@ void StageSelectScene::Initialize() {
     std::unique_ptr<Sprite> spriteReturn = std::make_unique< Sprite>();
     spriteReturn->Initialize("resources/Title.png");
     spriteReturn->SetAnchorPoint({ 5.0f, 5.0f }); // 中心基準
-    spriteReturn->SetSize({ 200.0f,5.0f });
+    spriteReturn->SetSize({ 100.0f,5.0f });
     uiSprites_.push_back(std::move(spriteReturn));
 
     // 4. 選択肢1番～: 「ステージ数字」画像
@@ -185,13 +185,26 @@ void StageSelectScene::Update() {
         uiSprites_[i]->SetPosition(targetPos);
 
         // 演出：選択中のものは不透明(1.0)、それ以外は半透明(0.5)かつ少し小さくする
-        if (i == selectStageNo_) {
-            uiSprites_[i]->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-            uiSprites_[i]->SetSize({ 200.0f, 200.0f }); // 画像本来のサイズに合わせて調整
-        } else {
-            uiSprites_[i]->SetColor({ 0.5f, 0.5f, 0.5f, 1.0f }); // グレーアウト
-            uiSprites_[i]->SetSize({ 150.0f, 150.0f }); // 小さく
+        if (i != 0)
+        {
+            if (i == selectStageNo_) {
+                uiSprites_[i]->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+                uiSprites_[i]->SetSize({ 200.0f, 200.0f }); // 画像本来のサイズに合わせて調整
+            } else {
+                uiSprites_[i]->SetColor({ 0.5f, 0.5f, 0.5f, 1.0f }); // グレーアウト
+                uiSprites_[i]->SetSize({ 150.0f, 150.0f }); // 小さく
+            }
+        } else
+        {
+             if (i == selectStageNo_) {
+                uiSprites_[i]->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+                uiSprites_[i]->SetSize({ 200.0f, 200.0f }); // 画像本来のサイズに合わせて調整
+            } else {
+                uiSprites_[i]->SetColor({ 0.5f, 0.5f, 0.5f, 1.0f }); // グレーアウト
+                uiSprites_[i]->SetSize({ 300.0f, 150.0f }); // 小さく
+            }
         }
+
     }
 
     // カーソルは中央に固定（あるいは選択アイテムの上に表示）

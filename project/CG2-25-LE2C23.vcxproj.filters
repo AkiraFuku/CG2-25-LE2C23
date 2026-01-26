@@ -193,13 +193,13 @@
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="sorth\Fade.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="StageSelectScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="StageManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\StageSelectScene.cpp">
+      <Filter>engine\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -333,13 +333,13 @@
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="sorth\Fade.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="StageSelectScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="StageManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\StageSelectScene.h">
+      <Filter>engine\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
