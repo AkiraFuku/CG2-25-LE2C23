@@ -9,7 +9,7 @@ void SkyDome::Initialize() {
     // モデルのセット (パスは適宜自作エンジンのルールに合わせてください)
     object_->SetModel("skydome/Skydome.obj"); 
 
-
+    object_->isModelLight(false);
 
     // 必要なら大きさを調整
     

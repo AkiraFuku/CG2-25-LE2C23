@@ -60,6 +60,8 @@
     <ClCompile Include="engine\scene\SceneFactory.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="sorth\Fade.cpp" />
+    <ClCompile Include="StageManager.cpp" />
+    <ClCompile Include="StageSelectScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Tool\AbstractSceneFactory.h" />
@@ -106,6 +108,8 @@
     <ClInclude Include="engine\Tool\LightManager.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="sorth\Fade.h" />
+    <ClInclude Include="StageManager.h" />
+    <ClInclude Include="StageSelectScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

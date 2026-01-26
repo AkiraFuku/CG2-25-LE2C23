@@ -10,7 +10,7 @@
 #include "Fade.h"
 void TitleScene::Initialize() {
 
-    LightManager::GetInstance()->AddDirectionalLight({ 1,1,1,1 }, { 0,-1,0 }, 1.0f);
+    LightManager::GetInstance()->AddDirectionalLight({ 1,1,1,1 }, { 0,-1,0 }, 1.5f);
     // カメラの生成と設定
     camera_ = std::make_unique<Camera>();
     camera_->SetTranslate({ 0.0f, 1.5f, -10.0f }); // 少し手前に引く
@@ -73,7 +73,7 @@ void TitleScene::Update() {
     case TitleScene::Phase::kFadeOut:
         Fade::GetInstance()->Update();
         if (Fade::GetInstance()->IsFinished()) {
-            SceneManager::GetInstance()->ChangeScene("GameScene");
+            SceneManager::GetInstance()->ChangeScene("SelectScene");
             // フェードアウトが終わったら、次のシーンへ
         }
         break;

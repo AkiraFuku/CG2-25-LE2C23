@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 #include "Fade.h"
+#include "StageManager.h"
 void GameEngine::Initialize() {
 
    Framework::Initialize();
@@ -13,7 +14,7 @@ void GameEngine::Initialize() {
 
    SceneManager::GetInstance()->ChangeScene("TitleScene");
      Fade::GetInstance()->Initialize();
-
+     StageManager::GetInstance()->RoadStage();
 };
 void GameEngine::Finalize() {  
     SceneManager::GetInstance()->Finalize();
