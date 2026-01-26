@@ -11,8 +11,8 @@
 #include "Scene.h"
 #include <memory>
 
+#include "Skydome.h"
 
-class SkyDome;
 class TitleScene :public Scene
 {
 public:
@@ -21,7 +21,7 @@ public:
 
 		kFadeIn, // フェードイン
 		kMain,   // メイン
-		kGaid, //ゲーム説明
+	
 		kFadeOut, // フェードアウト
 
 	};
@@ -30,6 +30,7 @@ public:
     void Finalize()override;
     void Update()override;
     void Draw()override;
+    ~TitleScene() override;
 private:
   
 

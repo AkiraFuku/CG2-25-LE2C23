@@ -1,23 +1,23 @@
 #include "GameEngine.h"
-
+#include "Fade.h"
 void GameEngine::Initialize() {
 
    Framework::Initialize();
   
-   
+ 
   
    sceneFactory_ = std::make_unique< SceneFactory>();
 
    
    SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
-   
    SceneManager::GetInstance()->ChangeScene("TitleScene");
+     Fade::GetInstance()->Initialize();
 
 };
 void GameEngine::Finalize() {  
     SceneManager::GetInstance()->Finalize();
-   
+    Fade::GetInstance()->Finalize();
     Framework::Finalize();
 };
 void GameEngine::Update() {

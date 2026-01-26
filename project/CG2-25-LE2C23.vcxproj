@@ -59,6 +59,7 @@
     <ClCompile Include="engine\base\PSOMnager.cpp" />
     <ClCompile Include="engine\scene\SceneFactory.cpp" />
     <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="sorth\Fade.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Tool\AbstractSceneFactory.h" />
@@ -104,6 +105,7 @@
     <ClInclude Include="engine\scene\SceneFactory.h" />
     <ClInclude Include="engine\Tool\LightManager.h" />
     <ClInclude Include="Skydome.h" />
+    <ClInclude Include="sorth\Fade.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

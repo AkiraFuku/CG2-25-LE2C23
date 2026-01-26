@@ -42,9 +42,16 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         image
 
     );
-    assert(SUCCEEDED(hr));
-    //ミップマップの生成
     DirectX::ScratchImage mipImages{};
+
+    assert(SUCCEEDED(hr));
+    if (image.GetMetadata().width == 1 && image.GetMetadata().height == 1) {
+        // 元のimageをそのままmipImagesとして扱う（コピーではなく所有権の移動で高速化）
+        mipImages = std::move(image);
+    }
+    else
+    {
+    //ミップマップの生成
     hr = DirectX::GenerateMipMaps(
         image.GetImages(),
         image.GetImageCount(),
@@ -54,7 +61,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
         mipImages
     );
     assert(SUCCEEDED(hr));
-    //テクスチャデータ追加
+    }//テクスチャデータ追加
     TextureData& textureData = textureDates[filePath];
     textureData.metadata = mipImages.GetMetadata();//メタデータ
     textureData.resource = DXCommon::GetInstance()->CreateTextureResourse(textureData.metadata);//テクスチャリソース
