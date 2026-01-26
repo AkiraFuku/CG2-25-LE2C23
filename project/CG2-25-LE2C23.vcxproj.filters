@@ -64,7 +64,7 @@
     <Filter Include="game">
       <UniqueIdentifier>{f76b0b1a-9e8f-4aeb-bd20-7a22e666db50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="engine\Tool\base">
+    <Filter Include="engine\base">
       <UniqueIdentifier>{db6c1153-66bc-4c64-8848-d9474d9029ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -103,19 +103,19 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\WinApp.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\DXCommon.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\D3DResourceLeakChecker.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\Tool\StringUtility.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\Tool\Logger.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\2d\SpriteCommon.cpp">
       <Filter>engine\2d</Filter>
@@ -148,7 +148,7 @@
       <Filter>engine\Tool</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\SrvManager.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\math\DrawFunction.cpp">
       <Filter>engine\math</Filter>
@@ -181,7 +181,7 @@
       <Filter>engine\scene</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\PSOMnager.cpp">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\Tool\LightManager.cpp">
       <Filter>engine\Tool</Filter>
@@ -231,19 +231,19 @@
       <Filter>engine\Input</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\WinApp.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\DXCommon.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\D3DResourceLeakChecker.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\Tool\Logger.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\Tool\StringUtility.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\2d\SpriteCommon.h">
       <Filter>engine\2d</Filter>
@@ -276,7 +276,7 @@
       <Filter>engine\Tool</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\SrvManager.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\math\DrawFunction.h">
       <Filter>engine\math</Filter>
@@ -309,7 +309,7 @@
       <Filter>engine\scene</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\PSOMnager.h">
-      <Filter>engine\Tool\base</Filter>
+      <Filter>engine\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\Tool\LightManager.h">
       <Filter>engine\Tool</Filter>

@@ -7,6 +7,7 @@
 #include "ParticleManager.h"//フレームワークに移植
 #include "PSOMnager.h"
 #include "LightManager.h"
+#include "Skydome.h"
 void TitleScene::Initialize() {
 
    LightManager::GetInstance()->AddDirectionalLight( { 1,1,1,1 }, { 0,-1,0 }, 1.0f);

@@ -11,7 +11,8 @@
 #include "Scene.h"
 #include <memory>
 
-#include "Skydome.h"
+
+class SkyDome;
 class TitleScene :public Scene
 {
 public:
