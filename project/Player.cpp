@@ -39,7 +39,7 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
     {
         // モデルを生成してリストに追加
         auto model = std::make_unique<Object3d>();
-        model->SetModel("cube.obj");
+        model->SetModel("マグロ.obj");
         model->Initialize();
         moveEffectModels_.push_back(std::move(model));
         // エフェクト本体を生成してリストに追加

@@ -25,7 +25,7 @@ GameScene::GameScene() = default;
 GameScene::~GameScene()
 {
     // メモリ解放
-    player_.reset();
+    //player_.release();
     obstacleFastModel_.clear();
     obstacleFast_.clear();
     obstacleMaxModel_.clear();
