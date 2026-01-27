@@ -50,6 +50,10 @@ public:
   };
 
 public:
+  bool IsEmpty() const { return particles_.empty(); }
+  uint32_t GetAliveCount() const {
+    return static_cast<uint32_t>(particles_.size());
+  }
 
   static BubbleParticle *GetInstance();
   static void Shutdown();

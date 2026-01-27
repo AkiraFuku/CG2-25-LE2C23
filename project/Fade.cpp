@@ -217,9 +217,9 @@ void Fade::Update() {
   // 黒が1になったら泡生成停止＆covering/finished
   //==================================================
   case Phase::kFadeOut: {
-    // 泡：黒が1になるまで出す（止めたくなったらstopEmit_）
+
+    // 泡：黒が1になるまで出す（stopEmit_フラグで制御）
     if (!stopEmit_) {
-      // 0..1（delay前は0、delay後に徐々に増える）を強度として使う
       float intensity01 = 0.0f;
       if (timer_ > fadeOutDelay_) {
         float tt = (timer_ - fadeOutDelay_) / fadeOutTime_;
@@ -228,7 +228,7 @@ void Fade::Update() {
       EmitBubblesOut_(intensity01);
     }
 
-    // 黒：delay中は0固定、その後0->1
+    // 黒：delay中は0、その後0->1
     if (timer_ < fadeOutDelay_) {
       SetOverlayAlpha_(0.0f);
     } else {
@@ -236,12 +236,17 @@ void Fade::Update() {
           std::clamp((timer_ - fadeOutDelay_) / fadeOutTime_, 0.0f, 1.0f);
       SetOverlayAlpha_(tt);
 
+      // 黒板が完全に画面を覆った (alpha >= 1.0)
       if (tt >= 1.0f) {
-        // 黒が完全に1になった → 泡生成停止
-        stopEmit_ = true;
-        covering_ = true;
-        finished_ = true;
-        phase_ = Phase::kIdle;
+        stopEmit_ = true; // 新規生成を停止
+         // 画面は隠れている状態とする
+
+        // ★ここが重要：泡がリストから完全になくなるまで待機
+        if (bubble_->IsEmpty()) {
+          finished_ = true;
+          covering_ = true;
+          phase_ = Phase::kIdle;
+        }
       }
     }
     break;

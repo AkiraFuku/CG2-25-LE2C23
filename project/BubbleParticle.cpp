@@ -90,13 +90,11 @@ void BubbleParticle::Update() {
     return;
   }
 
-  // billboard
+  // ビルボード行列計算などはそのまま
   Matrix4x4 backFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
   Matrix4x4 billboardMatrix =
       Multiply(backFrontMatrix, camera_->GetWorldMatrix());
-  billboardMatrix.m[3][0] = 0.0f;
-  billboardMatrix.m[3][1] = 0.0f;
-  billboardMatrix.m[3][2] = 0.0f;
+  // ... (省略) ...
 
   Matrix4x4 viewMatrix = camera_->GetViewMatrix();
   Matrix4x4 projectionMatrix = camera_->GetProjectionMatrix();
@@ -106,26 +104,56 @@ void BubbleParticle::Update() {
 
   for (auto it = particles_.begin(); it != particles_.end();) {
 
+    // 1. 寿命チェック（既存）
     if (it->lifeTime <= it->currentTime) {
       it = particles_.erase(it);
       continue;
     }
 
-    // 泡っぽい：ゆっくり上昇 + ちょい横揺れ
-    // accel は Emit で入れてる（上向き弱加速 & ゆらぎ）
+    // 移動更新
     it->velocity += it->accel * DXCommon::kDeltaTime;
     it->transfom.translate += it->velocity * DXCommon::kDeltaTime;
-
     it->transfom.rotate.z += it->angularVelocityZ * DXCommon::kDeltaTime;
-
     it->currentTime += DXCommon::kDeltaTime;
 
+    // ---------------------------------------------------------
+    // ★追加: 画面外判定 (NDC座標変換)
+    // ---------------------------------------------------------
+    // ワールド座標
+    Vector3 pos = it->transfom.translate;
+    // ビュープロジェクション変換 (w成分も計算)
+    float clipX = pos.x * viewProjectionMatrix.m[0][0] +
+                  pos.y * viewProjectionMatrix.m[1][0] +
+                  pos.z * viewProjectionMatrix.m[2][0] +
+                  viewProjectionMatrix.m[3][0];
+    float clipY = pos.x * viewProjectionMatrix.m[0][1] +
+                  pos.y * viewProjectionMatrix.m[1][1] +
+                  pos.z * viewProjectionMatrix.m[2][1] +
+                  viewProjectionMatrix.m[3][1];
+    float clipW = pos.x * viewProjectionMatrix.m[0][3] +
+                  pos.y * viewProjectionMatrix.m[1][3] +
+                  pos.z * viewProjectionMatrix.m[2][3] +
+                  viewProjectionMatrix.m[3][3];
+
+    // ゼロ除算対策と画面外判定
+    if (clipW > 0.0001f) {
+      float ndcY = clipY / clipW;
+
+      // 画面上端(1.0)より少し上(+0.2fなどのマージン)に行ったら消す
+      // これにより、Fade側で IsEmpty() が早くtrueになる
+      if (ndcY > 1.2f) {
+        it = particles_.erase(it);
+        continue;
+      }
+    }
+    // ---------------------------------------------------------
+
     float t = (it->currentTime / it->lifeTime);
-    float alpha = 1.0f - t; // 寿命でフェードアウト
+    float alpha = 1.0f - t;
     alpha = std::clamp(alpha, 0.0f, 1.0f);
 
     if (numInstance_ < kMaxNumInstance_) {
-      // billboard world
+      // ... インスタンシングデータの登録 (既存のまま) ...
       Matrix4x4 worldMatrix =
           MakeBillboardMatrix(it->transfom.scale, it->transfom.rotate,
                               billboardMatrix, it->transfom.translate);
@@ -134,10 +162,8 @@ void BubbleParticle::Update() {
           Multiply(worldMatrix, viewProjectionMatrix);
       instancingData_[numInstance_].World = worldMatrix;
 
-      instancingData_[numInstance_].color.x = it->color.x;
-      instancingData_[numInstance_].color.y = it->color.y;
-      instancingData_[numInstance_].color.z = it->color.z;
-      instancingData_[numInstance_].color.w = alpha;
+      instancingData_[numInstance_].color = it->color;
+      instancingData_[numInstance_].color.w = alpha; // Alpha更新
 
       ++numInstance_;
     }
@@ -145,7 +171,6 @@ void BubbleParticle::Update() {
     ++it;
   }
 }
-
 void BubbleParticle::Draw() {
   if (numInstance_ == 0) {
     return;
@@ -189,7 +214,7 @@ void BubbleParticle::Emit(const Vector3 &position, uint32_t count) {
   std::uniform_real_distribution<float> az(-0.08f, 0.08f);
 
   std::uniform_real_distribution<float> life(0.8f, 2.5f);
-  std::uniform_real_distribution<float> scale(0.15f, 0.45f);
+  std::uniform_real_distribution<float> scale(0.1f, 0.25f);
   std::uniform_real_distribution<float> ang(-2.5f, 2.5f);
 
   for (uint32_t i = 0; i < count; ++i) {
