@@ -23,6 +23,7 @@ class Goal;
 
 class CourseWall;
 
+#include"Fade.h"
 
 class GameScene : public Scene {
 public:
@@ -92,6 +93,8 @@ private:
     // ブロック用のワールドトランスフォーム
     std::vector<std::vector<Transform*>> worldTransformObjects;
 
-
+// メンバ
+    std::unique_ptr<Fade> fade_;
+    bool requestSceneChange_ = false;
 
 };

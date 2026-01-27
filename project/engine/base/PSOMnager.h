@@ -21,24 +21,40 @@ enum class FillMode {
     kSolid,     // 塗りつぶし
     kWireFrame  // ワイヤーフレーム
 };
+
+// 深度モード（追加）
+enum class DepthMode {
+  Default, // 今まで通り（typeごとの設定に従う）
+  NoDepth, // DepthEnable=false, WriteMask=ZERO
+  NoWrite, // DepthEnable=true,  WriteMask=ZERO（深度テストはする）
+};
+
+
 // PSO取得用キー
 struct PsoProperty {
     PipelineType type;
     BlendMode blendMode=BlendMode::None;
     FillMode fillMode=FillMode::kSolid;
+    DepthMode depthMode = DepthMode::Default; // ★追加
 
     bool operator==(const PsoProperty& other) const {
-        return type == other.type && blendMode == other.blendMode;
+      return type == other.type && blendMode == other.blendMode &&
+      depthMode == other.depthMode; // ★追加
     }
 };
 
 // ハッシュ関数
 struct PsoPropertyHasher {
-    std::size_t operator()(const PsoProperty& p) const {
-        return std::hash<int>()(static_cast<int>(p.type)) ^
-            (std::hash<int>()(static_cast<int>(p.blendMode)) << 1);
-    }
+  std::size_t operator()(const PsoProperty &p) const {
+    size_t h1 = std::hash<int>()(static_cast<int>(p.type));
+    size_t h2 = std::hash<int>()(static_cast<int>(p.blendMode));
+    size_t h3 = std::hash<int>()(static_cast<int>(p.fillMode));
+    size_t h4 = std::hash<int>()(static_cast<int>(p.depthMode));
+    // ざっくり合成
+    return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+  }
 };
+
 
 // PSOセット（RootSig + PSO）
 struct PsoSet {

@@ -12,7 +12,6 @@
 #include "Player.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
-#include "PSOMnager.h"
 #include "LightManager.h"
 #include <numbers>
 #include "imgui.h"
@@ -26,7 +25,7 @@ GameScene::GameScene() = default;
 GameScene::~GameScene()
 {
     // メモリ解放
-    player_.release();
+    player_.reset();
     obstacleFastModel_.clear();
     obstacleFast_.clear();
     obstacleMaxModel_.clear();
@@ -44,7 +43,7 @@ void GameScene::Initialize() {
     camera = std::make_unique<Camera>();
     camera->SetRotate({ 0.3f, 0.0f, 0.0f });
 
-    camera->SetTranslate({ 0.0f, 0.0f, 0.0f });
+    camera->SetTranslate({ 0.0f, 0.0f, -5.0f });
 
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
@@ -129,7 +128,9 @@ void GameScene::Initialize() {
 
     bitmappedFont_->Initialize(bitmappedFontSprite_, camera.get());
 
-
+    fade_ = std::make_unique<Fade>();
+    fade_->Initialize(camera.get());
+    fade_->Start(Fade::Phase::kFadeIn);
 }
 
 void GameScene::Finalize() {
@@ -139,6 +140,7 @@ void GameScene::Finalize() {
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
 void GameScene::Update() {
+
     emitter->Update();
 
     XINPUT_STATE state;
@@ -226,6 +228,8 @@ void GameScene::Update() {
 
     // 当たり判定
     CheckAllCollisions();
+
+    fade_->Update();
 
 #ifdef USE_IMGUI
     ImGui::Begin("Debug");
@@ -367,9 +371,9 @@ void GameScene::Update() {
 
 
 void GameScene::Draw() {
-    // object3d2->Draw();
-    // object3d->Draw();
-    // ParticleManager::GetInstance()->Draw();
+     object3d2->Draw();
+     object3d->Draw();
+     ParticleManager::GetInstance()->Draw();
 
 
     if (!isStarted_)
@@ -411,6 +415,8 @@ void GameScene::Draw() {
         goal->Draw();
 
     }
+
+     fade_->Draw();
 
     ///////スプライトの描画
     // sprite->Draw();
