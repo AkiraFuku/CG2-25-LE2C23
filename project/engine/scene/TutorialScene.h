@@ -91,10 +91,19 @@ private:
   std::unique_ptr<Fade> fade_;
   bool requestSceneChange_ = false;
 
+  public:
+  enum class SceneState {
+    kFadeIn, // フェードイン中（開始時・リセット時）
+    kMain,   // メイン処理中（プレイ可能）
+    kFadeOut // フェードアウト中（シーン遷移・リセット前）
+  };
+
+  SceneState sceneState_ = SceneState::kFadeIn;
+
 public:
   enum class TutorialPhase {
     kMovement, // WASD移動
-    kDecel,    // SPACE減速
+    kDrift,    // SPACE減速
     kAttack,   // 障害物破壊
     kComplete  // チュートリアル完了
   };
@@ -102,7 +111,7 @@ public:
   TutorialPhase currentPhase_ = TutorialPhase::kMovement;
   int destroyedObstaclesCount_ = 0;      // 破壊した障害物の数
   const int kTargetDestroyCount_ = 3;    // クリアに必要な破壊数
-  const float kTargetDecelSpeed_ = 0.5f; // クリアとみなす減速速度
+  const float kTargetDriftSpeed_ = 0.3f;
 
   bool isPhaseCleared_ = false; // クリア状態か？
   int waitTimer_ = 0;           // 待機タイマー
@@ -110,4 +119,15 @@ public:
 
   // ★追加: チュートリアル進行更新用関数
   void UpdateTutorialSteps();
+
+  void ResetTutorialState();
+
+  public:
+  enum class CompleteOption {
+    kRetry,      // 最初からやり直す
+    kGoToGame,   // ゲームシーンへ
+    kBackToTitle // タイトルへ
+  };
+
+  CompleteOption currentOption_ = CompleteOption::kGoToGame;
 };

@@ -158,6 +158,9 @@ public:
     void OnCollision(const CourseWall* courseWall);
     // デスフラグを取得
     bool IsDead() const { return isDead_; }
+    bool IsDeathAnimationFinished() const {
+      return isDead_ && deathTimer_ <= 0.0f;
+    }
     // ゴールフラグを取得
     bool IsGoal() const { return isGoal_; }
     // マップチップフィールドのセット

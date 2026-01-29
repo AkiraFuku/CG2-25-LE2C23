@@ -109,6 +109,7 @@ void TutorialScene::Initialize() {
 
   fade_ = std::make_unique<Fade>();
   fade_->Initialize(camera.get());
+  sceneState_ = SceneState::kFadeIn;
   fade_->Start(Fade::Phase::kFadeIn);
 }
 
@@ -120,37 +121,9 @@ void TutorialScene::Finalize() {
 }
 void TutorialScene::Update() {
 
-  emitter->Update();
-
-  XINPUT_STATE state;
-
-  // 現在のジョイスティックを取得
-
-  Input::GetInstance()->GetJoyStick(0, state);
-
-  // Aボタンを押していたら
-
-  if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
-
-    // Aボタンを押したときの処理
-
-    GetSceneManager()->ChangeScene("TitleScene");
-  }
-  if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B)) {
-  }
-
-  if (Input::GetInstance()->GetJoyStick(0, state)) {
-    // 左スティックの値を取得
-    float x = (float)state.Gamepad.sThumbLX;
-    float y = (float)state.Gamepad.sThumbLY;
-
-    // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
-    float normalizedX = x / 32767.0f;
-    float normalizedY = y / 32767.0f;
-    Vector3 camreaTranslate = camera->GetTranslate();
-    camreaTranslate = Add(camreaTranslate, Vector3{normalizedX / 60.0f,
-                                                   normalizedY / 60.0f, 0.0f});
-    camera->SetTranslate(camreaTranslate);
+  // 常にフェードの更新は行う
+  if (fade_) {
+    fade_->Update();
   }
 
   camera->Update();
@@ -186,63 +159,187 @@ void TutorialScene::Update() {
     goal->Update();
   }
 
-  // 当たり判定
-  CheckAllCollisions();
+  // シーンの状態によって処理を分ける
+  switch (sceneState_) {
 
-  // チュートリアルの更新
-  UpdateTutorialSteps();
-
-  auto CheckAndRemove = [&](auto &container) {
-    size_t prevSize = container.size();
-    container.erase(
-        std::remove_if(container.begin(), container.end(),
-                       [](const auto &obj) { return obj->IsScoreNone(); }),
-        container.end());
-
-    // 減った分だけカウントアップ (攻撃フェーズのみ)
-    if (currentPhase_ == TutorialPhase::kAttack) {
-      destroyedObstaclesCount_ += static_cast<int>(prevSize - container.size());
+  //---------------------------------------------------------
+  // 1. フェードイン中
+  //---------------------------------------------------------
+  case SceneState::kFadeIn:
+    // フェードインが終わったらメイン状態へ
+    if (fade_->IsFinished()) {
+      sceneState_ = SceneState::kMain;
     }
-  };
+    // ※ここでは入力を受け付けないため、returnしたり、下の処理をelseで囲ったりする
+    break;
 
-  CheckAndRemove(obstacleSlow_);
-  CheckAndRemove(obstacleNormal_);
-  CheckAndRemove(obstacleFast_);
-  CheckAndRemove(obstacleMax_);
+  //---------------------------------------------------------
+  // 2. メイン（プレイ可能状態）
+  //---------------------------------------------------------
+  case SceneState::kMain: {
 
-  fade_->Update();
+    if (!isStarted_) {
+      isStarted_ = true;
+    }
 
-  // Update内のImGui部分
+    emitter->Update();
+
+    XINPUT_STATE state;
+
+    // 現在のジョイスティックを取得
+
+    Input::GetInstance()->GetJoyStick(0, state);
+
+    // Aボタンを押していたら
+
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
+
+      // Aボタンを押したときの処理
+
+      GetSceneManager()->ChangeScene("TitleScene");
+    }
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B)) {
+    }
+
+    if (Input::GetInstance()->GetJoyStick(0, state)) {
+      // 左スティックの値を取得
+      float x = (float)state.Gamepad.sThumbLX;
+      float y = (float)state.Gamepad.sThumbLY;
+
+      // 数値が大きいので正規化（-1.0 ～ 1.0）して使うのが一般的
+      float normalizedX = x / 32767.0f;
+      float normalizedY = y / 32767.0f;
+      Vector3 camreaTranslate = camera->GetTranslate();
+      camreaTranslate =
+          Add(camreaTranslate,
+              Vector3{normalizedX / 60.0f, normalizedY / 60.0f, 0.0f});
+      camera->SetTranslate(camreaTranslate);
+    }
+
+    if (player_->IsDead()) {
+      if (player_->IsDeathAnimationFinished()) {
+        ResetTutorialState();
+      }
+      // 死んでいる間は操作などを行わないよう break
+      break;
+    }
+
+    // 当たり判定
+    CheckAllCollisions();
+
+    // チュートリアルの更新
+    UpdateTutorialSteps();
+
+    auto CheckAndRemove = [&](auto &container) {
+      size_t prevSize = container.size();
+      container.erase(
+          std::remove_if(container.begin(), container.end(),
+                         [](const auto &obj) { return obj->IsScoreNone(); }),
+          container.end());
+
+      // 減った分だけカウントアップ (攻撃フェーズのみ)
+      if (currentPhase_ == TutorialPhase::kAttack) {
+        destroyedObstaclesCount_ +=
+            static_cast<int>(prevSize - container.size());
+      }
+    };
+
+    CheckAndRemove(obstacleSlow_);
+    CheckAndRemove(obstacleNormal_);
+    CheckAndRemove(obstacleFast_);
+    CheckAndRemove(obstacleMax_);
+
+    break;
+  }
+
+  //---------------------------------------------------------
+  // 3. フェードアウト中
+  //---------------------------------------------------------
+  case SceneState::kFadeOut:
+    // フェードアウトが完了したら、次のアクションを実行
+    if (fade_->IsFinished()) {
+      switch (currentOption_) {
+      case CompleteOption::kRetry:
+        // リトライ処理
+        ResetTutorialState();               // 状態リセット
+        currentPhase_ = TutorialPhase::kMovement;
+        sceneState_ = SceneState::kFadeIn;  // 状態をフェードインへ
+        fade_->SetCamera(camera.get());
+        fade_->Start(Fade::Phase::kFadeIn); // フェードイン開始
+        break;
+
+      case CompleteOption::kGoToGame:
+        GetSceneManager()->ChangeScene("GameScene");
+        break;
+
+      case CompleteOption::kBackToTitle:
+        GetSceneManager()->ChangeScene("TitleScene");
+        break;
+      }
+    }
+    break;
+  }
 
 #ifdef USE_IMGUI
   ImGui::Begin("Tutorial");
 
-  // ★変更: フェーズ情報の表示
   const char *phaseStr = "";
   if (isPhaseCleared_) {
-    // 待機中は「CLEARED!」と表示
     phaseStr = "--- CLEARED! ---";
   } else {
     switch (currentPhase_) {
     case TutorialPhase::kMovement:
       phaseStr = "Step 1: WASD to Move";
       break;
-    case TutorialPhase::kDecel:
+    case TutorialPhase::kDrift:
       phaseStr = "Step 2: SPACE to Brake";
       break;
     case TutorialPhase::kAttack:
       phaseStr = "Step 3: Destroy 3 Obstacles";
       break;
+
+    // ★変更: 完了画面での表示
     case TutorialPhase::kComplete:
-      phaseStr = "Tutorial Complete! Press A/SPACE";
+      phaseStr = "Tutorial Complete!";
+
+      ImGui::Text("Select Option (W/S or UP/DOWN):");
+      ImGui::Separator();
+
+      // Retry
+      if (currentOption_ == CompleteOption::kRetry) {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1),
+                           "> Retry Tutorial"); // 黄色で強調
+      } else {
+        ImGui::Text("  Retry Tutorial");
+      }
+
+      // Go to Game
+      if (currentOption_ == CompleteOption::kGoToGame) {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "> Start Game");
+      } else {
+        ImGui::Text("  Start Game");
+      }
+
+      // Back to Title
+      if (currentOption_ == CompleteOption::kBackToTitle) {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "> Back to Title");
+      } else {
+        ImGui::Text("  Back to Title");
+      }
+
+      ImGui::Separator();
+      ImGui::Text("Press SPACE / A to Confirm");
       break;
     }
   }
 
-  ImGui::Text("Tutorial Phase: %s", phaseStr);
+  // 完了画面以外では今まで通りのフェーズテキストを表示
+  if (currentPhase_ != TutorialPhase::kComplete) {
+    ImGui::Text("Tutorial Phase: %s", phaseStr);
+  }
 
   ImGui::End();
-  // 以下略...
+// ...
 #endif
 
 #ifdef USE_IMGUI
@@ -754,16 +851,16 @@ void TutorialScene::UpdateTutorialSteps() {
       // 現在のフェーズに応じて次のフェーズへ遷移
       switch (currentPhase_) {
       case TutorialPhase::kMovement:
-        currentPhase_ = TutorialPhase::kAttack;
+        currentPhase_ = TutorialPhase::kDrift;
         break;
 
-      case TutorialPhase::kDecel:
-        currentPhase_ = TutorialPhase::kComplete;
-        destroyedObstaclesCount_ = 0; // カウントリセット
+      case TutorialPhase::kDrift:
+        currentPhase_ = TutorialPhase::kAttack;
+        destroyedObstaclesCount_ = 0;
         break;
 
       case TutorialPhase::kAttack:
-        currentPhase_ = TutorialPhase::kDecel;
+        currentPhase_ = TutorialPhase::kComplete;
         break;
 
       default:
@@ -789,14 +886,17 @@ void TutorialScene::UpdateTutorialSteps() {
     }
     break;
 
-  case TutorialPhase::kDecel:
-    if (Input::GetInstance()->PushedKeyDown(DIK_SPACE)) {
+  case TutorialPhase::kDrift:
+    // Playerクラスの実装では、SPACEを押して旋回し、離した瞬間に加速します。
+    // そのため、「現在の速度が目標速度を超えたら」クリアとします。
+    // (通常移動だけでは到達しにくい速度を設定しておくと確実です)
+    {
       float currentSpeed = player_->GetSpeedZ();
-      if (currentSpeed <= kTargetDecelSpeed_) {
+      if (currentSpeed >= kTargetDriftSpeed_) {
         // クリアフラグを立てる
         isPhaseCleared_ = true;
         waitTimer_ = kPhaseWaitTime_;
-        printf("Brake Cleared! Wait for next...\n");
+        printf("Drift Boost Cleared! Wait for next...\n");
       }
     }
     break;
@@ -811,10 +911,77 @@ void TutorialScene::UpdateTutorialSteps() {
     break;
 
   case TutorialPhase::kComplete:
+    // --- 完了画面での選択処理 ---
+
+      isStarted_ = false;
+
+    // 上入力 (選択肢を上に移動)
+    // ※ Aボタン判定を削除し、TriggerPadUpなどに変更
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A) ||
+        Input::GetInstance()->TriggerKeyDown(DIK_W) ||
+        Input::GetInstance()->TriggerKeyDown(DIK_UP)) {
+
+      if (currentOption_ == CompleteOption::kGoToGame) {
+        currentOption_ = CompleteOption::kRetry;
+      } else if (currentOption_ == CompleteOption::kBackToTitle) {
+        currentOption_ = CompleteOption::kGoToGame;
+      }
+    }
+
+    // 下入力 (選択肢を下に移動)
+    // ※ Aボタン判定を削除し、TriggerPadDownなどに変更
+    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A) ||
+        Input::GetInstance()->TriggerKeyDown(DIK_S) ||
+        Input::GetInstance()->TriggerKeyDown(DIK_DOWN)) {
+
+      if (currentOption_ == CompleteOption::kRetry) {
+        currentOption_ = CompleteOption::kGoToGame;
+      } else if (currentOption_ == CompleteOption::kGoToGame) {
+        currentOption_ = CompleteOption::kBackToTitle;
+      }
+    }
+
+    // 決定入力 (Aボタン or SPACE)
     if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A) ||
         Input::GetInstance()->TriggerKeyDown(DIK_SPACE)) {
-      GetSceneManager()->ChangeScene("TitleScene");
+
+      // ここでフェードアウトを開始
+      sceneState_ = SceneState::kFadeOut;
+      fade_->Start(Fade::Phase::kFadeOut);
     }
     break;
   }
+}
+
+void TutorialScene::ResetTutorialState() {
+  // 1. プレイヤーとモデルを削除
+  player_.reset();
+  playerModel_.reset();
+
+  // 2. 障害物リストとモデルリストをクリア
+  obstacleSlow_.clear();
+  obstacleNormal_.clear();
+  obstacleFast_.clear();
+  obstacleMax_.clear();
+
+  obstacleSlowModel_.clear();
+  obstacleNormalModel_.clear();
+  obstacleFastModel_.clear();
+  obstacleMaxModel_.clear();
+
+  // 3. 壁とゴールのリストもクリア
+  walls_.clear();
+  wallModels_.clear();
+  goals_.clear();
+  goalModels_.clear();
+
+  // ◎ フェーズ内の「達成状況」だけリセットします
+  isPhaseCleared_ = false;      // クリア済みフラグを下ろす
+  waitTimer_ = 0;               // 演出用タイマーリセット
+  destroyedObstaclesCount_ = 0; // 破壊カウントを0に戻す（Attackフェーズ用）
+
+  // ---------------------------------------------------
+
+  // 4. マップ上のオブジェクトを再生成
+  GenerateFieldObjects();
 }

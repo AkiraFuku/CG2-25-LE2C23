@@ -28,6 +28,8 @@ public:
   bool IsFinished() const { return finished_; }
   bool IsCovering() const { return covering_; }
 
+  void SetCamera(Camera *camera) { camera_ = camera; }
+
 private:
   Phase phase_ = Phase::kIdle;
 
