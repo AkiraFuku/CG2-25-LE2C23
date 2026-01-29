@@ -128,25 +128,37 @@ void GameScene::Initialize() {
 
     // ビットマップフォントの生成と初期化
     bitmappedFont_ = std::make_unique<Bitmappedfont>();
-    // ビットマップフォントのスプライト
+
+    // 【修正】ベクターをクリアしておく
+    bitmappedFontSprites_.clear();
+
+    // ビットマップフォントのスプライト読み込み (0～9番)
     for (int i = 0; i < 10; ++i) {
-        // ファイル名の作成
-        //std::string filePath = "Resources/number" + std::to_string(i) + ".png";
-        // 仮置き画像
-        std::string filePath = "resources/uvChecker.png";
+      // 画像ファイル名の作成 (数字に対応した画像を読み込む場合)
+      // 実在するパスに合わせて修正してください。例: "resources/number0.png"
+      // std::string filePath = "resources/number" + std::to_string(i) + ".png";
 
-        // スプライトのインスタンスを作成
-        auto sprite = std::make_unique<Sprite>();
+      std::string path = "resources/numbers/" + std::to_string(i) + ".png";
 
-        // スプライトの初期化
-        sprite->Initialize(filePath.c_str());
-        sprite->SetPosition(Vector2{ 400.0f, 100.0f });
+      // TextureManagerでロード（2回呼んでも内部で同じ画像データが使い回されるので無駄はありません）
+      TextureManager::GetInstance()->LoadTexture(path);
 
-        // 対応するインデックスの vector に追加
-        bitmappedFontSprite_[i].push_back(std::move(sprite));
+      // スプライトのインスタンスを作成
+      auto sprite = std::make_unique<Sprite>();
+
+      // スプライトの初期化
+      sprite->Initialize(path);
+
+      // ★重要: 数字を表示したい位置に設定 (画面中央など)
+      sprite->SetPosition(Vector2{640.0f, 360.0f});
+      sprite->SetAnchorPoint({0.5f, 0.5f}); // 中心基準にしておくと配置しやすい
+
+      // 【修正】単一の vector に追加していく
+      bitmappedFontSprites_.push_back(std::move(sprite));
     }
 
-    bitmappedFont_->Initialize(bitmappedFontSprite_, camera.get());
+    // 【修正】ベクターのアドレスを渡す
+    bitmappedFont_->Initialize(&bitmappedFontSprites_, camera.get());
 
     fade_ = std::make_unique<Fade>();
     fade_->Initialize(camera.get());
@@ -331,9 +343,21 @@ void GameScene::Update() {
         }
         else
         {
-            countdownTimer_--;
-            bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
-            bitmappedFont_->Update();
+          countdownTimer_--;
+
+          // 【修正】残り時間から表示すべき数字(インデックス)を計算
+          // 180~121 -> 3, 120~61 -> 2, 60~1 -> 1 となる計算式
+          // (timer + 59) / 60 で切り上げ計算になります
+          int displayNum = (countdownTimer_ + 59) / 60;
+
+          // 0以下にならないように、また画像範囲外にならないように制御
+          if (displayNum < 0)
+            displayNum = 0;
+          if (displayNum > 9)
+            displayNum = 9;
+
+          bitmappedFont_->SetNumber(displayNum);
+          bitmappedFont_->Update();
         }
     }
 

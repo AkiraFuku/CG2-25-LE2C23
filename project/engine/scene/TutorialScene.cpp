@@ -2,6 +2,7 @@
 #include "CourseWall.h"
 #include "Input.h"
 
+#include "Bitmappedfont.h"
 #include "Goal.h"
 #include "LightManager.h"
 #include "MapChipField.h"
@@ -15,6 +16,7 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 #include "imgui.h"
+
 #include <numbers>
 
 // コンストラクタ
@@ -93,7 +95,7 @@ void TutorialScene::Initialize() {
 
   // マップチップフィールドの初期化
   mapChipField_ = std::make_unique<MapChipField>();
-  mapChipField_->LoadMapChipCsv("resources/mapchip.csv");
+  mapChipField_->LoadMapChipCsv("resources/stage2.csv");
 
   // マップチップの生成
   GenerateFieldObjects();
@@ -112,28 +114,28 @@ void TutorialScene::Initialize() {
   moveText_->Initialize("resources/tutorial/move.png"); // ※画像パスは要確認
   moveText_->SetAnchorPoint({0.5f, 0.0f});
   moveText_->SetSize({460.0f, 160.0f});
-  moveText_->SetPosition({640.0f, 200.0f}); // 仮の初期位置
+  moveText_->SetPosition({640.0f, 100.0f}); // 仮の初期位置
 
   // 3. clearedText_
   clearedText_ = std::make_unique<Sprite>();
   clearedText_->Initialize("resources/tutorial/cleared.png");
   clearedText_->SetAnchorPoint({0.5f, 0.0f});
   clearedText_->SetSize({460.0f, 64.0f});
-  clearedText_->SetPosition({640.0f, 200});
+  clearedText_->SetPosition({640.0f, 100.0f});
 
   // 4. destroyNumText_
   destroyNumText_ = std::make_unique<Sprite>();
   destroyNumText_->Initialize("resources/tutorial/destroyNum.png");
   destroyNumText_->SetAnchorPoint({0.5f, 0.0f});
   destroyNumText_->SetSize({460.0f, 160.0f});
-  destroyNumText_->SetPosition({640.0f, 200.0f});
+  destroyNumText_->SetPosition({640.0f, 100.0f});
 
   // 5. driftText_
   driftText_ = std::make_unique<Sprite>();
   driftText_->Initialize("resources/tutorial/drift.png");
   driftText_->SetAnchorPoint({0.5f, 0.0f});
   driftText_->SetSize({400.0f, 280.0f});
-  driftText_->SetPosition({640.0f, 200.0f});
+  driftText_->SetPosition({640.0f, 100.0f});
 
   // 6. meterImpactText_
   meterImpactText_ = std::make_unique<Sprite>();
@@ -148,21 +150,21 @@ void TutorialScene::Initialize() {
   tutorialClearedText_->Initialize("resources/tutorial/tutorialCleared.png");
   tutorialClearedText_->SetAnchorPoint({0.5f, 0.5f});
   tutorialClearedText_->SetSize({460.0f, 160.0f});
-  tutorialClearedText_->SetPosition({640.0f, 200.0f});
+  tutorialClearedText_->SetPosition({640.0f, 100.0f});
 
   // 8. stageSelectText_
   stageSelectText_ = std::make_unique<Sprite>();
   stageSelectText_->Initialize("resources/tutorial/stageSelect.png");
   stageSelectText_->SetAnchorPoint({0.5f, 0.5f});
   stageSelectText_->SetSize({460.0f, 64.0f});
-  stageSelectText_->SetPosition({640.0f, 400.0f});
+  stageSelectText_->SetPosition({640.0f, 300.0f});
 
   // 7. retryText_
   retryText_ = std::make_unique<Sprite>();
   retryText_->Initialize("resources/tutorial/retry.png");
   retryText_->SetAnchorPoint({0.5f, 0.5f});
   retryText_->SetSize({460.0f, 64.0f});
-  retryText_->SetPosition({640.0f, 480.0f});
+  retryText_->SetPosition({640.0f, 380.0f});
   retryText_->SetColor({1.0f, 1.0f, 1.0f, alpha_});
 
   // 2. backTitleText_
@@ -170,8 +172,41 @@ void TutorialScene::Initialize() {
   backTitleText_->Initialize("resources/tutorial/backTitle.png");
   backTitleText_->SetAnchorPoint({0.5f, 0.5f});
   backTitleText_->SetSize({460.0f, 64.0f});
-  backTitleText_->SetPosition({640.0f, 560.0f});
+  backTitleText_->SetPosition({640.0f, 460.0f});
   backTitleText_->SetColor({1.0f, 1.0f, 1.0f, alpha_});
+
+  for (int i = 0; i < 4; i++) {
+    // 画像パスの生成
+    std::string path = "resources/numbers/" + std::to_string(i) + ".png";
+
+    // TextureManagerでロード（2回呼んでも内部で同じ画像データが使い回されるので無駄はありません）
+    TextureManager::GetInstance()->LoadTexture(path);
+
+    // --- 1. 現在のスコア用スプライトの生成 ---
+    auto sScore = std::make_unique<Sprite>();
+    sScore->Initialize(path);
+    sScore->SetPosition({600.0f, 220.0f}); // 左側の座標
+    sScore->SetSize({64.0f, 64.0f});
+    sScore->SetAnchorPoint({0.5f, 0.5f});
+
+    numberSprites_.push_back(std::move(sScore)); // 配列1へ登録
+
+    // --- 2. 目標スコア用スプライトの生成 ---
+    auto sTarget = std::make_unique<Sprite>();
+    sTarget->Initialize(path);
+    sTarget->SetPosition({700.0f, 220.0f}); // 右側の座標
+    sTarget->SetSize({64.0f, 64.0f});
+    sTarget->SetAnchorPoint({0.5f, 0.5f});
+
+    targetNumberSprites_.push_back(std::move(sTarget)); // 配列2へ登録
+  }
+
+  // それぞれのBitmappedfontクラスに、別の配列を渡す
+  scoreDisplay_ = std::make_unique<Bitmappedfont>();
+  scoreDisplay_->Initialize(&numberSprites_, camera.get());
+
+  targetDisplay_ = std::make_unique<Bitmappedfont>();
+  targetDisplay_->Initialize(&targetNumberSprites_, camera.get());
 
   fade_ = std::make_unique<Fade>();
   fade_->Initialize(camera.get());
@@ -303,6 +338,21 @@ void TutorialScene::Update() {
     CheckAndRemove(obstacleNormal_);
     CheckAndRemove(obstacleFast_);
     CheckAndRemove(obstacleMax_);
+
+    int displayNum = std::min(destroyedObstaclesCount_, 9);
+
+    if (scoreDisplay_) {
+      scoreDisplay_->SetNumber(displayNum);
+      scoreDisplay_->Update();
+    }
+
+    // 2. 目標数 (破壊すべき数)
+    // kTargetDestroyCount_ は const int で 3 が入っています
+    int targetNum = std::min(kTargetDestroyCount_, 9);
+    if (targetDisplay_) {
+      targetDisplay_->SetNumber(targetNum);
+      targetDisplay_->Update();
+    }
 
     // 更新処理
     moveText_->Update();
@@ -605,6 +655,18 @@ void TutorialScene::Draw() {
       // 破壊目標数などの表示（必要なら）
       if (destroyNumText_)
         destroyNumText_->Draw();
+
+      if (destroyNumText_)
+        destroyNumText_->Draw();
+
+      // ▼▼▼ スコア（破壊数）の描画 ▼▼▼
+      if (scoreDisplay_) {
+        scoreDisplay_->Draw();
+      }
+
+      if (targetDisplay_) {
+        targetDisplay_->Draw();
+      }
       break;
 
     case TutorialPhase::kComplete:

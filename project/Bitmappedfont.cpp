@@ -16,21 +16,27 @@ void Bitmappedfont::Initialize(std::vector<std::unique_ptr<Sprite>>* sprite, Cam
     sprite_ = sprite;
     camera_ = camera;
 
-    sprite_[index_].at(0)->Update();
+    //sprite_[index_].at(0)->Update();
+
+    if (!(*sprite_).empty()) {
+      (*sprite_)[0]->Update();
+    }
 }
 
 void Bitmappedfont::Update()
 {
-    if (!sprite_[index_].empty()) {
-        sprite_[index_].at(0)->Update(); // その中のスプライトを更新
-    }
+  if (sprite_ && !(*sprite_).empty() && index_ < (*sprite_).size()) {
+    // 【修正】 (*sprite_) でベクター実体へアクセスし、[index_] で要素を取得
+    (*sprite_)[index_]->Update();
+  }
 }
 
 void Bitmappedfont::Draw()  
 {  
-    if (!sprite_[index_].empty()) {
-        sprite_[index_].at(0)->Draw();
-    }
+    // ポインタの参照先のベクターが空でなく、インデックスが範囲内かチェック
+  if (sprite_ && !(*sprite_).empty() && index_ < (*sprite_).size()) {
+    (*sprite_)[index_]->Draw();
+  }
 }
 
 Bitmappedfont::~Bitmappedfont()

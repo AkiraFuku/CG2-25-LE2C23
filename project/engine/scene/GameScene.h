@@ -77,7 +77,7 @@ private:
 
     // ビットマップフォント
     std::unique_ptr<Bitmappedfont> bitmappedFont_;
-    std::vector<std::unique_ptr<Sprite>> bitmappedFontSprite_[10];
+    std::vector<std::unique_ptr<Sprite>> bitmappedFontSprites_;
 
     // ゴール
     std::vector<std::unique_ptr<Goal>> goals_;

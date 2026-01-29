@@ -17,6 +17,7 @@ class ObstacleNormal;
 class ObstacleFast;
 class ObstacleMax;
 class MapChipField;
+class Bitmappedfont;
 
 class Score;
 class Goal;
@@ -122,6 +123,16 @@ public:
   void UpdateTutorialSteps();
 
   void ResetTutorialState();
+
+  // 数字用スプライトの配列（0～9などを格納）
+  std::vector<std::unique_ptr<Sprite>> numberSprites_;
+  // 数字表示管理クラス
+  std::unique_ptr<Bitmappedfont> scoreDisplay_;
+
+  // 目標数用のスプライト配列
+  std::vector<std::unique_ptr<Sprite>> targetNumberSprites_;
+  // 目標数表示管理クラス
+  std::unique_ptr<Bitmappedfont> targetDisplay_;
 
   std::unique_ptr<Sprite> moveText_;
   std::unique_ptr<Sprite> backTitleText_;
