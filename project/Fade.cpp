@@ -42,7 +42,7 @@ void Fade::Initialize(Camera *camera) {
 
   static bool initialized = false;
   if (!initialized) {
-    bubble_->Initialize("resources/uvChecker.png");
+    bubble_->Initialize("resources/bubble.png");
     initialized = true;
   }
   bubble_->SetCamera(camera_);

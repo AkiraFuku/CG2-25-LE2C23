@@ -15,7 +15,7 @@
 class TitleScene : public Scene {
 public:
   enum class Phase {
-    kIdle,   
+    kIdle,
     kFadeIn, // フェードイン
     kFadOut, // フェードアウト
   };

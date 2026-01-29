@@ -195,7 +195,7 @@ void GameScene::Update() {
     object3d2->Update();
 
     // プレイヤーの更新処理
-    player_->Update();
+    player_->Update(isStarted_);
 
     // 障害物の更新処理
     for (auto& obstacle : obstacleSlow_) {
@@ -582,8 +582,6 @@ void GameScene::GenerateFieldObjects() {
                 playerModel_->SetModel("cube.obj");
                 playerModel_->Initialize();
                 player_->Initialize(playerModel_.get(), camera.get(), pos);
-                player_->SetGameScene(this);
-
             }
             break;
             }

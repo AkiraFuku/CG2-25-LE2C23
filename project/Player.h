@@ -16,7 +16,6 @@ class MoveEffect;
 class DriftEffect;
 class RotateArrow;
 class SpeedMeter;
-class GameScene;
 class Goal;
 class CourseWall;
 
@@ -114,9 +113,6 @@ private:
     // スコア
     int score_ = 0;
 
-    // ゲームシーンのポインタ
-    GameScene* gameScene_ = nullptr;
-
     // 死亡時のプレイヤーの角度
     Vector3 deadRotate_ = {0.0f,0.0f,3.0f};
 
@@ -126,11 +122,13 @@ private:
     // ゴールしたかどうかのフラグ
     bool isGoal_ = false;
 
+    bool isGameStarted_ = false;
+
 public:
     // 初期化
     void Initialize(Object3d* model, Camera* camera, const Vector3& position);
     // 更新
-    void Update();
+    void Update(bool isGameStarted);
     // 描画
     void Draw();
     // 旋回
@@ -173,8 +171,6 @@ public:
     // スコアを加算
     void AddScore(int score) { score_ += score; }
     int GetScore() const { return score_; }
-    // ゲームシーンのポインタを取得
-    void SetGameScene(GameScene* gamescene) { gameScene_ = gamescene; }
     // コンストラクタとデストラクタ
     Player();
     ~Player();

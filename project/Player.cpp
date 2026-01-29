@@ -1,5 +1,4 @@
 #include "Player.h"
-#include "GameScene.h"
 #include "ModelManager.h"
 #include "Input.h"
 #include "MoveEffect.h"
@@ -77,8 +76,11 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
 
 }
 
-void Player::Update()
+void Player::Update(bool isGameStarted)
 {
+
+    isGameStarted_ = isGameStarted;
+
     if (isGoal_)
     {
         // ゴールしたら動かない
@@ -100,7 +102,7 @@ void Player::Update()
     else
     {
 
-        if (gameScene_->IsStarted())
+        if (isGameStarted_)
         {
             // 速度が0になったら
             if (speedZ_ <= 0.001f)
@@ -172,7 +174,7 @@ void Player::Draw()
     if (!isDead_)
     {
 
-        if (!gameScene_->IsStarted())
+        if (!isGameStarted_)
         {
             return;
         }

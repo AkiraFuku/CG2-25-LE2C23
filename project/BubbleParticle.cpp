@@ -214,7 +214,7 @@ void BubbleParticle::Emit(const Vector3 &position, uint32_t count) {
   std::uniform_real_distribution<float> az(-0.08f, 0.08f);
 
   std::uniform_real_distribution<float> life(0.8f, 2.5f);
-  std::uniform_real_distribution<float> scale(0.1f, 0.25f);
+  std::uniform_real_distribution<float> scale(0.25f, 0.45f);
   std::uniform_real_distribution<float> ang(-2.5f, 2.5f);
 
   for (uint32_t i = 0; i < count; ++i) {

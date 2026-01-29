@@ -75,7 +75,9 @@
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="RotateArrow.cpp" />
     <ClCompile Include="Score.cpp" />
+    <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="SpeedMeter.cpp" />
+    <ClCompile Include="engine\scene\TutorialScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractSceneFactory.h" />
@@ -137,7 +139,9 @@
     <ClInclude Include="Rand.h" />
     <ClInclude Include="RotateArrow.h" />
     <ClInclude Include="Score.h" />
+    <ClInclude Include="SelectScene.h" />
     <ClInclude Include="SpeedMeter.h" />
+    <ClInclude Include="engine\scene\TutorialScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -51,9 +51,11 @@ void TitleScene::Finalize() {
 void TitleScene::Update() {
 
   // SPACE 押したら FadeOut 開始
-  if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE) && !requestSceneChange_) {
-    fade_->Start(Fade::Phase::kFadeOut); // FadeOut
-    requestSceneChange_ = true;
+  if (Input::GetInstance()->TriggerKeyDown(DIK_SPACE)) {
+    if (!requestSceneChange_) {
+      fade_->Start(Fade::Phase::kFadeOut); // FadeOut
+      requestSceneChange_ = true;
+    }
   }
 
   // フェード更新
@@ -61,7 +63,7 @@ void TitleScene::Update() {
 
   // 画面を覆い切った瞬間にシーン切替
   if (requestSceneChange_ && fade_->IsCovering()) {
-    GetSceneManager()->ChangeScene("GameScene");
+    GetSceneManager()->ChangeScene("SelectScene");
     requestSceneChange_ = false;
     return;
   }
@@ -138,10 +140,10 @@ void TitleScene::Update() {
 }
 void TitleScene::Draw() {
 
-  //ParticleManager::GetInstance()->Draw();
+  // ParticleManager::GetInstance()->Draw();
 
   fade_->Draw();
 
   ///////スプライトの描画
-  //sprite->Draw();
+  // sprite->Draw();
 }
