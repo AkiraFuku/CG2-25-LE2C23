@@ -17,6 +17,7 @@
 #include "imgui.h"
 #include "Bitmappedfont.h"
 #include "Goal.h"
+#include "GameContext.h"
 
 // コンストラクタ
 GameScene::GameScene() = default;
@@ -98,9 +99,26 @@ void GameScene::Initialize() {
 
     // マップチップフィールドの初期化
     mapChipField_ = std::make_unique<MapChipField>();
-    mapChipField_->LoadMapChipCsv("resources/stage3.csv");
 
+    int currentStage = GameContext::GetInstance()->GetStageNum();
+    std::string csvPath = "resources/stage1.csv"; // デフォルト
 
+    switch (currentStage) {
+    case 1:
+      csvPath = "resources/stage1.csv";
+      break;
+    case 2:
+      csvPath = "resources/stage2.csv";
+      break;
+    case 3:
+      csvPath = "resources/stage3.csv";
+      break;
+    default:
+      csvPath = "resources/stage1.csv";
+      break;
+    }
+
+    mapChipField_->LoadMapChipCsv(csvPath);
 
     // マップチップの生成
     GenerateFieldObjects();

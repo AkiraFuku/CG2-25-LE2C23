@@ -9,9 +9,12 @@ class Fade;
 class Camera;
 
 class SelectScene : public Scene {
+public:
   enum class Selection {
     kTutorial, // チュートリアル
-    kGame,     // ゲーム
+    kStage1,
+    kStage2,
+    kStage3,
     kNone,     // 選択なし
   };
 

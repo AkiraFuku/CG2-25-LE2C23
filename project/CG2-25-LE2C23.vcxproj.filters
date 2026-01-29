@@ -68,7 +68,8 @@
     <ClCompile Include="Fade.cpp" />
     <ClCompile Include="BubbleParticle.cpp" />
     <ClCompile Include="engine\scene\TutorialScene.cpp" />
-    <ClCompile Include="SelectScene.cpp" />
+    <ClCompile Include="engine\scene\SelectScene.cpp" />
+    <ClCompile Include="GameContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractSceneFactory.h" />
@@ -132,7 +133,8 @@
     <ClInclude Include="Fade.h" />
     <ClInclude Include="BubbleParticle.h" />
     <ClInclude Include="engine\scene\TutorialScene.h" />
-    <ClInclude Include="SelectScene.h" />
+    <ClInclude Include="engine\scene\SelectScene.h" />
+    <ClInclude Include="GameContext.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\Object3d\Object3d.hlsli" />

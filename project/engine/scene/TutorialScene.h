@@ -10,6 +10,7 @@
 #include "Sprite.h"
 #include "TextureManager.h"
 #include <memory>
+
 class Player;
 class ObstacleSlow;
 class ObstacleNormal;
@@ -91,7 +92,7 @@ private:
   std::unique_ptr<Fade> fade_;
   bool requestSceneChange_ = false;
 
-  public:
+public:
   enum class SceneState {
     kFadeIn, // フェードイン中（開始時・リセット時）
     kMain,   // メイン処理中（プレイ可能）
@@ -109,8 +110,8 @@ public:
   };
 
   TutorialPhase currentPhase_ = TutorialPhase::kMovement;
-  int destroyedObstaclesCount_ = 0;      // 破壊した障害物の数
-  const int kTargetDestroyCount_ = 3;    // クリアに必要な破壊数
+  int destroyedObstaclesCount_ = 0;   // 破壊した障害物の数
+  const int kTargetDestroyCount_ = 3; // クリアに必要な破壊数
   const float kTargetDriftSpeed_ = 0.3f;
 
   bool isPhaseCleared_ = false; // クリア状態か？
@@ -122,12 +123,24 @@ public:
 
   void ResetTutorialState();
 
-  public:
+  std::unique_ptr<Sprite> moveText_;
+  std::unique_ptr<Sprite> backTitleText_;
+  std::unique_ptr<Sprite> clearedText_;
+  std::unique_ptr<Sprite> destroyNumText_;
+  std::unique_ptr<Sprite> driftText_;
+  std::unique_ptr<Sprite> meterImpactText_;
+  std::unique_ptr<Sprite> retryText_;
+  std::unique_ptr<Sprite> stageSelectText_;
+  std::unique_ptr<Sprite> tutorialClearedText_;
+
+  float alpha_ = 0.3f;
+
+public:
   enum class CompleteOption {
     kRetry,      // 最初からやり直す
-    kGoToGame,   // ゲームシーンへ
+    kGoToSelect, // ゲームシーンへ
     kBackToTitle // タイトルへ
   };
 
-  CompleteOption currentOption_ = CompleteOption::kGoToGame;
+  CompleteOption currentOption_ = CompleteOption::kGoToSelect;
 };

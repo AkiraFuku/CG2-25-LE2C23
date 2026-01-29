@@ -93,7 +93,7 @@ void TutorialScene::Initialize() {
 
   // マップチップフィールドの初期化
   mapChipField_ = std::make_unique<MapChipField>();
-  mapChipField_->LoadMapChipCsv("resources/stage2.csv");
+  mapChipField_->LoadMapChipCsv("resources/mapchip.csv");
 
   // マップチップの生成
   GenerateFieldObjects();
@@ -106,6 +106,72 @@ void TutorialScene::Initialize() {
   destroyedObstaclesCount_ = 0;
   isPhaseCleared_ = false;
   waitTimer_ = 0;
+
+  // 1. moveText_
+  moveText_ = std::make_unique<Sprite>();
+  moveText_->Initialize("resources/tutorial/move.png"); // ※画像パスは要確認
+  moveText_->SetAnchorPoint({0.5f, 0.0f});
+  moveText_->SetSize({460.0f, 160.0f});
+  moveText_->SetPosition({640.0f, 200.0f}); // 仮の初期位置
+
+  // 3. clearedText_
+  clearedText_ = std::make_unique<Sprite>();
+  clearedText_->Initialize("resources/tutorial/cleared.png");
+  clearedText_->SetAnchorPoint({0.5f, 0.0f});
+  clearedText_->SetSize({460.0f, 64.0f});
+  clearedText_->SetPosition({640.0f, 200});
+
+  // 4. destroyNumText_
+  destroyNumText_ = std::make_unique<Sprite>();
+  destroyNumText_->Initialize("resources/tutorial/destroyNum.png");
+  destroyNumText_->SetAnchorPoint({0.5f, 0.0f});
+  destroyNumText_->SetSize({460.0f, 160.0f});
+  destroyNumText_->SetPosition({640.0f, 200.0f});
+
+  // 5. driftText_
+  driftText_ = std::make_unique<Sprite>();
+  driftText_->Initialize("resources/tutorial/drift.png");
+  driftText_->SetAnchorPoint({0.5f, 0.0f});
+  driftText_->SetSize({400.0f, 280.0f});
+  driftText_->SetPosition({640.0f, 200.0f});
+
+  // 6. meterImpactText_
+  meterImpactText_ = std::make_unique<Sprite>();
+  meterImpactText_->Initialize("resources/tutorial/meterImpact.png");
+  meterImpactText_->SetAnchorPoint({0.5f, 0.5f});
+  meterImpactText_->SetSize({255.0f, 255.0f});
+  meterImpactText_->SetPosition({155.0f, 585.0f});
+  meterImpactText_->SetSize({250.0f, 250.0f});
+
+  // 9. tutorialClearedText_
+  tutorialClearedText_ = std::make_unique<Sprite>();
+  tutorialClearedText_->Initialize("resources/tutorial/tutorialCleared.png");
+  tutorialClearedText_->SetAnchorPoint({0.5f, 0.5f});
+  tutorialClearedText_->SetSize({460.0f, 160.0f});
+  tutorialClearedText_->SetPosition({640.0f, 200.0f});
+
+  // 8. stageSelectText_
+  stageSelectText_ = std::make_unique<Sprite>();
+  stageSelectText_->Initialize("resources/tutorial/stageSelect.png");
+  stageSelectText_->SetAnchorPoint({0.5f, 0.5f});
+  stageSelectText_->SetSize({460.0f, 64.0f});
+  stageSelectText_->SetPosition({640.0f, 400.0f});
+
+  // 7. retryText_
+  retryText_ = std::make_unique<Sprite>();
+  retryText_->Initialize("resources/tutorial/retry.png");
+  retryText_->SetAnchorPoint({0.5f, 0.5f});
+  retryText_->SetSize({460.0f, 64.0f});
+  retryText_->SetPosition({640.0f, 480.0f});
+  retryText_->SetColor({1.0f, 1.0f, 1.0f, alpha_});
+
+  // 2. backTitleText_
+  backTitleText_ = std::make_unique<Sprite>();
+  backTitleText_->Initialize("resources/tutorial/backTitle.png");
+  backTitleText_->SetAnchorPoint({0.5f, 0.5f});
+  backTitleText_->SetSize({460.0f, 64.0f});
+  backTitleText_->SetPosition({640.0f, 560.0f});
+  backTitleText_->SetColor({1.0f, 1.0f, 1.0f, alpha_});
 
   fade_ = std::make_unique<Fade>();
   fade_->Initialize(camera.get());
@@ -190,17 +256,6 @@ void TutorialScene::Update() {
 
     Input::GetInstance()->GetJoyStick(0, state);
 
-    // Aボタンを押していたら
-
-    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A)) {
-
-      // Aボタンを押したときの処理
-
-      GetSceneManager()->ChangeScene("TitleScene");
-    }
-    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_B)) {
-    }
-
     if (Input::GetInstance()->GetJoyStick(0, state)) {
       // 左スティックの値を取得
       float x = (float)state.Gamepad.sThumbLX;
@@ -249,6 +304,17 @@ void TutorialScene::Update() {
     CheckAndRemove(obstacleFast_);
     CheckAndRemove(obstacleMax_);
 
+    // 更新処理
+    moveText_->Update();
+    backTitleText_->Update();
+    clearedText_->Update();
+    destroyNumText_->Update();
+    driftText_->Update();
+    meterImpactText_->Update();
+    retryText_->Update();
+    stageSelectText_->Update();
+    tutorialClearedText_->Update();
+
     break;
   }
 
@@ -261,15 +327,15 @@ void TutorialScene::Update() {
       switch (currentOption_) {
       case CompleteOption::kRetry:
         // リトライ処理
-        ResetTutorialState();               // 状態リセット
+        ResetTutorialState(); // 状態リセット
         currentPhase_ = TutorialPhase::kMovement;
-        sceneState_ = SceneState::kFadeIn;  // 状態をフェードインへ
+        sceneState_ = SceneState::kFadeIn; // 状態をフェードインへ
         fade_->SetCamera(camera.get());
         fade_->Start(Fade::Phase::kFadeIn); // フェードイン開始
         break;
 
-      case CompleteOption::kGoToGame:
-        GetSceneManager()->ChangeScene("GameScene");
+      case CompleteOption::kGoToSelect:
+        GetSceneManager()->ChangeScene("SelectScene");
         break;
 
       case CompleteOption::kBackToTitle:
@@ -314,7 +380,7 @@ void TutorialScene::Update() {
       }
 
       // Go to Game
-      if (currentOption_ == CompleteOption::kGoToGame) {
+      if (currentOption_ == CompleteOption::kGoToSelect) {
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "> Start Game");
       } else {
         ImGui::Text("  Start Game");
@@ -506,6 +572,59 @@ void TutorialScene::Draw() {
   for (auto &goal : goals_) {
 
     goal->Draw();
+  }
+
+  // 攻撃の説明（スピードを上げて当たる）
+  if (meterImpactText_)
+    meterImpactText_->Draw();
+
+  if (isPhaseCleared_) {
+    // 成功！みたいなテキストがあればここで出す
+    // 例: clearedText_->Draw();
+    // 今のコードだと clearedText_ があるのでそれを出すのが良さそうです
+    if (clearedText_) {
+      clearedText_->Draw();
+    }
+  }
+  // 2. 通常のチュートリアル進行中
+  else {
+    switch (currentPhase_) {
+    case TutorialPhase::kMovement:
+      // 移動の説明
+      if (moveText_)
+        moveText_->Draw();
+      break;
+
+    case TutorialPhase::kDrift:
+      // ドリフトの説明
+      if (driftText_)
+        driftText_->Draw();
+      break;
+
+    case TutorialPhase::kAttack:
+      // 破壊目標数などの表示（必要なら）
+      if (destroyNumText_)
+        destroyNumText_->Draw();
+      break;
+
+    case TutorialPhase::kComplete:
+      // チュートリアル完了！の表示
+      if (tutorialClearedText_)
+        tutorialClearedText_->Draw();
+
+      // --- メニュー選択肢の描画 ---
+      // ※選択中の項目を強調（色を変える、矢印を出すなど）したい場合は
+      //   ここで currentOption_ を見て処理を追加します。
+      //   とりあえず単純に表示だけ行います。
+
+      if (retryText_)
+        retryText_->Draw(); // リトライ
+      if (stageSelectText_)
+        stageSelectText_->Draw(); // ステージ選択へ
+      if (backTitleText_)
+        backTitleText_->Draw(); // タイトルへ
+      break;
+    }
   }
 
   fade_->Draw();
@@ -874,9 +993,7 @@ void TutorialScene::UpdateTutorialSteps() {
   // ■ 2. 通常の判定処理 (クリア条件のチェック)
   switch (currentPhase_) {
   case TutorialPhase::kMovement:
-    if (Input::GetInstance()->PushedKeyDown(DIK_W) ||
-        Input::GetInstance()->PushedKeyDown(DIK_A) ||
-        Input::GetInstance()->PushedKeyDown(DIK_S) ||
+    if (Input::GetInstance()->PushedKeyDown(DIK_A) ||
         Input::GetInstance()->PushedKeyDown(DIK_D)) {
 
       // 即座にフェーズを変えず、クリアフラグを立ててタイマーセット
@@ -912,35 +1029,68 @@ void TutorialScene::UpdateTutorialSteps() {
 
   case TutorialPhase::kComplete:
     // --- 完了画面での選択処理 ---
+    isStarted_ = false;
 
-      isStarted_ = false;
+    // -----------------------------------------------------------
+    // 1. 入力による選択肢の切り替え
+    // -----------------------------------------------------------
 
     // 上入力 (選択肢を上に移動)
-    // ※ Aボタン判定を削除し、TriggerPadUpなどに変更
-    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A) ||
-        Input::GetInstance()->TriggerKeyDown(DIK_W) ||
+    // ※元のコードにあった Aボタン(GAMEPAD_A)
+    // は決定ボタンと被るため外したほうが無難ですが、
+    //  ここではW/UPキーを中心に判定します
+    if (Input::GetInstance()->TriggerKeyDown(DIK_W) ||
         Input::GetInstance()->TriggerKeyDown(DIK_UP)) {
 
-      if (currentOption_ == CompleteOption::kGoToGame) {
-        currentOption_ = CompleteOption::kRetry;
+      if (currentOption_ == CompleteOption::kRetry) {
+        currentOption_ = CompleteOption::kGoToSelect;
       } else if (currentOption_ == CompleteOption::kBackToTitle) {
-        currentOption_ = CompleteOption::kGoToGame;
+        currentOption_ = CompleteOption::kRetry;
       }
     }
 
     // 下入力 (選択肢を下に移動)
-    // ※ Aボタン判定を削除し、TriggerPadDownなどに変更
-    if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A) ||
-        Input::GetInstance()->TriggerKeyDown(DIK_S) ||
+    if (Input::GetInstance()->TriggerKeyDown(DIK_S) ||
         Input::GetInstance()->TriggerKeyDown(DIK_DOWN)) {
 
-      if (currentOption_ == CompleteOption::kRetry) {
-        currentOption_ = CompleteOption::kGoToGame;
-      } else if (currentOption_ == CompleteOption::kGoToGame) {
+      if (currentOption_ == CompleteOption::kGoToSelect) {
+        currentOption_ = CompleteOption::kRetry;
+      } else if (currentOption_ == CompleteOption::kRetry) {
         currentOption_ = CompleteOption::kBackToTitle;
       }
     }
 
+    // -----------------------------------------------------------
+    // 2. 色の更新処理（★ここが追加・修正部分です）
+    // -----------------------------------------------------------
+    {
+      // 定義済みであろうメンバ変数 alpha_ を使用
+      // 選択時は不透明(1.0f)、非選択時は半透明(alpha_)
+      Vector4 colorSelected = {1.0f, 1.0f, 1.0f, 1.0f};
+      Vector4 colorUnselected = {1.0f, 1.0f, 1.0f, alpha_};
+
+      // 一旦すべてを「非選択色」にセット
+      retryText_->SetColor(colorUnselected);
+      stageSelectText_->SetColor(colorUnselected);
+      backTitleText_->SetColor(colorUnselected);
+
+      // 現在選択されているものだけ「選択色」で上書き
+      switch (currentOption_) {
+      case CompleteOption::kRetry:
+        retryText_->SetColor(colorSelected);
+        break;
+      case CompleteOption::kGoToSelect:
+        stageSelectText_->SetColor(colorSelected);
+        break;
+      case CompleteOption::kBackToTitle:
+        backTitleText_->SetColor(colorSelected);
+        break;
+      }
+    }
+
+    // -----------------------------------------------------------
+    // 3. 決定処理
+    // -----------------------------------------------------------
     // 決定入力 (Aボタン or SPACE)
     if (Input::GetInstance()->TriggerPadDown(0, XINPUT_GAMEPAD_A) ||
         Input::GetInstance()->TriggerKeyDown(DIK_SPACE)) {

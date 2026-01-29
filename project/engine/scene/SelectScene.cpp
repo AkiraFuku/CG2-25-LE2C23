@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "imgui.h"
+#include "GameContext.h"
 
 void SelectScene::Initialize() {
 
@@ -61,7 +62,19 @@ void SelectScene::Update() {
       case Selection::kTutorial:
         nextSceneName_ = "TutorialScene";
         break;
-      case Selection::kGame:
+
+      case Selection::kStage1:
+        GameContext::GetInstance()->SetStageNum(1); // データ書き込み
+        nextSceneName_ = "GameScene";
+        break;
+
+      case Selection::kStage2:
+        GameContext::GetInstance()->SetStageNum(2);
+        nextSceneName_ = "GameScene";
+        break;
+
+      case Selection::kStage3:
+        GameContext::GetInstance()->SetStageNum(3);
         nextSceneName_ = "GameScene";
         break;
       }
@@ -100,8 +113,14 @@ void SelectScene::Update() {
   case Selection::kTutorial:
     ImGui::TextColored(ImVec4(0, 1, 0, 1), "Tutorial Scene"); // 緑色で表示
     break;
-  case Selection::kGame:
-    ImGui::TextColored(ImVec4(0, 1, 1, 1), "Game Scene"); // 水色で表示
+  case Selection::kStage1:
+    ImGui::TextColored(ImVec4(0, 1, 1, 1), "Stage1"); // 水色で表示
+    break;
+  case Selection::kStage2:
+    ImGui::TextColored(ImVec4(0, 1, 1, 1), "Stage2"); // 水色で表示
+    break;
+  case Selection::kStage3:
+    ImGui::TextColored(ImVec4(0, 1, 1, 1), "Stage3"); // 水色で表示
     break;
   default:
     ImGui::TextColored(ImVec4(1, 0, 0, 1), "Unknown"); // 赤色

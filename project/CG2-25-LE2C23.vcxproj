@@ -42,6 +42,7 @@
     <ClCompile Include="engine\GAME\GameEngine.cpp" />
     <ClCompile Include="engine\scene\GameScene.cpp" />
     <ClCompile Include="Fade.cpp" />
+    <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp">
@@ -75,7 +76,7 @@
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="RotateArrow.cpp" />
     <ClCompile Include="Score.cpp" />
-    <ClCompile Include="SelectScene.cpp" />
+    <ClCompile Include="engine\scene\SelectScene.cpp" />
     <ClCompile Include="SpeedMeter.cpp" />
     <ClCompile Include="engine\scene\TutorialScene.cpp" />
   </ItemGroup>
@@ -126,6 +127,7 @@
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
     <ClInclude Include="Fade.h" />
+    <ClInclude Include="GameContext.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="MapChipField.h" />
@@ -139,7 +141,7 @@
     <ClInclude Include="Rand.h" />
     <ClInclude Include="RotateArrow.h" />
     <ClInclude Include="Score.h" />
-    <ClInclude Include="SelectScene.h" />
+    <ClInclude Include="engine\scene\SelectScene.h" />
     <ClInclude Include="SpeedMeter.h" />
     <ClInclude Include="engine\scene\TutorialScene.h" />
   </ItemGroup>
