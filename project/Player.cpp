@@ -35,22 +35,22 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
     speedZ_ = velocity_.z;
 
     // 移動エフェクトの生成と初期化
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         // モデルを生成してリストに追加
         auto model = std::make_unique<Object3d>();
-        model->SetModel("cube.obj");
+        model->SetModel("moveEffect.obj");
         model->Initialize();
         moveEffectModels_.push_back(std::move(model));
         // エフェクト本体を生成してリストに追加
         auto effect = std::make_unique<MoveEffect>();
-        effect->Initialize(moveEffectModels_.back().get(), camera_, transform_.translate * static_cast<float>(i + 1), this);
+        effect->Initialize(moveEffectModels_.back().get(), camera_, transform_.translate * static_cast<float>(i + 2), this);
         moveEffects_.push_back(std::move(effect));
     }
 
     // 加速エフェクトの生成と初期化
     driftEffectSprite_ = std::make_unique<Sprite>();
-    driftEffectSprite_->Initialize("resources/uvChecker.png");
+    driftEffectSprite_->Initialize("resources/speedUp.png");
     driftEffectSprite_->SetPosition(Vector2{ 0.0f,0.0f });
     driftEffectSprite_->SetAnchorPoint(Vector2{ 0.0f,0.0f });
     driftEffect_ = std::make_unique<DriftEffect>();
@@ -58,20 +58,20 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
 
     // 方向矢印の生成と初期化
     rotateArrowModel_ = std::make_unique<Object3d>();
-    rotateArrowModel_->SetModel("axis.obj");
+    rotateArrowModel_->SetModel("rotateArrow.obj");
     rotateArrowModel_->Initialize();
     rotateArrow_ = std::make_unique<RotateArrow>();
     rotateArrow_->Initialize(rotateArrowModel_.get(), camera_, transform_.translate, this);
 
     // スピードメーターの生成と初期化
     baseSprite_ = std::make_unique<Sprite>();
-    baseSprite_->Initialize("resources/uvChecker.png");
-    baseSprite_->SetPosition(Vector2{ 800.0f, 300.0f });
+    baseSprite_->Initialize("resources/base.png");
+    baseSprite_->SetPosition(Vector2{ 800.0f, 250.0f });
     baseSprite_->SetAnchorPoint(Vector2{ 0.0f, 0.0f });
     speedMeterSprite_ = std::make_unique<Sprite>();
-    speedMeterSprite_->Initialize("resources/uvChecker.png");
-    speedMeterSprite_->SetPosition(Vector2{ 1400.0f, 600.0f });
-    speedMeterSprite_->SetAnchorPoint(Vector2{ 0.0f, 0.0f });
+    speedMeterSprite_->Initialize("resources/speedMeter.png");
+    speedMeterSprite_->SetPosition(Vector2{1250.0f, 800.0f });
+    speedMeterSprite_->SetAnchorPoint(Vector2{ 1.0f, 1.0f });
     speedMeter_ = std::make_unique<SpeedMeter>();
     speedMeter_->Initialize(speedMeterSprite_.get(), baseSprite_.get(), camera_, this);
 
@@ -108,6 +108,7 @@ void Player::Update()
                 // 死亡させる
                 speedZ_ = 0.0f;
                 isDead_ = true;
+                gameScene_->SetGameOver(true);
                 return;
             }
 
@@ -361,6 +362,7 @@ void Player::OnCollision(const ObstacleNormal* obstacleNormal)
     if (currentSpeedStage_ < SpeedStage::kNormal)
     {
         isDead_ = true;
+        gameScene_->SetGameOver(true);
     }
 }
 
@@ -370,6 +372,7 @@ void Player::OnCollision(const ObstacleFast* obstacleFast)
     if (currentSpeedStage_ < SpeedStage::kFast)
     {
         isDead_ = true;
+        gameScene_->SetGameOver(true);
     }
 }
 
@@ -379,6 +382,7 @@ void Player::OnCollision(const ObstacleMax* obstacleMax)
     if (currentSpeedStage_ < SpeedStage::kMax)
     {
         isDead_ = true;
+        gameScene_->SetGameOver(true);
     }
 }
 
@@ -390,11 +394,13 @@ void Player::OnCollision(const Goal* goal)
     }
 
     isGoal_ = true;
+    gameScene_->SetCleared(true);
 }
 
 void Player::OnCollision(const CourseWall* courseWall)
 {
     isDead_ = true;
+    gameScene_->SetGameOver(true);
 }
 
 
