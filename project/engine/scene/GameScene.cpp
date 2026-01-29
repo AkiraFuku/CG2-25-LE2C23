@@ -98,7 +98,7 @@ void GameScene::Initialize() {
 
     // マップチップフィールドの初期化
     mapChipField_ = std::make_unique<MapChipField>();
-    mapChipField_->LoadMapChipCsv("resources/stage2.csv");
+    mapChipField_->LoadMapChipCsv("resources/stage3.csv");
 
 
 
