@@ -12,13 +12,16 @@
 #include "Player.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
-#include "PSOMnager.h"
 #include "LightManager.h"
 #include <numbers>
 #include "imgui.h"
 #include "Bitmappedfont.h"
 #include "Goal.h"
+
 #include "Sprite.h"
+
+#include "GameContext.h"
+
 
 // コンストラクタ
 GameScene::GameScene() = default;
@@ -46,7 +49,7 @@ void GameScene::Initialize() {
     camera = std::make_unique<Camera>();
     camera->SetRotate({ 0.3f, 0.0f, 0.0f });
 
-    camera->SetTranslate({ 0.0f, 0.0f, 0.0f });
+    camera->SetTranslate({ 0.0f, 0.0f, -5.0f });
 
     Object3dCommon::GetInstance()->SetDefaultCamera(camera.get());
     ParticleManager::GetInstance()->Setcamera(camera.get());
@@ -101,9 +104,27 @@ void GameScene::Initialize() {
 
     // マップチップフィールドの初期化
     mapChipField_ = std::make_unique<MapChipField>();
-    mapChipField_->LoadMapChipCsv("resources/stage1.csv");
 
 
+    int currentStage = GameContext::GetInstance()->GetStageNum();
+    std::string csvPath = "resources/stage1.csv"; // デフォルト
+
+    switch (currentStage) {
+    case 1:
+      csvPath = "resources/stage1.csv";
+      break;
+    case 2:
+      csvPath = "resources/stage2.csv";
+      break;
+    case 3:
+      csvPath = "resources/stage3.csv";
+      break;
+    default:
+      csvPath = "resources/stage1.csv";
+      break;
+    }
+
+    mapChipField_->LoadMapChipCsv(csvPath);
 
     // マップチップの生成
     GenerateFieldObjects();
@@ -113,14 +134,19 @@ void GameScene::Initialize() {
 
     // ビットマップフォントの生成と初期化
     bitmappedFont_ = std::make_unique<Bitmappedfont>();
-    // ビットマップフォントのスプライト
+
+   
+    // ビットマップフォントのスプライト読み込み (0～9番)
     for (int i = 0; i < 10; ++i) {
+
         // ファイル名の作成
         std::string filePath = "resources/" + std::to_string(i) + ".png";
 
     }
+// 【修正】ベクターのアドレスを渡す
+    bitmappedFont_->Initialize(&bitmappedFontSprites_, camera.get());
+     
 
-    bitmappedFont_->Initialize(bitmappedFontSprite_, camera.get());
 
     // 背景モデルの生成と初期化
     backgroundModel_ = std::make_unique<Object3d>();
@@ -143,6 +169,10 @@ void GameScene::Initialize() {
     pressSpaceText_->Initialize("resources/pressSpace.png");
     pressSpaceText_->SetPosition(Vector2{ 100.0f, 3000.0f });
 
+
+    fade_ = std::make_unique<Fade>();
+    fade_->Initialize(camera.get());
+    fade_->Start(Fade::Phase::kFadeIn);
 }
 
 void GameScene::Finalize() {
@@ -152,6 +182,7 @@ void GameScene::Finalize() {
     ParticleManager::GetInstance()->ReleaseParticleGroup("Test");
 }
 void GameScene::Update() {
+
     emitter->Update();
 
     XINPUT_STATE state;
@@ -237,7 +268,7 @@ void GameScene::Update() {
     backgroundModel_->Update();
 
     // プレイヤーの更新処理
-    player_->Update();
+    player_->Update(isStarted_);
 
     // 障害物の更新処理
     for (auto& obstacle : obstacleSlow_) {
@@ -268,6 +299,57 @@ void GameScene::Update() {
 
     // 当たり判定
     CheckAllCollisions();
+
+
+    fade_->Update();
+
+#ifdef USE_IMGUI
+    ImGui::Begin("Debug");
+    ImGui::Text("Sphere");
+    Vector3 pos = object3d->GetTranslate();
+    Vector3 scale = object3d->GetScale();
+    ImGui::SliderFloat3("Pos", &(pos.x), 0.1f, 1000.0f);
+    ImGui::DragFloat3("scale", &(scale.x), 0.1f, 1000.0f);
+    object3d->SetTranslate(pos);
+    object3d->SetScale(scale);
+    if (LightManager::GetInstance()->GetPointLightCount() > 0) {
+        ImGui::Begin("Light Setting");
+
+        // 0番目のポイントライトのデータを参照で取得
+        // "auto&" にすることで、ここで書き換えた内容が直接LightManager内のデータに反映されます
+        auto& pointLight2 = LightManager::GetInstance()->GetPointLight(1);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light2 Pos", &pointLight2.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light2 Color", &pointLight2.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light2 Intensity", &pointLight2.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light2 Decay", &pointLight2.decay, 0.1f, 0.0f, 10.0f);
+        auto& pointLight1 = LightManager::GetInstance()->GetPointLight(0);
+
+        // 位置の調整
+        ImGui::DragFloat3("Point Light Pos", &pointLight1.position.x, 0.1f);
+
+        // 色の調整
+        ImGui::ColorEdit4("Point Light Color", &pointLight1.color.x);
+
+        // 強度の調整
+        ImGui::DragFloat("Point Light Intensity", &pointLight1.intensity, 0.1f, 0.0f, 100.0f);
+
+        // 減衰率の調整
+        ImGui::DragFloat("Point Light Decay", &pointLight1.decay, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat("Point Light rad", &pointLight1.radius, 0.1f, 0.0f, 10.0f);
+
+        ImGui::End();
+    }
+
+
+
 
     // 障害物の削除処理
     obstacleSlow_.erase(std::remove_if(obstacleSlow_.begin(), obstacleSlow_.end(),
@@ -306,10 +388,12 @@ void GameScene::Update() {
         }
         else
         {
+
             countdownTimer_--;
             bitmappedFont_->SetNumber(countdownTimer_ / 60 + 1);
             bitmappedFont_->SetPosition(Vector2{ 500.0f,200.0f });
             bitmappedFont_->Update();
+
         }
     }
 
@@ -416,10 +500,13 @@ void GameScene::Update() {
 
 
 void GameScene::Draw() {
+
     // object3d2->Draw();
     // object3d->Draw();
     // ParticleManager::GetInstance()->Draw();
     backgroundModel_->Draw();
+
+  
 
 
     if (!isStarted_)
@@ -479,6 +566,8 @@ void GameScene::Draw() {
         goal->Draw();
 
     }
+
+     fade_->Draw();
 
     ///////スプライトの描画
     // sprite->Draw();
@@ -646,8 +735,6 @@ void GameScene::GenerateFieldObjects() {
                 playerModel_->SetModel("maguro.obj");
                 playerModel_->Initialize();
                 player_->Initialize(playerModel_.get(), camera.get(), pos);
-                player_->SetGameScene(this);
-
             }
             break;
             }

@@ -23,17 +23,21 @@ void Bitmappedfont::Initialize(std::vector<std::unique_ptr<Sprite>>* sprite, Cam
     sprite_ = sprite;
     camera_ = camera;
 
+
 }
 
 void Bitmappedfont::Update()
 {
+
     if (mySprite_) {
         mySprite_->Update();
     }
+
 }
 
 void Bitmappedfont::Draw()  
 {  
+
     if (mySprite_) {
         mySprite_->Draw();
     }
@@ -55,6 +59,7 @@ void Bitmappedfont::SetNumber(int index)
 
     // 保持している座標を反映
     mySprite_->SetPosition(Vector2{ transform_.translate.x, transform_.translate.y });
+
 }
 
 Bitmappedfont::~Bitmappedfont()

@@ -23,6 +23,7 @@ class Goal;
 
 class CourseWall;
 
+#include"Fade.h"
 
 class GameScene : public Scene {
 public:
@@ -87,7 +88,7 @@ private:
 
     // ビットマップフォント
     std::unique_ptr<Bitmappedfont> bitmappedFont_;
-    std::vector<std::unique_ptr<Sprite>> bitmappedFontSprite_[10];
+    std::vector<std::unique_ptr<Sprite>> bitmappedFontSprites_;
 
     // ゴール
     std::vector<std::unique_ptr<Goal>> goals_;
@@ -115,4 +116,10 @@ private:
     std::unique_ptr<MapChipField> mapChipField_;
     // ブロック用のワールドトランスフォーム
     std::vector<std::vector<Transform*>> worldTransformObjects;
+
+// メンバ
+    std::unique_ptr<Fade> fade_;
+    bool requestSceneChange_ = false;
+
+
 };

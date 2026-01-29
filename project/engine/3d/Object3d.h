@@ -70,7 +70,13 @@ public:
     }
 
     void SetRadius(float radius) { radius_ = radius; }
-private:
+
+    void SetColor(const Vector4 &color) { model_->SetColor(color); }
+    void SetDepthMode(DepthMode mode) { depthMode_ = mode; }
+
+    DepthMode depthMode_ = DepthMode::Default;
+
+  private:
 
     float radius_ = 1.0f;
     std::shared_ptr<Model> model_ = nullptr;

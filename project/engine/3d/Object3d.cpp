@@ -38,6 +38,7 @@ void Object3d::Update()
     //行列をGPUに転送
     wvpResource_->WVP = worldViewProjectionMatrix;
     wvpResource_->World = worldMatrix;
+    wvpResource_->WorldInverseTranspose= Inverse(worldMatrix);
 }
 
 void Object3d::Draw()
@@ -94,7 +95,11 @@ void Object3d::Draw()
     }
 
     Object3dCommon::GetInstance()->Object3dCommonDraw();
-    PsoProperty psoProp = { PipelineType::Object3d, blendMode_ ,fillMode_ };
+    PsoProperty psoProp{};
+    psoProp.type = PipelineType::Object3d;
+    psoProp.blendMode = blendMode_;
+    psoProp.fillMode = fillMode_;
+    psoProp.depthMode = depthMode_;
     PsoSet psoSet = PSOMnager::GetInstance()->GetPsoSet(psoProp);
 
     // PSOをセット

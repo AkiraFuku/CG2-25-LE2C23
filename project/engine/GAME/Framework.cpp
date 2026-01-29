@@ -13,6 +13,7 @@
 #include "ModelCommon.h"//フレームワークに移植
 #include "ModelManager.h"//フレームワークに移植
 #include "SrvManager.h"//フレームワークに移植
+#include "BubbleParticle.h"
 #include <fstream>
 #include <iostream> 
 #include "PSOMnager.h"
@@ -123,6 +124,7 @@ void Framework::Finalize()
     TextureManager::GetInstance()->Finalize();
     ModelManager::GetInstance()->Finalize();
     ParticleManager::GetInstance()->Finalize();
+    BubbleParticle::GetInstance()->Shutdown();
 
     WinApp::GetInstance()->Finalize();
 }

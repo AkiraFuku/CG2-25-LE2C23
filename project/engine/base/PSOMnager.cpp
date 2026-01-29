@@ -324,6 +324,26 @@ void PSOMnager::CreatePso(const PsoProperty& property) {
     //比較関数
     depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
+	switch (property.depthMode) {
+    case DepthMode::Default:
+      // 何もしない（typeごとの設定をそのまま）
+      break;
+
+    case DepthMode::NoDepth:
+      depthDesc.DepthEnable = FALSE;
+      depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+      // DepthFunc は無視されるけど一応置いとくなら ALWAYS
+      depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+      break;
+
+    case DepthMode::NoWrite:
+      depthDesc.DepthEnable = TRUE;
+      depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+      // テストは通常通り
+      depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+      break;
+    }
+
     // タイプごとの設定微調整
     switch (property.type) {
     case PipelineType::Sprite:

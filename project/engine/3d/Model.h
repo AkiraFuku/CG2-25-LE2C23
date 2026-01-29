@@ -68,6 +68,8 @@ public:
 
     static Node ReadNode(aiNode*node );
 
+    void SetColor(const Vector4 &color) { materialData_->color = color; }
+
 private:
 
     ModelData modelData_;

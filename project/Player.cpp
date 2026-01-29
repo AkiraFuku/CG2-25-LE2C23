@@ -1,5 +1,4 @@
 #include "Player.h"
-#include "GameScene.h"
 #include "ModelManager.h"
 #include "Input.h"
 #include "MoveEffect.h"
@@ -77,8 +76,11 @@ void Player::Initialize(Object3d* model, Camera* camera, const Vector3& position
 
 }
 
-void Player::Update()
+void Player::Update(bool isGameStarted)
 {
+
+    isGameStarted_ = isGameStarted;
+
     if (isGoal_)
     {
         // ゴールしたら動かない
@@ -87,20 +89,19 @@ void Player::Update()
 
     if (isDead_)
     {
-        if (deathTimer_ <= 0)
-        {
-            // プレイヤーの死亡演出
-            transform_.rotate = Lerp(transform_.rotate, deadRotate_, kInterpolationRate);
-        }
-        else
-        {
-            deathTimer_--;
-        }
+      transform_.rotate =
+          Lerp(transform_.rotate, deadRotate_, kInterpolationRate);
+
+      // タイマーを減らす
+      if (deathTimer_ > 0.0f) {
+        deathTimer_ -= 1.0f;
+      }
     }
+
     else
     {
 
-        if (gameScene_->IsStarted())
+        if (isGameStarted_)
         {
             // 速度が0になったら
             if (speedZ_ <= 0.001f)
@@ -173,7 +174,7 @@ void Player::Draw()
     if (!isDead_)
     {
 
-        if (!gameScene_->IsStarted())
+        if (!isGameStarted_)
         {
             return;
         }
@@ -235,7 +236,7 @@ void Player::MoveCamera()
     worldMatrix_ = MakeAfineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
     // カメラの位置を更新
-    Vector3 offset = { 0.0f, 8.0f, -30.0f };
+    Vector3 offset = { 0.0f, 10.0f, -20.0f };
     offset = TransformNormal(offset, worldMatrix_);
     targetPos_ = transform_.translate + offset;
     cameraTransform_.translate = Lerp(cameraTransform_.translate, targetPos_, kInterpolationRate);
