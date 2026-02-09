@@ -1,5 +1,4 @@
 #include "CameraController.h"
-#include "CameraController.h"
 // Playerの具体的な定義が必要なため、ここでインクルード
 // ※まだ移植していない場合は仮のクラスかコメントアウトで対応してください
 //#include "Player.h" 

@@ -30,6 +30,11 @@ public:
     void SetModel(const std::string& filePath);
 
     //トランスフォームセッター
+
+    void SetTransform(const Transform& transForm) {
+        transform_ = transForm;
+    }
+
     void SetScale(const Vector3& scale) {
         transform_.scale = scale;
     }
